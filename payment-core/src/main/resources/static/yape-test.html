@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YAPE PAYMENT TEST</title>
+<style>
+  :root {
+    --purple: #7142b8;
+    --purple-dark: #4b2a80;
+    --green: #128a4b;
+    --amber: #b26a00;
+    --bg: #f4f1fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: #24202e;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  main {
+    width: 100%;
+    max-width: 460px;
+    background: #fff;
+    border: 1px solid #e4dcf3;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 6px 22px rgba(75, 42, 128, .08);
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    letter-spacing: .04em;
+    color: var(--purple-dark);
+  }
+  h2 { font-size: 14px; margin: 18px 0 8px; color: var(--purple-dark); }
+  label { display: block; font-size: 13px; color: #5c5570; margin-bottom: 6px; }
+  .amount-row, .ref-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 20px; font-weight: 600; color: var(--purple-dark);
+    border: 1px solid #d9cef0; border-radius: 10px;
+    padding: 10px 14px; background: #fbfaff; margin-bottom: 10px;
+  }
+  .ref-row { font-size: 14px; font-weight: 400; color: #5c5570; }
+  .amount-row input, .ref-row input {
+    border: 0; outline: 0; background: transparent;
+    font: inherit; color: inherit; width: 100%;
+  }
+  button {
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    cursor: pointer;
+  }
+  #waitBtn { background: var(--purple); color: #fff; }
+  #waitBtn:hover { background: var(--purple-dark); }
+  #newBtn { background: #fff; color: var(--purple-dark); border: 1px solid #d9cef0; margin-top: 14px; }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 14px; }
+  .row span:first-child { color: #5c5570; }
+  .row strong { text-align: right; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee7fb; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #8a839c; }
+  td.amount { font-weight: 700; }
+  tr.selectable { cursor: pointer; }
+  tr.selectable:hover { background: #f6f1ff; }
+  tr.selected { background: #efe7ff; outline: 1px solid var(--purple); }
+  td.code-cell { min-width: 150px; }
+  .code-input { width: 92px; padding: 7px; border: 1px solid #d9cef0; border-radius: 7px; text-align: center; letter-spacing: .25em; }
+  .code-button { width: auto; padding: 7px 9px; margin-left: 4px; font-size: 11px; }
+  .code-unavailable { color: var(--amber); font-size: 12px; line-height: 1.25; }
+  .st-WAITING { color: var(--amber); font-weight: 700; }
+  .st-PAID { color: var(--green); font-weight: 700; }
+  .st-CANCELLED { color: #8a839c; font-weight: 700; }
+  #detected {
+    margin-top: 16px;
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    color: var(--green);
+    background: #effaf3;
+  }
+  #detected .title { font-size: 17px; font-weight: 800; letter-spacing: .04em; }
+  #detected .amount { font-size: 30px; font-weight: 800; margin: 6px 0 2px; }
+  #detected .status { font-size: 14px; font-weight: 700; letter-spacing: .12em; }
+  #ambiguous {
+    margin-top: 16px;
+    border: 2px solid var(--amber);
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff7ec;
+    color: #5a3a05;
+  }
+  #ambiguous .title { font-size: 16px; font-weight: 800; letter-spacing: .04em; text-align: center; }
+  #ambiguous .amount { font-size: 28px; font-weight: 800; text-align: center; margin: 6px 0; }
+  #ambiguous .msg { font-size: 13px; margin: 8px 0; line-height: 1.4; }
+  #ambiguous input {
+    width: 100%;
+    border: 1px solid #d9cef0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 16px;
+    margin-bottom: 8px;
+    background: #fff;
+  }
+  #ambiguous input#codeInput { letter-spacing: .5em; text-align: center; font-size: 20px; }
+  #ambiguous button { background: var(--purple); color: #fff; }
+  .hint { font-size: 12px; color: #8a839c; margin-top: 10px; }
+  #debug, #lab { border-top: 1px solid #eee7fb; margin-top: 18px; padding-top: 12px; }
+  #debug .row strong { font-family: ui-monospace, monospace; font-size: 13px; }
+  #labList { font-size: 13px; }
+  #labList .lab-item { padding: 6px 0; border-bottom: 1px dashed #eee7fb; font-family: ui-monospace, monospace; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>YAPE PAYMENT TEST</h1>
+  <span hidden>NUEVA PRUEBA</span>
+
+  <section id="form">
+    <label for="amount">Monto esperado:</label>
+    <div class="amount-row">S/<input id="amount" placeholder="0.00" inputmode="decimal" autocomplete="off"></div>
+    <label for="reference">Referencia (opcional):</label>
+    <div class="ref-row"><input id="reference" placeholder="SALE-001" autocomplete="off"></div>
+    <button id="waitBtn">ESPERAR YAPE</button>
+  </section>
+
+  <section id="status" hidden>
+    <h2>PAGOS ACTIVOS</h2>
+    <table>
+      <thead>
+        <tr><th>Venta</th><th>Monto</th><th>Estado</th><th>Restante</th><th>Código Yape</th></tr>
+      </thead>
+      <tbody id="waitsBody"></tbody>
+    </table>
+
+    <h2>PAGOS RECIENTES</h2>
+    <table><thead><tr><th>Venta</th><th>Monto</th><th>Estado</th></tr></thead><tbody id="historyBody"></tbody></table>
+
+    <div class="row"><span>Bridge:</span><strong id="bridge">WAITING FOR NOTIFICATION</strong></div>
+
+    <div id="detected" hidden>
+      <div class="title">&#10003; YAPE DETECTADO</div>
+      <div class="amount" id="detectedAmount">S/ 0.00</div>
+      <div class="status">PAID</div>
+    </div>
+
+    <div id="ambiguous" hidden>
+      <div class="title">PAGO RECIBIDO</div>
+      <div class="amount" id="ambAmount">S/ 0.00</div>
+      <div class="msg">Se encontraron varias ventas con el mismo importe.</div>
+
+      <div class="hint">El c&oacute;digo se solicita solo cuando hay ventas compatibles simult&aacute;neas. Nunca se muestra el c&oacute;digo esperado.</div>
+    </div>
+
+  </section>
+
+  <section id="debug">
+    <h2>&#8981; &Uacute;LTIMA NOTIFICACI&Oacute;N</h2>
+    <div class="row"><span>Package:</span><strong id="dbgPackage">&mdash;</strong></div>
+    <div class="row"><span>Monto detectado:</span><strong id="dbgAmount">&mdash;</strong></div>
+    <div class="row"><span>Resultado:</span><strong id="dbgResult">&mdash;</strong></div>
+    <div class="hint">LAB MODE &mdash; solo resumen; el texto completo nunca se muestra.</div>
+  </section>
+
+  <section id="lab">
+    <h2>&#9881; DIAGN&Oacute;STICO LAB</h2>
+    <div id="labList">Sin notificaciones a&uacute;n.</div>
+    <div class="hint">Visi&oacute;n admin: nombres ya normalizados; jam&aacute;s texto crudo ni c&oacute;digos.</div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var selectedPaymentId = null;
+  var lastNotificationId = null;
+
+  function $(id) { return document.getElementById(id); }
+
+  // Enteros/String solamente: sin Double en servidor ni en el navegador.
+  function toMinorUnits(raw) {
+    var cleaned = String(raw || "")
+      .replace(/S\//g, "")
+      .replace(/\s/g, "")
+      .replace(",", ".");
+    if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return null;
+    var parts = cleaned.split(".");
+    var soles = parseInt(parts[0], 10);
+    var cents = parseInt(((parts[1] || "") + "00").slice(0, 2), 10);
+    return soles * 100 + cents;
+  }
+
+  function renderWaits(waits, ambiguous) {
+    var body = $("waitsBody");
+    var history = $("historyBody");
+    body.textContent = "";
+    history.textContent = "";
+    var selectable = ambiguous ? (ambiguous.paymentIds || []) : [];
+    waits.filter(function (wait) { return wait.status === "WAITING" || wait.status === "AMBIGUOUS"; }).forEach(function (wait) {
+      var tr = document.createElement("tr");
+      var isSelectable = selectable.indexOf(wait.id) >= 0;
+      if (isSelectable) {
+        tr.className = "selectable" + (selectedPaymentId === wait.id ? " selected" : "");
+        tr.addEventListener("click", function () {
+          selectedPaymentId = wait.id;
+          renderWaits(waits, ambiguous);
+        });
+      }
+      var id = document.createElement("td");
+      id.textContent = wait.id + (wait.reference ? " · " + wait.reference : "");
+      var amount = document.createElement("td");
+      amount.className = "amount";
+      amount.textContent = wait.amountDisplay;
+      var status = document.createElement("td");
+      status.className = "st-" + wait.status;
+      status.textContent = wait.status;
+      tr.appendChild(id);
+      tr.appendChild(amount);
+      tr.appendChild(status);
+      var remaining = document.createElement("td");
+      remaining.textContent = remainingTime(wait.expiresAt);
+      tr.appendChild(remaining);
+      var codeCell = document.createElement("td");
+      codeCell.className = "code-cell";
+      if (isSelectable) {
+        if (ambiguous.requiresSecurityCode) {
+          var input = document.createElement("input");
+          input.className = "code-input";
+          input.id = "code-" + wait.id;
+          input.maxLength = 3;
+          input.inputMode = "numeric";
+          input.placeholder = "___";
+          input.addEventListener("input", function () { input.value = input.value.replace(/[^0-9]/g, "").slice(0, 3); });
+          var button = document.createElement("button");
+          button.className = "code-button";
+          button.textContent = "CONFIRMAR";
+          button.addEventListener("click", function () { resolvePayment(wait.id, input.value); });
+          codeCell.appendChild(input);
+          codeCell.appendChild(button);
+        }
+        if (ambiguous.securityCodeUnavailable) {
+          var unavailable = document.createElement("div");
+          unavailable.className = "code-unavailable";
+          unavailable.textContent = "El código de seguridad no está disponible en esta notificación.";
+          codeCell.appendChild(unavailable);
+        }
+      }
+      tr.appendChild(codeCell);
+      body.appendChild(tr);
+    });
+    waits.filter(function (wait) { return wait.status === "PAID" || wait.status === "EXPIRED" || wait.status === "CANCELLED"; }).slice().reverse().slice(0, 20).forEach(function (wait) {
+      var tr = document.createElement("tr");
+      [wait.id + (wait.reference ? " · " + wait.reference : ""), wait.amountDisplay, wait.status].forEach(function (value, index) {
+        var td = document.createElement("td"); td.textContent = value; if (index === 1) td.className = "amount"; if (index === 2) td.className = "st-" + value; tr.appendChild(td);
+      });
+      history.appendChild(tr);
+    });
+  }
+
+  function remainingTime(expiresAt) {
+    var seconds = Math.max(0, Math.floor((Date.parse(expiresAt) - Date.now()) / 1000));
+    return String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
+  }
+
+  function renderAmbiguous(ambiguous) {
+    if (!ambiguous) {
+      $("ambiguous").hidden = true;
+      return;
+    }
+    var ids = ambiguous.paymentIds || [];
+    if (ids.indexOf(selectedPaymentId) < 0) selectedPaymentId = ids[0] || null;
+    $("ambiguous").hidden = false;
+    $("ambAmount").textContent = ambiguous.amountDisplay;
+  }
+
+  function renderPaid(waits) {
+    var paid = waits.filter(function (w) { return w.status === "PAID"; });
+    if (!paid.length) {
+      $("detected").hidden = true;
+      return;
+    }
+    $("detected").hidden = false;
+    $("detectedAmount").textContent = paid[paid.length - 1].amountDisplay;
+  }
+
+  function renderNotification(note) {
+    $("dbgPackage").textContent = note.packageName || "\u2014";
+    var amounts = note.detectedAmountsDisplay || [];
+    $("dbgAmount").textContent = amounts.length ? amounts.join(", ") : "\u2014";
+    $("dbgResult").textContent = note.result || "\u2014";
+    if (note.notificationId !== lastNotificationId) {
+      lastNotificationId = note.notificationId || null;
+      loadLab();
+    }
+  }
+
+  function loadLab() {
+    fetch("/api/lab/yape/notifications")
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (items) {
+        var box = $("labList");
+        box.textContent = "";
+        if (!items.length) {
+          box.textContent = "Sin notificaciones aún.";
+          return;
+        }
+        items.slice().reverse().forEach(function (n) {
+          var div = document.createElement("div");
+          div.className = "lab-item";
+          div.textContent = n.id + " · " + n.amountDisplay +
+            " · " + (n.payerName || "sin nombre") +
+            " · code:" + (n.hasSecurityCode ? "sí" : "no") +
+            " · " + n.matchStatus;
+          box.appendChild(div);
+        });
+      })
+      .catch(function () { /* diagnóstico best-effort */ });
+  }
+
+  function render(state) {
+    lastState = state;
+    var waits = state.waits || (state.wait ? [state.wait] : []);
+    var ambiguous = state.ambiguous || null;
+    if (waits.length) $("status").hidden = false;
+    renderWaits(waits, ambiguous);
+    renderPaid(waits);
+    renderAmbiguous(ambiguous);
+    $("bridge").textContent = state.lastNotification
+      ? "NOTIFICATION RECEIVED"
+      : "WAITING FOR NOTIFICATION";
+    if (state.lastNotification) renderNotification(state.lastNotification);
+  }
+
+  function resolvePayment(paymentId, code) {
+    if (!/^\d{3}$/.test(code)) {
+      alert("Ingresa exactamente 3 dígitos.");
+      return;
+    }
+    fetch("/api/yape/waits/" + encodeURIComponent(paymentId) + "/resolve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ securityCode: code })
+    }).then(function (response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
+    }).catch(function () {
+      alert("No se encontró un pago compatible con el código ingresado.");
+    });
+  }
+
+  $("waitBtn").addEventListener("click", function () {
+    var minor = toMinorUnits($("amount").value);
+    if (minor === null || minor <= 0) {
+      alert("Ingrese un monto mayor a 0 (ej. 7.00)");
+      return;
+    }
+    var reference = ($("reference").value || "").trim();
+    fetch("/api/yape/wait", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reference
+        ? { amountMinor: minor, reference: reference }
+        : { amountMinor: minor })
+    }).then(function (response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      $("amount").value = "";
+    }).catch(function (error) {
+      alert("No se pudo crear la venta: " + error.message);
+    });
+  });
+
+  // Actualización en vivo sin reload (SSE del Modelo 2).
+  var source = new EventSource("/api/yape/wait/events");
+  var lastState = null;
+  source.addEventListener("yape-state", function (event) {
+    try {
+      render(JSON.parse(event.data));
+    } catch (e) {
+      // Estado ilegible: se ignora y se conserva el último válido.
+    }
+  });
+  loadLab();
+  setInterval(function () { if (lastState) render(lastState); }, 1000);
+})();
+</script>
+</body>
+</html>

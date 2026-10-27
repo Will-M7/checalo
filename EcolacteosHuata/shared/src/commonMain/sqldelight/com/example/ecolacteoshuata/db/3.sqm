@@ -1,0 +1,4 @@
+-- "PLANTA" es un valor viejo (de antes de que el rol se llamara PERSONAL_PLANTA) que quedó
+-- guardado en algunos dispositivos y hacía crashear la app al listar usuarios
+-- (Rol.valueOf lanzaba IllegalArgumentException porque ese enum ya no existe).
+UPDATE usuario SET rol = 'PERSONAL_PLANTA' WHERE rol = 'PLANTA';

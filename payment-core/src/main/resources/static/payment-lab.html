@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR LAB — Synthetic Payment Laboratory</title>
+  <link rel="stylesheet" href="/static/payment-lab.css">
+</head>
+<body>
+  <!-- LAB ONLY: interfaz de laboratorio. Jamás apunta a Yape, Entel, LIGO ni ningún proveedor real. -->
+  <header class="hero">
+    <h1>QR LAB</h1>
+    <p class="subtitle">Synthetic Payment Laboratory</p>
+    <p class="banner">SYNTHETIC PAYMENTS ONLY — NOT A REAL PAYMENT QR</p>
+  </header>
+
+  <main>
+    <section id="create-section" class="card">
+      <h2>Crear pago</h2>
+      <label for="reference">Reference</label>
+      <input id="reference" type="text" value="SALE-DEMO-001" autocomplete="off">
+
+      <label for="amount">Amount (S/)</label>
+      <input id="amount" type="text" value="7.00" inputmode="decimal" autocomplete="off">
+      <p class="hint">Ejemplos: 5 · 5.00 · 7.50 · 10.99 (máximo 2 decimales)</p>
+
+      <fieldset id="method-field">
+        <legend>Payment method</legend>
+        <label><input type="radio" name="paymethod" value="SYNTHETIC_QR" checked> Synthetic QR</label>
+        <label><input type="radio" name="paymethod" value="YAPE_NOTIFICATION"> Yape Notification</label>
+      </fieldset>
+
+      <button id="create-btn" type="button">Crear pago</button>
+      <p id="form-error" class="error" hidden></p>
+    </section>
+
+    <section id="payment-section" class="card" hidden>
+      <h2>Pago</h2>
+      <p>Status: <span id="status-pill" class="pill">-</span></p>
+      <p id="status-text" class="status-text"></p>
+      <img id="qr-img" alt="QR sintético del pago">
+      <div id="yape-panel" hidden>
+        <p id="yape-waiting" class="status-text">Esperando Yape... Total: <span id="yape-total">-</span></p>
+        <img id="yape-static-qr" alt="QR estático del negocio" hidden>
+        <p id="yape-ambiguous" class="error" hidden>Se recibieron varios pagos compatibles. Ingresa el código de seguridad de 3 dígitos que aparece en el comprobante del cliente.</p>
+        <label for="yape-code">Código de seguridad</label>
+        <input id="yape-code" type="text" value="" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="___">
+        <button id="yape-resolve" type="button">Validar</button>
+        <p id="yape-error" class="error" hidden></p>
+      </div>
+      <dl class="details">
+        <dt>ID</dt><dd id="d-id">-</dd>
+        <dt>Reference</dt><dd id="d-reference">-</dd>
+        <dt>Amount</dt><dd id="d-amount">-</dd>
+        <dt>PaidAt</dt><dd id="d-paidat">-</dd>
+        <dt>Operation</dt><dd id="d-opref">-</dd>
+      </dl>
+      <p>Live connection: <span id="conn-indicator" class="conn">DISCONNECTED</span></p>
+      <button id="new-btn" type="button">Nuevo pago</button>
+    </section>
+
+    <section id="lab-controls" class="card lab" hidden>
+      <h2>LAB CONTROLS <span class="sim-only">SIMULATION ONLY</span></h2>
+      <!-- LAB ONLY - NEVER ENABLE FOR REAL PAYMENT PROVIDERS -->
+      <p class="hint">Botones solo de laboratorio. Llaman a las rutas /api/lab ya existentes.</p>
+      <div class="lab-buttons">
+        <button id="lab-confirm" type="button">Confirmar pago</button>
+        <button id="lab-fail" type="button">Fallar pago</button>
+        <button id="lab-expire" type="button">Expirar pago</button>
+        <button id="lab-cancel" type="button">Cancelar pago</button>
+      </div>
+      <p id="lab-error" class="error" hidden></p>
+    </section>
+  </main>
+
+  <script src="/static/payment-lab.js"></script>
+</body>
+</html>

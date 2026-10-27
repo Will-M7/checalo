@@ -1,0 +1,28 @@
+CREATE TABLE pago_proveedor (
+    id TEXT NOT NULL PRIMARY KEY,
+    proveedor_id TEXT NOT NULL,
+    recojo_id TEXT,
+    fecha TEXT NOT NULL,
+    monto REAL NOT NULL,
+    metodo_pago TEXT NOT NULL,
+    periodo TEXT NOT NULL,
+    FOREIGN KEY (proveedor_id) REFERENCES proveedor(id),
+    FOREIGN KEY (recojo_id) REFERENCES recojo(id)
+);
+
+selectAll:
+SELECT * FROM pago_proveedor ORDER BY fecha DESC;
+
+selectByProveedor:
+SELECT * FROM pago_proveedor WHERE proveedor_id = ? ORDER BY fecha DESC;
+
+selectEntreFechas:
+SELECT * FROM pago_proveedor WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+
+insert:
+INSERT INTO pago_proveedor(id, proveedor_id, recojo_id, fecha, monto, metodo_pago, periodo)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+upsertFromSync:
+INSERT OR REPLACE INTO pago_proveedor(id, proveedor_id, recojo_id, fecha, monto, metodo_pago, periodo)
+VALUES (?, ?, ?, ?, ?, ?, ?);

@@ -1,0 +1,51 @@
+CREATE TABLE proveedor (
+    id TEXT NOT NULL PRIMARY KEY,
+    usuario_id TEXT NOT NULL,
+    finca_ubicacion TEXT NOT NULL,
+    finca_referencia TEXT NOT NULL DEFAULT '',
+    latitud REAL,
+    longitud REAL,
+    acopiador_id TEXT,
+    bloqueado INTEGER NOT NULL DEFAULT 0,
+    alteraciones INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (acopiador_id) REFERENCES acopiador(id)
+);
+
+selectAll:
+SELECT * FROM proveedor;
+
+selectById:
+SELECT * FROM proveedor WHERE id = ?;
+
+selectByUsuarioId:
+SELECT * FROM proveedor WHERE usuario_id = ?;
+
+selectByAcopiador:
+SELECT * FROM proveedor WHERE acopiador_id = ?;
+
+insert:
+INSERT INTO proveedor(id, usuario_id, finca_ubicacion, finca_referencia, latitud, longitud, acopiador_id, bloqueado, alteraciones)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateFinca:
+UPDATE proveedor SET finca_ubicacion = ?, finca_referencia = ?, latitud = ?, longitud = ? WHERE id = ?;
+
+updateAcopiador:
+UPDATE proveedor SET acopiador_id = ? WHERE id = ?;
+
+incrementarAlteraciones:
+UPDATE proveedor SET alteraciones = alteraciones + 1 WHERE id = ?;
+
+resetAlteraciones:
+UPDATE proveedor SET alteraciones = 0 WHERE id = ?;
+
+setBloqueado:
+UPDATE proveedor SET bloqueado = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM proveedor WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO proveedor(id, usuario_id, finca_ubicacion, finca_referencia, latitud, longitud, acopiador_id, bloqueado, alteraciones)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);

@@ -1,0 +1,18 @@
+CREATE TABLE turno_produccion (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    hora_inicio TEXT NOT NULL,
+    hora_fin TEXT NOT NULL
+);
+
+selectAll:
+SELECT * FROM turno_produccion ORDER BY hora_inicio;
+
+insert:
+INSERT INTO turno_produccion(id, nombre, hora_inicio, hora_fin) VALUES (?, ?, ?, ?);
+
+deleteById:
+DELETE FROM turno_produccion WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO turno_produccion(id, nombre, hora_inicio, hora_fin) VALUES (?, ?, ?, ?);

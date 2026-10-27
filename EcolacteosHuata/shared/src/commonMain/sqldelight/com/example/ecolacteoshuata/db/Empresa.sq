@@ -1,0 +1,19 @@
+CREATE TABLE empresa (
+    id TEXT NOT NULL PRIMARY KEY,
+    razon_social TEXT NOT NULL,
+    ruc TEXT NOT NULL,
+    telefono TEXT NOT NULL,
+    direccion TEXT NOT NULL
+);
+
+selectPrimera:
+SELECT * FROM empresa LIMIT 1;
+
+insert:
+INSERT INTO empresa(id, razon_social, ruc, telefono, direccion) VALUES (?, ?, ?, ?, ?);
+
+update:
+UPDATE empresa SET razon_social = ?, ruc = ?, telefono = ?, direccion = ? WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO empresa(id, razon_social, ruc, telefono, direccion) VALUES (?, ?, ?, ?, ?);

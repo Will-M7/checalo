@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+: pantalla de inicio con el logo del ternero sobre fondo crema. -->
+    <style name="Theme.EcolacteosHuata" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/huata_crema</item>
+        <item name="android:statusBarColor">@color/huata_verde_profundo</item>
+        <item name="android:windowSplashScreenBackground">@color/huata_crema</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+    </style>
+</resources>

@@ -1,0 +1,27 @@
+CREATE TABLE acopiador (
+    id TEXT NOT NULL PRIMARY KEY,
+    usuario_id TEXT NOT NULL,
+    ruta_nombre TEXT NOT NULL DEFAULT '',
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
+selectAll:
+SELECT * FROM acopiador;
+
+selectById:
+SELECT * FROM acopiador WHERE id = ?;
+
+selectByUsuarioId:
+SELECT * FROM acopiador WHERE usuario_id = ?;
+
+insert:
+INSERT INTO acopiador(id, usuario_id, ruta_nombre) VALUES (?, ?, ?);
+
+update:
+UPDATE acopiador SET ruta_nombre = ? WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO acopiador(id, usuario_id, ruta_nombre) VALUES (?, ?, ?);
+
+deleteById:
+DELETE FROM acopiador WHERE id = ?;

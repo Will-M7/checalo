@@ -1,0 +1,425 @@
+@import 'tailwindcss';
+
+@source '../views/welcome.blade.php';
+
+@theme {
+    --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+
+    /* Huata Corporate: blanco leche, azul hielo, azul corporativo, verde Huata, rojo y amarillo de la marca */
+    --color-leche: #f7fafc;
+    --color-suero: #eaf3fb;
+    --color-tinta: #173d72;
+    --color-tinta-suave: #64748b;
+    --color-cielo-50: #eaf3fb;
+    --color-cobalto-600: #2864b4;
+    --color-cobalto-700: #1f5299;
+    --color-cobalto-900: #173d72;
+    --color-cobalto-950: #12305d;
+    --color-rojo-600: #c93445;
+    --color-rojo-700: #a52a39;
+    --color-sol: #f2c230;
+    --color-eco: #23865b;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 5rem;
+    }
+
+    body {
+        background: var(--color-leche);
+        color: var(--color-tinta);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+        background: var(--color-sol);
+        color: var(--color-cobalto-950);
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--color-cobalto-700);
+        outline-offset: 3px;
+        border-radius: 4px;
+        box-shadow: 0 0 0 6px rgb(255 255 255 / 0.9);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .text-pretty {
+        text-wrap: pretty;
+    }
+
+    .tabular {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/* Cabecera: entra con "el aterrizaje" de la portada */
+#cabecera {
+    transition:
+        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+        background-color 0.3s,
+        color 0.3s,
+        border-color 0.3s;
+}
+
+.js body:not(.llegado) #cabecera {
+    transform: translateY(-100%);
+}
+
+/* Texto de la portada y revelado por scroll: visibles por defecto (sin JS o con movimiento reducido) */
+.js body:not(.llegado) .entra {
+    opacity: 0;
+    transform: translateY(18px);
+}
+
+.js .rev:not(.vis) {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .entra {
+        transition:
+            opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        transition-delay: calc(0.55s + var(--i, 0) * 120ms);
+    }
+
+    .rev {
+        transition:
+            opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        transition-delay: calc(var(--r, 0) * 90ms);
+    }
+
+    /* El fondo llega desde cerca y desenfocado */
+    @keyframes aterrizar {
+        from {
+            transform: scale(1.35);
+            filter: blur(10px);
+        }
+        to {
+            transform: scale(1);
+            filter: blur(0);
+        }
+    }
+
+    .llegado .hero-bg {
+        animation: aterrizar 2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+}
+
+/* Carrusel de fondo: fundido lento con acercamiento suave, y parallax con el mouse */
+.paralaje {
+    transform: translate3d(calc(var(--px, 0) * -14px), calc(var(--py, 0) * -10px), 0);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide {
+    transition: opacity 1.4s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes acercar {
+        from {
+            transform: scale(1);
+        }
+        to {
+            transform: scale(1.08);
+        }
+    }
+
+    .slide[data-activo='true'] {
+        animation: acercar 7.5s linear forwards;
+    }
+}
+
+/* Esfera de cristal con vaso, burbujas que orbitan y gotas */
+.esfera {
+    --d: min(66vw, 25rem);
+    width: var(--d);
+}
+
+.esfera-cristal {
+    box-shadow:
+        inset 0 0 40px rgb(255 255 255 / 0.18),
+        inset -12px -18px 40px rgb(6 27 63 / 0.25),
+        0 24px 60px rgb(0 0 0 / 0.3);
+    background-image: radial-gradient(circle at 30% 22%, rgb(255 255 255 / 0.45), transparent 38%);
+}
+
+.burbuja {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(var(--a)) translateX(calc(var(--d) * 0.5)) rotate(calc(var(--a) * -1));
+}
+
+.burbuja-texto {
+    display: block;
+    white-space: nowrap;
+    border-radius: 9999px;
+    border: 1px solid rgb(255 255 255 / 0.5);
+    background: rgb(255 255 255 / 0.16);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+
+.gota {
+    position: absolute;
+    top: 14%;
+    left: var(--x);
+    width: 9px;
+    height: 12px;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: #fffef9;
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes flotar {
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes orbitar {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes contraorbitar {
+        to {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @keyframes caer {
+        0% {
+            transform: translateY(0);
+            opacity: 0;
+        }
+        15% {
+            opacity: 0.95;
+        }
+        100% {
+            transform: translateY(95px);
+            opacity: 0;
+        }
+    }
+
+    .esfera-flota {
+        animation: flotar 6s ease-in-out infinite;
+    }
+
+    .orbita {
+        animation: orbitar 46s linear infinite;
+    }
+
+    .burbuja-texto {
+        animation: contraorbitar 46s linear infinite;
+    }
+
+    .gota {
+        animation: caer 3.3s ease-in infinite;
+        animation-delay: var(--d);
+    }
+}
+
+/* Intro cinematográfica: polvo y grano */
+.mota {
+    position: absolute;
+    border-radius: 9999px;
+    background: #fff4dc;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes polvo {
+        from {
+            transform: translate(0, 0);
+        }
+        to {
+            transform: translate(40px, -120px);
+        }
+    }
+
+    @keyframes grano {
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+        20% {
+            transform: translate(-3%, 2%);
+        }
+        40% {
+            transform: translate(2%, -3%);
+        }
+        60% {
+            transform: translate(-2%, -1%);
+        }
+        80% {
+            transform: translate(3%, 3%);
+        }
+    }
+
+    .mota {
+        animation: polvo linear infinite alternate;
+    }
+
+    .intro-grano {
+        animation: grano 0.9s steps(4) infinite;
+    }
+}
+
+/* La intro cubre la portada desde el primer pintado; el JS toma el control al cargar */
+html.con-intro #intro.hidden {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #intro {
+        display: none !important;
+    }
+}
+
+/* Franja del logo: las cuatro bandas de la marca (azul, verde, amarillo y rojo) */
+.franja-aguayo {
+    height: 10px;
+    background: linear-gradient(
+        90deg,
+        var(--color-cobalto-600) 0 34%,
+        var(--color-eco) 34% 54%,
+        var(--color-sol) 54% 76%,
+        var(--color-rojo-600) 76% 100%
+    );
+}
+
+/* Ola de leche que remata la portada */
+.ola-leche {
+    display: block;
+    width: 100%;
+    height: clamp(36px, 6vw, 84px);
+    color: var(--color-leche);
+}
+
+/* Hero 3D: el vaso vive en un canvas WebGL; si falla, queda la esfera SVG de respaldo */
+.hero3d-ok .hero3d-fallback {
+    display: none;
+}
+
+.hero-caption {
+    display: none;
+}
+
+.hero3d-scroll .hero-escena {
+    height: 260svh;
+}
+
+.hero3d-scroll .hero-sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+}
+
+.hero3d-scroll .hero-caption {
+    display: block;
+    opacity: 0;
+}
+
+.boton-magnetico {
+    transition:
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.2s,
+        border-color 0.2s;
+}
+
+.boton-magnetico:active {
+    transform: scale(0.97);
+}
+
+/* Cursor personalizado (solo escritorio): anillo discreto con indicación opcional */
+.cursor-huata {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 1.5px solid rgb(255 255 255 / 0.9);
+    border-radius: 9999px;
+    mix-blend-mode: difference;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.3s, height 0.3s, margin 0.3s, background-color 0.3s, opacity 0.3s, border-color 0.3s;
+}
+
+.cursor-huata.visible {
+    opacity: 1;
+}
+
+.cursor-huata[data-modo='accion'] {
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
+}
+
+.cursor-huata[data-modo='guia'] {
+    width: 128px;
+    height: 128px;
+    margin: -64px 0 0 -64px;
+    background-color: rgb(255 255 255 / 0.95);
+    border-color: transparent;
+}
+
+.cursor-huata.presionado {
+    transform: scale(0.88);
+}
+
+.cursor-huata span {
+    padding: 0 14px;
+    text-align: center;
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.35;
+    color: #000;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor-huata {
+        display: none;
+    }
+}
+
+.cursor-grabbing {
+    cursor: grabbing;
+}
+
+/* Disco azul cielo detrás del vaso 3D: da contraste al cristal sobre la portada luminosa */
+.hero-disco {
+    background: radial-gradient(circle at 50% 50%, rgb(40 100 180 / 0.32) 0%, rgb(111 163 232 / 0.2) 48%, transparent 70%);
+    filter: blur(6px);
+}

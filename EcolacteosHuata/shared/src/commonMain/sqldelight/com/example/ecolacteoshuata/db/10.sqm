@@ -1,0 +1,2 @@
+-- Estado de la producción como en Laravel: PLANIFICADA hasta que se publica (COMPLETADA).
+ALTER TABLE produccion ADD COLUMN estado TEXT NOT NULL DEFAULT 'PLANIFICADA';

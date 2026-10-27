@@ -1,0 +1,2 @@
+Coloca aqui fotos propias para la intro (jpg, jpeg, png o webp). Se usan en orden alfabetico y reemplazan una a una las 6 fotos de Unsplash: 01-campo.jpg, 02-ordeno.jpg, 03-acopio.jpg, 04-planta.jpg, 05-queso.jpg, 06-producto.jpg
+Tamano recomendado: 2200 px de ancho, horizontales.

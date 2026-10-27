@@ -1,0 +1,125 @@
+-- "Tomar asistencia" como en Laravel (tablas `horarios_asistencia`, `dias_asistencia_acopiador`,
+-- `asistencias` y `justificaciones`).
+
+-- Horas en que los acopiadores marcan su asistencia (ej. "Mañana": 05:00 a 05:10 presente,
+-- hasta 05:20 tardanza; después queda con falta).
+CREATE TABLE horario_asistencia (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    hora_inicio TEXT NOT NULL,
+    hora_limite_presente TEXT NOT NULL,
+    hora_limite_tardanza TEXT NOT NULL,
+    activo INTEGER NOT NULL DEFAULT 1
+);
+
+-- Días en que se toma asistencia a los acopiadores (solo esos días marcan o quedan con falta).
+CREATE TABLE dia_asistencia_acopiador (
+    id TEXT NOT NULL PRIMARY KEY,
+    fecha TEXT NOT NULL
+);
+
+-- Sin horario es la asistencia general (la tabla de trabajadores); con horario, la marca de un
+-- acopiador en ese horario.
+CREATE TABLE asistencia (
+    id TEXT NOT NULL PRIMARY KEY,
+    usuario_id TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    horario_asistencia_id TEXT,
+    -- PRESENTE, TARDANZA o FALTA.
+    estado TEXT NOT NULL,
+    hora_marcada TEXT,
+    registrado_por TEXT
+);
+
+CREATE INDEX asistencia_fecha ON asistencia(fecha);
+
+-- Las envía el trabajador desde la web; en el teléfono solo se aceptan o rechazan.
+CREATE TABLE justificacion (
+    id TEXT NOT NULL PRIMARY KEY,
+    asistencia_id TEXT NOT NULL,
+    motivo TEXT NOT NULL,
+    tiene_archivo INTEGER NOT NULL DEFAULT 0,
+    -- PENDIENTE, ACEPTADA o RECHAZADA.
+    estado TEXT NOT NULL,
+    enviada_en TEXT
+);
+
+selectHorarios:
+SELECT * FROM horario_asistencia ORDER BY hora_inicio;
+
+insertHorario:
+INSERT INTO horario_asistencia(id, nombre, hora_inicio, hora_limite_presente, hora_limite_tardanza, activo) VALUES (?, ?, ?, ?, ?, ?);
+
+updateHorario:
+UPDATE horario_asistencia SET nombre = ?, hora_inicio = ?, hora_limite_presente = ?, hora_limite_tardanza = ?, activo = ? WHERE id = ?;
+
+deleteHorario:
+DELETE FROM horario_asistencia WHERE id = ?;
+
+upsertHorarioFromSync:
+INSERT OR REPLACE INTO horario_asistencia(id, nombre, hora_inicio, hora_limite_presente, hora_limite_tardanza, activo) VALUES (?, ?, ?, ?, ?, ?);
+
+selectDiasEntre:
+SELECT * FROM dia_asistencia_acopiador WHERE fecha >= ? AND fecha <= ? ORDER BY fecha;
+
+selectDiaPorFecha:
+SELECT * FROM dia_asistencia_acopiador WHERE fecha = ?;
+
+insertDia:
+INSERT INTO dia_asistencia_acopiador(id, fecha) VALUES (?, ?);
+
+deleteDia:
+DELETE FROM dia_asistencia_acopiador WHERE id = ?;
+
+upsertDiaFromSync:
+INSERT OR REPLACE INTO dia_asistencia_acopiador(id, fecha) VALUES (?, ?);
+
+selectAsistenciasEntre:
+SELECT * FROM asistencia WHERE fecha >= ? AND fecha <= ?;
+
+selectMarca:
+SELECT * FROM asistencia WHERE usuario_id = ? AND fecha = ? AND COALESCE(horario_asistencia_id, '') = ? LIMIT 1;
+
+insertAsistencia:
+INSERT INTO asistencia(id, usuario_id, fecha, horario_asistencia_id, estado, hora_marcada, registrado_por) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+updateEstadoAsistencia:
+UPDATE asistencia SET estado = ?, registrado_por = ? WHERE id = ?;
+
+deleteAsistencia:
+DELETE FROM asistencia WHERE id = ?;
+
+deleteAsistenciasDeHorario:
+DELETE FROM asistencia WHERE horario_asistencia_id = ?;
+
+upsertAsistenciaFromSync:
+INSERT OR REPLACE INTO asistencia(id, usuario_id, fecha, horario_asistencia_id, estado, hora_marcada, registrado_por) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectJustificaciones:
+SELECT j.*, a.usuario_id, a.fecha, a.estado AS estado_asistencia, a.horario_asistencia_id
+FROM justificacion j
+JOIN asistencia a ON a.id = j.asistencia_id
+ORDER BY COALESCE(j.enviada_en, a.fecha) DESC, j.id DESC;
+
+updateEstadoJustificacion:
+UPDATE justificacion SET estado = ? WHERE id = ?;
+
+upsertJustificacionFromSync:
+INSERT OR REPLACE INTO justificacion(id, asistencia_id, motivo, tiene_archivo, estado, enviada_en) VALUES (?, ?, ?, ?, ?, ?);
+
+-- "Asistencia" (mis asistencias) de un trabajador, con su justificación si la tiene.
+selectMisAsistenciasEntre:
+SELECT a.*, j.id AS justificacion_id, j.estado AS justificacion_estado, j.motivo AS justificacion_motivo
+FROM asistencia a
+LEFT JOIN justificacion j ON j.asistencia_id = a.id
+WHERE a.usuario_id = ? AND a.fecha >= ? AND a.fecha <= ?
+ORDER BY a.fecha DESC, a.hora_marcada DESC;
+
+selectJustificacionPorAsistencia:
+SELECT * FROM justificacion WHERE asistencia_id = ? LIMIT 1;
+
+insertJustificacion:
+INSERT INTO justificacion(id, asistencia_id, motivo, tiene_archivo, estado, enviada_en) VALUES (?, ?, ?, 0, 'PENDIENTE', ?);
+
+reenviarJustificacion:
+UPDATE justificacion SET motivo = ?, tiene_archivo = 0, estado = 'PENDIENTE', enviada_en = ? WHERE id = ?;

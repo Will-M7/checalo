@@ -1,0 +1,1 @@
+ALTER TABLE conexion_servidor ADD COLUMN ultima_sincronizacion TEXT;

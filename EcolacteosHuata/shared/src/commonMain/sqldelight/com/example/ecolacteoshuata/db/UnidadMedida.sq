@@ -1,0 +1,23 @@
+CREATE TABLE unidad_medida (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    simbolo TEXT NOT NULL
+);
+
+selectAll:
+SELECT * FROM unidad_medida ORDER BY nombre;
+
+selectById:
+SELECT * FROM unidad_medida WHERE id = ?;
+
+insert:
+INSERT INTO unidad_medida(id, nombre, simbolo) VALUES (?, ?, ?);
+
+update:
+UPDATE unidad_medida SET nombre = ?, simbolo = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM unidad_medida WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO unidad_medida(id, nombre, simbolo) VALUES (?, ?, ?);

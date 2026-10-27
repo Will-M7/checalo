@@ -1,0 +1,87 @@
+CREATE TABLE recojo (
+    id TEXT NOT NULL PRIMARY KEY,
+    proveedor_id TEXT NOT NULL,
+    acopiador_id TEXT NOT NULL,
+    turno_id TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    litros REAL NOT NULL,
+    estado_leche TEXT NOT NULL,
+    estado_otro TEXT NOT NULL DEFAULT '',
+    precio_litro REAL NOT NULL,
+    total REAL NOT NULL,
+    pagado INTEGER NOT NULL DEFAULT 0,
+    metodo_pago TEXT,
+    entregado INTEGER NOT NULL DEFAULT 0,
+    sincronizado INTEGER NOT NULL DEFAULT 0,
+    -- Lo que entregó el proveedor; `litros` es lo que llegó a planta (lo que se paga).
+    litros_entregados REAL,
+    FOREIGN KEY (proveedor_id) REFERENCES proveedor(id),
+    FOREIGN KEY (acopiador_id) REFERENCES acopiador(id),
+    FOREIGN KEY (turno_id) REFERENCES turno(id)
+);
+
+CREATE INDEX idx_recojo_fecha ON recojo(fecha);
+CREATE INDEX idx_recojo_proveedor ON recojo(proveedor_id);
+CREATE INDEX idx_recojo_acopiador ON recojo(acopiador_id);
+
+selectAll:
+SELECT * FROM recojo ORDER BY fecha DESC;
+
+selectById:
+SELECT * FROM recojo WHERE id = ?;
+
+selectByProveedor:
+SELECT * FROM recojo WHERE proveedor_id = ? ORDER BY fecha DESC;
+
+selectByAcopiadorYFecha:
+SELECT * FROM recojo WHERE acopiador_id = ? AND fecha = ? ORDER BY fecha DESC;
+
+selectByAcopiadorTurnoFecha:
+SELECT * FROM recojo WHERE acopiador_id = ? AND turno_id = ? AND fecha = ?;
+
+selectByAcopiadorEntreFechas:
+SELECT * FROM recojo WHERE acopiador_id = ? AND fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+
+selectByProveedorEntreFechas:
+SELECT * FROM recojo WHERE proveedor_id = ? AND fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+
+selectEntreFechas:
+SELECT * FROM recojo WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+
+selectPendientesSincronizar:
+SELECT * FROM recojo WHERE sincronizado = 0;
+
+selectPendientesPago:
+SELECT * FROM recojo WHERE proveedor_id = ? AND pagado = 0;
+
+sumLitrosHoy:
+SELECT COALESCE(SUM(litros), 0.0) FROM recojo WHERE fecha = ?;
+
+countPendientesSincronizar:
+SELECT COUNT(*) FROM recojo WHERE sincronizado = 0;
+
+insert:
+INSERT INTO recojo(id, proveedor_id, acopiador_id, turno_id, fecha, litros, estado_leche, estado_otro, precio_litro, total, pagado, metodo_pago, entregado, sincronizado)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+marcarPagado:
+UPDATE recojo SET pagado = 1, metodo_pago = ? WHERE id = ?;
+
+marcarEntregado:
+UPDATE recojo SET entregado = 1 WHERE id = ?;
+
+-- El litraje que registra el laboratorio es el definitivo (como en Laravel).
+actualizarLitros:
+UPDATE recojo SET litros = ?, total = ? WHERE id = ?;
+
+marcarSincronizado:
+UPDATE recojo SET sincronizado = 1 WHERE id = ?;
+
+deleteById:
+DELETE FROM recojo WHERE id = ?;
+
+-- sincronizado siempre queda en 1: si el servidor ya tiene esta fila, está sincronizada por
+-- definición (los recojos creados solo offline no aparecen acá, así que nunca chocan).
+upsertFromSync:
+INSERT OR REPLACE INTO recojo(id, proveedor_id, acopiador_id, turno_id, fecha, litros, estado_leche, estado_otro, precio_litro, total, pagado, metodo_pago, entregado, sincronizado, litros_entregados)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?);

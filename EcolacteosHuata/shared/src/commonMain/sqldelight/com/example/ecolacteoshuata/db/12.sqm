@@ -1,0 +1,5 @@
+-- Laravel ahora exige un token (se obtiene al iniciar sesión con conexión) para descargar datos.
+ALTER TABLE conexion_servidor ADD COLUMN token TEXT;
+-- Descarga completa en el próximo sync: trae los hashes de contraseña (login sin señal) y
+-- borra lo que se eliminó en Laravel.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

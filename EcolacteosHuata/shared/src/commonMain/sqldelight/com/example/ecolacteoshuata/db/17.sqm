@@ -1,0 +1,6 @@
+-- Laboratorio de planta como en Laravel: "Enviar a producción" (la leche conforme se suma al
+-- stock del insumo leche en Laravel al sincronizar).
+ALTER TABLE resultado_laboratorio ADD COLUMN enviado_produccion INTEGER NOT NULL DEFAULT 0;
+
+-- Descarga completa: trae qué resultados ya se enviaron a producción.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

@@ -1,0 +1,17 @@
+CREATE TABLE inventario_producto (
+    producto_id TEXT NOT NULL PRIMARY KEY,
+    stock REAL NOT NULL DEFAULT 0,
+    FOREIGN KEY (producto_id) REFERENCES producto(id)
+);
+
+selectAll:
+SELECT * FROM inventario_producto;
+
+selectByProducto:
+SELECT * FROM inventario_producto WHERE producto_id = ?;
+
+insert:
+INSERT INTO inventario_producto(producto_id, stock) VALUES (?, ?);
+
+update:
+UPDATE inventario_producto SET stock = ? WHERE producto_id = ?;

@@ -1,0 +1,13 @@
+CREATE TABLE borrador_venta_yape (
+    vendedor_id TEXT NOT NULL PRIMARY KEY,
+    payload TEXT NOT NULL
+);
+
+guardar:
+INSERT OR REPLACE INTO borrador_venta_yape(vendedor_id,payload) VALUES (?,?);
+
+cargar:
+SELECT payload FROM borrador_venta_yape WHERE vendedor_id=?;
+
+eliminar:
+DELETE FROM borrador_venta_yape WHERE vendedor_id=?;

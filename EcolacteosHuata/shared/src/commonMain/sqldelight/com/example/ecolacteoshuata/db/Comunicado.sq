@@ -1,0 +1,26 @@
+CREATE TABLE comunicado (
+    id TEXT NOT NULL PRIMARY KEY,
+    tipo TEXT NOT NULL,
+    titulo TEXT NOT NULL,
+    descripcion TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    autor_id TEXT NOT NULL,
+    -- Roles destinatarios (nombres de Rol separados por coma); NULL = todos los roles.
+    roles TEXT,
+    FOREIGN KEY (autor_id) REFERENCES usuario(id)
+);
+
+selectAll:
+SELECT * FROM comunicado ORDER BY fecha DESC;
+
+selectById:
+SELECT * FROM comunicado WHERE id = ?;
+
+insert:
+INSERT INTO comunicado(id, tipo, titulo, descripcion, fecha, autor_id, roles) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM comunicado WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO comunicado(id, tipo, titulo, descripcion, fecha, autor_id, roles) VALUES (?, ?, ?, ?, ?, ?, ?);

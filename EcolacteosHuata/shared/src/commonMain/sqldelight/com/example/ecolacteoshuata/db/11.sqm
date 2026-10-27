@@ -1,0 +1,7 @@
+-- Datos del ticket del analizador SmartScan AI (SN, Mode, hora y fecha del análisis).
+ALTER TABLE resultado_laboratorio ADD COLUMN sn TEXT;
+ALTER TABLE resultado_laboratorio ADD COLUMN modo TEXT;
+ALTER TABLE resultado_laboratorio ADD COLUMN hora_analisis TEXT;
+ALTER TABLE resultado_laboratorio ADD COLUMN fecha_analisis TEXT;
+-- Descarga completa en el próximo sync para traer estos datos desde Laravel.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

@@ -1,0 +1,54 @@
+CREATE TABLE usuario (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombres TEXT NOT NULL,
+    apellidos TEXT NOT NULL,
+    documento TEXT NOT NULL,
+    celular TEXT NOT NULL,
+    rol TEXT NOT NULL,
+    usuario TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    activo INTEGER NOT NULL DEFAULT 1,
+    creado_en TEXT NOT NULL,
+    -- Roles adicionales (nombres de Rol separados por coma), como `users.roles` de Laravel.
+    -- `rol` es el principal y siempre cuenta aunque no esté aquí.
+    roles TEXT NOT NULL DEFAULT '',
+    -- 1 si el administrador le asignó "Tomar asistencia" (`users.toma_asistencia`).
+    toma_asistencia INTEGER NOT NULL DEFAULT 0
+);
+
+actualizarTomaAsistencia:
+UPDATE usuario SET toma_asistencia = ? WHERE id = ? AND toma_asistencia != ?;
+
+selectAll:
+SELECT * FROM usuario ORDER BY nombres, apellidos;
+
+selectById:
+SELECT * FROM usuario WHERE id = ?;
+
+selectByUsuario:
+SELECT * FROM usuario WHERE usuario = ? COLLATE NOCASE;
+
+selectByRol:
+SELECT * FROM usuario WHERE rol = ? ORDER BY nombres, apellidos;
+
+countActivos:
+SELECT COUNT(*) FROM usuario WHERE activo = 1;
+
+countAll:
+SELECT COUNT(*) FROM usuario;
+
+insert:
+INSERT INTO usuario(id, nombres, apellidos, documento, celular, rol, usuario, password_hash, activo, creado_en)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE usuario SET nombres = ?, apellidos = ?, documento = ?, celular = ?, rol = ?, usuario = ?, password_hash = ?, activo = ?
+WHERE id = ?;
+actualizarRoles:
+UPDATE usuario SET rol = ?, roles = ? WHERE id = ?;
+
+actualizarPassword:
+UPDATE usuario SET password_hash = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM usuario WHERE id = ?;

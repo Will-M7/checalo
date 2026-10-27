@@ -1,0 +1,30 @@
+CREATE TABLE autorizacion_local (
+    usuario_id TEXT NOT NULL PRIMARY KEY,
+    version TEXT NOT NULL,
+    documento TEXT NOT NULL
+);
+CREATE TABLE autorizacion_sesion (
+    id INTEGER NOT NULL PRIMARY KEY,
+    usuario_id TEXT
+);
+INSERT INTO autorizacion_sesion(id, usuario_id) VALUES (1, NULL);
+CREATE TABLE autorizacion_pantalla (
+    usuario_id TEXT NOT NULL,
+    pantalla TEXT NOT NULL,
+    PRIMARY KEY(usuario_id, pantalla)
+);
+CREATE TABLE cambio_revision (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    actor_id TEXT,
+    version TEXT,
+    tabla TEXT NOT NULL,
+    registro_id TEXT NOT NULL,
+    operacion TEXT NOT NULL,
+    documento TEXT NOT NULL,
+    motivo TEXT NOT NULL,
+    creado_en TEXT NOT NULL
+);
+ALTER TABLE cambio_pendiente ADD COLUMN actor_id TEXT;
+
+CREATE TABLE autorizacion_migracion (id INTEGER NOT NULL PRIMARY KEY, importada INTEGER NOT NULL);
+INSERT INTO autorizacion_migracion(id,importada) VALUES (1,0);

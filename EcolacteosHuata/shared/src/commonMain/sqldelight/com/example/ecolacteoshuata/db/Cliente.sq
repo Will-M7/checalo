@@ -1,0 +1,44 @@
+CREATE TABLE cliente (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombres TEXT NOT NULL,
+    apellidos TEXT NOT NULL DEFAULT '',
+    documento TEXT NOT NULL,
+    compras_count INTEGER NOT NULL DEFAULT 0,
+    favorito INTEGER NOT NULL DEFAULT 0,
+    descuento_favorito REAL NOT NULL DEFAULT 0,
+    mayorista INTEGER NOT NULL DEFAULT 0,
+    descuento_mayorista REAL NOT NULL DEFAULT 0
+);
+
+selectAll:
+SELECT * FROM cliente ORDER BY compras_count DESC, nombres;
+
+selectById:
+SELECT * FROM cliente WHERE id = ?;
+
+selectMasFrecuente:
+SELECT * FROM cliente ORDER BY compras_count DESC LIMIT 1;
+
+countAll:
+SELECT COUNT(*) FROM cliente;
+
+insert:
+INSERT INTO cliente(id, nombres, apellidos, documento, compras_count, favorito, descuento_favorito, mayorista, descuento_mayorista)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE cliente SET nombres = ?, apellidos = ?, documento = ? WHERE id = ?;
+
+setDescuentos:
+UPDATE cliente SET favorito = ?, descuento_favorito = ?, mayorista = ?, descuento_mayorista = ? WHERE id = ?;
+
+incrementarCompras:
+UPDATE cliente SET compras_count = compras_count + 1 WHERE id = ?;
+
+deleteById:
+DELETE FROM cliente WHERE id = ?;
+
+-- favorito/descuento_favorito/mayorista/descuento_mayorista son exclusivos del dispositivo
+-- (Laravel no los tiene): esta actualización de sync no los toca.
+actualizarDatosSync:
+UPDATE cliente SET nombres = ?, apellidos = ?, documento = ?, compras_count = ? WHERE id = ?;

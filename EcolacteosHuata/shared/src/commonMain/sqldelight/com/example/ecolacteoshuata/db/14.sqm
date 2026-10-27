@@ -1,0 +1,29 @@
+-- Producción, ventas e inventario funcionan como en Laravel y se sincronizan: lo que se vende es
+-- la producción publicada (no un catálogo de productos) y cada ítem de venta apunta a ella.
+ALTER TABLE produccion ADD COLUMN nombre TEXT NOT NULL DEFAULT '';
+ALTER TABLE produccion ADD COLUMN lote TEXT NOT NULL DEFAULT '';
+ALTER TABLE produccion ADD COLUMN cantidad_vendida REAL NOT NULL DEFAULT 0;
+ALTER TABLE produccion ADD COLUMN responsable_id TEXT;
+UPDATE produccion SET nombre = COALESCE((SELECT receta.nombre FROM receta WHERE receta.id = produccion.receta_id), '');
+UPDATE produccion SET lote = 'L-' || REPLACE(fecha, '-', '') || '-' || substr(id, 1, 6) WHERE lote = '';
+
+ALTER TABLE venta ADD COLUMN vendedor_id TEXT;
+ALTER TABLE venta_item ADD COLUMN produccion_id TEXT;
+UPDATE venta SET descuento_tipo = CASE descuento_tipo
+    WHEN 'FAVORITO' THEN 'Favorito' WHEN 'MAYORISTA' THEN 'Mayorista' WHEN 'NINGUNO' THEN '' ELSE descuento_tipo END;
+
+-- Stock de insumos como en Laravel: `stock_actual` es el stock real (lo suben las compras y lo
+-- bajan las producciones) y `stock_inicial` el que se ingresó al registrar el insumo.
+ALTER TABLE insumo ADD COLUMN stock_inicial REAL NOT NULL DEFAULT 0;
+ALTER TABLE insumo ADD COLUMN stock_editado INTEGER NOT NULL DEFAULT 0;
+UPDATE insumo SET stock_inicial = stock_actual;
+UPDATE insumo SET stock_actual = MAX(0, stock_actual
+    + COALESCE((SELECT SUM(cd.cantidad) FROM compra_detalle cd WHERE cd.insumo_id = insumo.id), 0)
+    - COALESCE((SELECT SUM(rd.cantidad * p.cantidad_lotes) FROM produccion p JOIN receta_detalle rd ON rd.receta_id = p.receta_id WHERE rd.insumo_id = insumo.id), 0));
+
+-- Lo que ya se había registrado en el teléfono se sube en la próxima sincronización.
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'produccion', id, 'guardar' FROM produccion WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'venta', id, 'guardar' FROM venta WHERE id GLOB '*[^0-9]*';
+
+-- Descarga completa: trae las producciones, las ventas y el stock real de los insumos.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "asignaciones": {
+    "administrador": [
+      "admin.panel",
+      "admin.usuarios",
+      "admin.asignar-roles",
+      "admin.empresa",
+      "admin.descuentos",
+      "admin.turnos",
+      "admin.precios",
+      "planta.panel",
+      "planta.entregas",
+      "planta.laboratorio",
+      "planta.rutas",
+      "planta.pagos",
+      "planta.comunicados",
+      "vendedor.panel",
+      "vendedor.ventas",
+      "vendedor.produccion",
+      "vendedor.historial",
+      "vendedor.inventario",
+      "vendedor.clientes",
+      "vendedor.pedidos-web",
+      "produccion.panel",
+      "produccion.insumos",
+      "produccion.unidades",
+      "produccion.recetas",
+      "produccion.registros",
+      "produccion.productos",
+      "produccion.compras",
+      "produccion.inventario",
+      "asistencia.mis",
+      "asistencia.tomar",
+      "admin.roles"
+    ],
+    "personal_planta": [
+      "planta.panel",
+      "planta.entregas",
+      "planta.laboratorio",
+      "planta.rutas",
+      "planta.pagos",
+      "planta.comunicados",
+      "asistencia.mis"
+    ],
+    "acopiador": [
+      "acopiador.panel",
+      "acopiador.recojo",
+      "acopiador.mapa-recojo",
+      "acopiador.entrega",
+      "acopiador.inventario",
+      "asistencia.mis"
+    ],
+    "proveedor": [
+      "proveedor.panel",
+      "proveedor.entregas",
+      "proveedor.laboratorio",
+      "proveedor.comunicados",
+      "asistencia.mis"
+    ],
+    "vendedor": [
+      "vendedor.panel",
+      "vendedor.ventas",
+      "vendedor.produccion",
+      "vendedor.historial",
+      "vendedor.inventario",
+      "vendedor.clientes",
+      "vendedor.pedidos-web",
+      "asistencia.mis"
+    ],
+    "produccion": [
+      "produccion.panel",
+      "produccion.insumos",
+      "produccion.unidades",
+      "produccion.recetas",
+      "produccion.registros",
+      "produccion.productos",
+      "produccion.compras",
+      "produccion.inventario",
+      "asistencia.mis"
+    ]
+  },
+  "origen": {
+    "revision": "0fd6a98e3010187a041baa1ce60cf79333f582d4",
+    "origen": "Primera entrada clone del reflog HEAD, igual a origin/web-laravel-huata al inspeccionar.",
+    "fuentes_sha256": {
+      "laravelEcolacteosHuata/routes/admin.php": "d914db6467305b8cc21dbcd64c92835a7f2512e1a8a37c2f023fcb5f8e22cfa2",
+      "laravelEcolacteosHuata/routes/planta.php": "d3374b595baa765038d5016e9f8d51523d0832cacd5b1b418d73ca16b435bbb1",
+      "laravelEcolacteosHuata/routes/acopiador.php": "bf87aafe5d9cf6806bd26b5d92576909a2557af12ca3ed46ec89e34cd57f1967",
+      "laravelEcolacteosHuata/routes/proveedor.php": "46a365a9114cc641cd661ae05c96d71b12c64b35987eb0a6b82a4649ae1a5e24",
+      "laravelEcolacteosHuata/routes/vendedor.php": "35bee696dda46950cbbe9e5565cc3a8688cdccea3047b7e40c4a65e629c378c8",
+      "laravelEcolacteosHuata/routes/produccion.php": "6421ef47abf38b2aa2e028ed47d5faa55b22d0b523513f9321faeaf3d7c32ff8"
+    },
+    "adaptaciones": [
+      "admin.roles añadido al Administrador exclusivamente para conservar control dinámico.",
+      "Configuración de pagos no existía en esta revisión: no se asigna por suposición.",
+      "Asistencia individual histórica por flags de usuario no se reconstruye como rol auxiliar.",
+      "La plantilla representa acceso de rutas web; no reproduce la anterior API sin capacidades granulares."
+    ]
+  }
+}

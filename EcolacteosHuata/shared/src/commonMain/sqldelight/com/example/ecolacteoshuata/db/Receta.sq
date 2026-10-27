@@ -1,0 +1,53 @@
+CREATE TABLE receta (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    descripcion TEXT NOT NULL DEFAULT '',
+    producto_id TEXT,
+    FOREIGN KEY (producto_id) REFERENCES producto(id)
+);
+
+CREATE TABLE receta_detalle (
+    id TEXT NOT NULL PRIMARY KEY,
+    receta_id TEXT NOT NULL,
+    insumo_id TEXT NOT NULL,
+    cantidad REAL NOT NULL,
+    FOREIGN KEY (receta_id) REFERENCES receta(id),
+    FOREIGN KEY (insumo_id) REFERENCES insumo(id)
+);
+
+CREATE INDEX idx_receta_detalle_receta ON receta_detalle(receta_id);
+
+selectAll:
+SELECT * FROM receta ORDER BY nombre;
+
+selectById:
+SELECT * FROM receta WHERE id = ?;
+
+insert:
+INSERT INTO receta(id, nombre, descripcion, producto_id) VALUES (?, ?, ?, ?);
+
+update:
+UPDATE receta SET nombre = ?, descripcion = ?, producto_id = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM receta WHERE id = ?;
+
+selectDetalleByReceta:
+SELECT * FROM receta_detalle WHERE receta_id = ?;
+
+selectDetalleAll:
+SELECT * FROM receta_detalle;
+
+insertDetalle:
+INSERT INTO receta_detalle(id, receta_id, insumo_id, cantidad) VALUES (?, ?, ?, ?);
+
+deleteDetalleByReceta:
+DELETE FROM receta_detalle WHERE receta_id = ?;
+
+-- descripcion/producto_id son exclusivos del dispositivo (Laravel no los tiene): esta
+-- actualización de sync no los toca.
+actualizarNombreSync:
+UPDATE receta SET nombre = ? WHERE id = ?;
+
+upsertDetalleFromSync:
+INSERT OR REPLACE INTO receta_detalle(id, receta_id, insumo_id, cantidad) VALUES (?, ?, ?, ?);

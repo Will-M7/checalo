@@ -1,0 +1,36 @@
+-- Notificaciones de la campana (tabla `notifications` de Laravel) del usuario del token:
+-- comunicados y asesoramiento, cambios de ubicación de proveedores, etc.
+CREATE TABLE notificacion (
+    id TEXT NOT NULL PRIMARY KEY,
+    tipo TEXT NOT NULL,
+    titulo TEXT NOT NULL,
+    mensaje TEXT NOT NULL,
+    leida INTEGER NOT NULL DEFAULT 0,
+    creada_en TEXT NOT NULL,
+    -- 1 cuando ya se mostró como notificación del sistema en el celular (no se repite).
+    avisada INTEGER NOT NULL DEFAULT 0
+);
+
+selectTodas:
+SELECT * FROM notificacion ORDER BY creada_en DESC;
+
+selectPorId:
+SELECT * FROM notificacion WHERE id = ?;
+
+contarNoLeidas:
+SELECT COUNT(*) FROM notificacion WHERE leida = 0;
+
+selectNoLeidasIds:
+SELECT id FROM notificacion WHERE leida = 0;
+
+marcarLeida:
+UPDATE notificacion SET leida = 1 WHERE id = ?;
+
+marcarAvisada:
+UPDATE notificacion SET avisada = 1 WHERE id = ?;
+
+borrarTodas:
+DELETE FROM notificacion;
+
+insertar:
+INSERT OR REPLACE INTO notificacion(id, tipo, titulo, mensaje, leida, creada_en, avisada) VALUES (?, ?, ?, ?, ?, ?, ?);

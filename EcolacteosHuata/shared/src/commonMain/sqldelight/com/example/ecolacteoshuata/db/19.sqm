@@ -1,0 +1,5 @@
+-- Borrador local pendiente, excluido de RegistroCambios y de la sincronización.
+CREATE TABLE borrador_venta_yape (
+    vendedor_id TEXT NOT NULL PRIMARY KEY,
+    payload TEXT NOT NULL
+);

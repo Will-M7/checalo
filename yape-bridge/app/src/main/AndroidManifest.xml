@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- HTTPS en release; HTTP de pruebas LAN solo en el manifiesto debug. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="com.example.ecolacteoshuata.BRIDGE_SESSION" />
+    <queries><package android:name="com.example.ecolacteoshuata.huata" /></queries>
+    <application
+        android:name=".YapeBridgeApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.YapeBridgeLab"
+        tools:targetApi="36">
+
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:theme="@style/Theme.YapeBridgeLab">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="huatabridge" android:host="enroll" />
+            </intent-filter>
+        </activity>
+        <receiver android:name=".bridge.HuataSessionChangedReceiver" android:exported="true" android:permission="com.example.ecolacteoshuata.BRIDGE_SESSION">
+            <intent-filter><action android:name="huata.bridge.SESSION_CHANGED" /></intent-filter>
+        </receiver>
+
+        <service
+            android:name=".listener.LabNotificationListener"
+            android:exported="true"
+            android:label="@string/listener_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>

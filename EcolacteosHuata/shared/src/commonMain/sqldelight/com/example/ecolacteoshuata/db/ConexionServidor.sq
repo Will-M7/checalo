@@ -1,0 +1,27 @@
+CREATE TABLE conexion_servidor (
+    id INTEGER NOT NULL PRIMARY KEY,
+    host TEXT NOT NULL,
+    puerto TEXT NOT NULL,
+    activa INTEGER NOT NULL,
+    ultima_sincronizacion TEXT,
+    -- Token que entrega POST /api/mobile/login; sin él Laravel no responde el sync.
+    token TEXT
+);
+
+selectPrimera:
+SELECT * FROM conexion_servidor LIMIT 1;
+
+insert:
+INSERT INTO conexion_servidor(id, host, puerto, activa, ultima_sincronizacion) VALUES (?, ?, ?, ?, ?);
+
+update:
+UPDATE conexion_servidor SET host = ?, puerto = ?, activa = ? WHERE id = ?;
+
+reiniciarSincronizacion:
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL WHERE id = ?;
+
+actualizarUltimaSincronizacion:
+UPDATE conexion_servidor SET ultima_sincronizacion = ? WHERE id = ?;
+
+guardarToken:
+UPDATE conexion_servidor SET token = ? WHERE id = ?;

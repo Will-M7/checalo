@@ -1,0 +1,576 @@
+/*
+ * HUATA CORPORATE DESIGN SYSTEM — paneles internos de Ecolácteos Huata.
+ * Luminoso y empresarial: fondo gris azulado muy claro, superficies blancas, barra lateral azul hielo,
+ * azul corporativo para interactuar, verde Huata como identidad productiva y amarillo/rojo como acentos.
+ * Tokens en variables CSS (claro y oscuro) y clases `hh-`. Los componentes Blade viven en resources/views/components/ui/.
+ */
+
+:root {
+    /* Superficies y texto */
+    --hh-fondo: #f7fafc;
+    --hh-hielo: #eaf3fb;
+    --hh-vidrio: #ffffff;
+    --hh-vidrio-fuerte: rgb(255 255 255 / 0.94);
+    --hh-vidrio-borde: #dce9f5;
+    --hh-superficie: #ffffff;
+    --hh-superficie-solida: #ffffff;
+    --hh-superficie-2: #eaf3fb;
+    --hh-borde: #dce9f5;
+    --hh-borde-fuerte: #bcd3e8;
+    --hh-texto: #173d72;
+    --hh-texto-2: #64748b;
+
+    /* Marca */
+    --hh-marca: #2864b4;
+    --hh-marca-oscura: #1f5299;
+    --hh-marca-suave: rgb(40 100 180 / 0.1);
+    --hh-verde: #23865b;
+    --hh-acento: #f2c230;
+    --hh-peligro: #c93445;
+    --hh-profundo: #173d72;
+
+    /* Barra lateral (azul hielo) */
+    --hh-lateral-fondo: #eaf3fb;
+    --hh-lateral-borde: #d3e4f3;
+    --hh-lateral-texto: #173d72;
+    --hh-lateral-texto-2: #4d6b94;
+    --hh-lateral-hover: rgb(40 100 180 / 0.1);
+
+    /* Profundidad, radios y movimiento */
+    --hh-sombra-sm: 0 1px 2px rgb(23 61 114 / 0.04), 0 6px 18px rgb(23 61 114 / 0.06);
+    --hh-sombra-md: 0 2px 4px rgb(23 61 114 / 0.06), 0 14px 32px rgb(23 61 114 / 0.1);
+    --hh-radio: 1rem;
+    --hh-curva: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark {
+    --hh-fondo: #0f1b2e;
+    --hh-hielo: #15233a;
+    --hh-vidrio: #172640;
+    --hh-vidrio-fuerte: rgb(23 38 64 / 0.94);
+    --hh-vidrio-borde: rgb(148 175 230 / 0.16);
+    --hh-superficie: #172640;
+    --hh-superficie-solida: #172640;
+    --hh-superficie-2: rgb(148 175 230 / 0.1);
+    --hh-borde: rgb(148 175 230 / 0.16);
+    --hh-borde-fuerte: rgb(148 175 230 / 0.3);
+    --hh-texto: #e6eef9;
+    --hh-texto-2: #9fb0c8;
+    --hh-marca: #6fa3e8;
+    --hh-marca-oscura: #8db8f2;
+    --hh-marca-suave: rgb(111 163 232 / 0.16);
+    --hh-verde: #4fbf8c;
+    --hh-profundo: #e6eef9;
+
+    --hh-lateral-fondo: #0b1626;
+    --hh-lateral-borde: rgb(148 175 230 / 0.12);
+    --hh-lateral-texto: #dbe7f7;
+    --hh-lateral-texto-2: #8fa4c2;
+    --hh-lateral-hover: rgb(255 255 255 / 0.07);
+
+    --hh-sombra-sm: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 18px rgb(0 0 0 / 0.22);
+    --hh-sombra-md: 0 2px 4px rgb(0 0 0 / 0.35), 0 14px 32px rgb(0 0 0 / 0.4);
+}
+
+/* Fondo del sistema: color sólido luminoso con un resplandor azul hielo muy suave */
+.hh-cuerpo {
+    min-height: 100vh;
+    color: var(--hh-texto);
+    background-color: var(--hh-fondo);
+    /* Foto de la vaca con velo azul translúcido de la paleta corporativa */
+    background-image:
+        linear-gradient(165deg, rgb(234 243 251 / 0.9) 0%, rgb(40 100 180 / 0.62) 55%, rgb(23 61 114 / 0.78) 100%),
+        url('/images/fondo-huata.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.dark .hh-cuerpo {
+    background-image:
+        linear-gradient(165deg, rgb(15 27 46 / 0.9) 0%, rgb(23 61 114 / 0.78) 55%, rgb(15 27 46 / 0.92) 100%),
+        url('/images/fondo-huata.jpg');
+}
+
+/* Las tarjetas antiguas (`huata-cuadro`) usan la misma superficie blanca */
+@utility huata-cuadro {
+    background-color: var(--hh-vidrio);
+    border-color: var(--hh-vidrio-borde);
+    box-shadow: var(--hh-sombra-sm);
+
+    &:where(.dark, .dark *) {
+        background-color: var(--hh-vidrio);
+    }
+}
+
+/* ---------- Barra lateral (azul hielo) ---------- */
+.hh-lateral {
+    background: var(--hh-lateral-fondo);
+    border-inline-end: 1px solid var(--hh-lateral-borde);
+    color: var(--hh-lateral-texto);
+}
+
+.hh-lateral [data-flux-sidebar-item] {
+    position: relative;
+    color: var(--hh-lateral-texto);
+    border-color: transparent;
+    background: transparent;
+    transition:
+        background-color 0.2s var(--hh-curva),
+        color 0.2s ease,
+        box-shadow 0.25s var(--hh-curva);
+}
+
+.hh-lateral [data-flux-sidebar-item]:hover {
+    background: var(--hh-lateral-hover);
+    color: var(--hh-lateral-texto);
+}
+
+.hh-lateral [data-flux-sidebar-item][data-current] {
+    background: var(--hh-marca);
+    color: #fff;
+    border-color: transparent;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgb(40 100 180 / 0.32);
+}
+
+.dark .hh-lateral [data-flux-sidebar-item][data-current] {
+    background: #2864b4;
+}
+
+.hh-lateral [data-flux-sidebar-item] svg {
+    transition: transform 0.2s var(--hh-curva);
+}
+
+.hh-lateral [data-flux-sidebar-item]:hover svg {
+    transform: scale(1.08);
+}
+
+.hh-lateral .hh-grupo-titulo {
+    color: var(--hh-lateral-texto-2);
+}
+
+.hh-lateral-rol {
+    border: 1px solid var(--hh-lateral-borde);
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(23 61 114 / 0.04);
+}
+
+.dark .hh-lateral-rol {
+    background: rgb(255 255 255 / 0.05);
+}
+
+.hh-lateral [data-flux-sidebar-collapse] button {
+    color: var(--hh-lateral-texto-2);
+}
+
+.hh-lateral [data-flux-sidebar-collapse] button:hover {
+    background: var(--hh-lateral-hover);
+    color: var(--hh-lateral-texto);
+}
+
+.hh-lateral [data-flux-sidebar-collapse] svg {
+    color: inherit;
+}
+
+/* Pie de la barra lateral: usuario, configuración y cierre de sesión */
+.hh-lateral-usuario {
+    border-top: 1px solid var(--hh-lateral-borde);
+}
+
+/* ---------- Barra superior ---------- */
+.hh-superior {
+    background-color: var(--hh-superficie-solida);
+    border-bottom: 1px solid var(--hh-borde);
+}
+
+.hh-buscador {
+    border: 1px solid var(--hh-borde);
+    background: var(--hh-fondo);
+    color: var(--hh-texto-2);
+    transition:
+        border-color 0.2s,
+        background-color 0.2s;
+}
+
+.hh-buscador:hover,
+.hh-buscador:focus-within {
+    border-color: var(--hh-marca);
+    background: var(--hh-marca-suave);
+}
+
+/* ---------- Tarjetas y componentes ---------- */
+.hh-panel {
+    background: var(--hh-vidrio);
+    border: 1px solid var(--hh-vidrio-borde);
+    border-radius: var(--hh-radio);
+    box-shadow: var(--hh-sombra-sm);
+}
+
+.hh-panel-solido {
+    background: var(--hh-superficie-solida);
+    border: 1px solid var(--hh-borde);
+    border-radius: var(--hh-radio);
+}
+
+/* Banner de bienvenida de cada panel: degradado azul corporativo con la fotografía muy suave */
+.hh-banner {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    color: #fff;
+    background:
+        linear-gradient(115deg, rgb(23 61 114 / 0.97) 0%, rgb(40 100 180 / 0.92) 62%, rgb(74 130 200 / 0.88) 100%),
+        url('/images/fondo-huata.jpg') center 35% / cover;
+    box-shadow: 0 14px 34px rgb(23 61 114 / 0.22);
+}
+
+.hh-banner::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: -4rem;
+    inset-block-start: -5rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.18), transparent 68%);
+    pointer-events: none;
+}
+
+.hh-banner-franja {
+    height: 4px;
+    background: linear-gradient(90deg, #2864b4 0 34%, #23865b 34% 54%, #f2c230 54% 76%, #c93445 76% 100%);
+}
+
+.hh-kpi {
+    position: relative;
+    background: var(--hh-vidrio);
+    border: 1px solid var(--hh-vidrio-borde);
+    border-radius: var(--hh-radio);
+    box-shadow: var(--hh-sombra-sm), inset 0 3px 0 var(--hh-kpi-color, #2864b4);
+    transition:
+        transform 0.3s var(--hh-curva),
+        box-shadow 0.3s var(--hh-curva);
+}
+
+.hh-kpi:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--hh-sombra-md), inset 0 3px 0 var(--hh-kpi-color, #2864b4);
+}
+
+.hh-kpi-icono {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--hh-kpi-color, #2864b4) 12%, transparent);
+    color: color-mix(in srgb, var(--hh-kpi-color, #2864b4) 78%, #0f2a4d);
+}
+
+.hh-accion {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.95rem 1.05rem;
+    background: var(--hh-vidrio);
+    border: 1px solid var(--hh-vidrio-borde);
+    border-radius: var(--hh-radio);
+    box-shadow: var(--hh-sombra-sm);
+    transition:
+        transform 0.25s var(--hh-curva),
+        border-color 0.2s,
+        box-shadow 0.25s var(--hh-curva);
+}
+
+.hh-accion:hover,
+.hh-accion:focus-visible {
+    transform: translateY(-2px);
+    border-color: var(--hh-marca);
+    box-shadow: var(--hh-sombra-md);
+}
+
+.hh-accion .hh-flecha {
+    margin-inline-start: auto;
+    color: var(--hh-texto-2);
+    transition:
+        transform 0.25s var(--hh-curva),
+        color 0.2s;
+}
+
+.hh-accion:hover .hh-flecha {
+    color: var(--hh-marca);
+    transform: translateX(3px);
+}
+
+.hh-accion .hh-icono-suave {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.8rem;
+    border: 0;
+    background: var(--hh-superficie-2);
+    color: var(--hh-marca);
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.hh-accion:hover .hh-icono-suave {
+    background: var(--hh-marca);
+    color: #fff;
+}
+
+/* Barras finas del gráfico (el ancho se anima al aparecer) */
+.hh-barra {
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--hh-superficie-2);
+    overflow: hidden;
+}
+
+.hh-barra > span {
+    display: block;
+    height: 100%;
+    width: var(--hh-ancho, 0%);
+    border-radius: inherit;
+    background: var(--hh-barra-color, #2864b4);
+}
+
+/* Esqueleto de carga */
+.hh-esqueleto {
+    border-radius: 0.6rem;
+    background: linear-gradient(90deg, var(--hh-superficie-2) 25%, color-mix(in srgb, var(--hh-superficie-2) 50%, var(--hh-vidrio)) 50%, var(--hh-superficie-2) 75%);
+    background-size: 200% 100%;
+}
+
+/* Estado vacío */
+.hh-vacio {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--hh-texto-2);
+}
+
+.hh-vacio .hh-icono-suave {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+    background: var(--hh-superficie-2);
+    color: var(--hh-marca);
+}
+
+/* Entrada escalonada (la demora sale de --i) */
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes hh-entra {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+    }
+
+    @keyframes hh-barra {
+        from {
+            width: 0;
+        }
+    }
+
+    @keyframes hh-brillo {
+        to {
+            background-position: -200% 0;
+        }
+    }
+
+    .hh-entra {
+        animation: hh-entra 0.5s var(--hh-curva) backwards;
+        animation-delay: calc(var(--i, 0) * 55ms);
+    }
+
+    .hh-barra > span {
+        animation: hh-barra 0.9s var(--hh-curva) backwards;
+        animation-delay: calc(0.2s + var(--i, 0) * 70ms);
+    }
+
+    .hh-esqueleto {
+        animation: hh-brillo 1.4s linear infinite;
+    }
+}
+
+/* =====================================================================
+ * Componentes de Flux dentro del sistema (tablas, campos, modales, menús, botones)
+ * Se aplican a todas las pantallas sin tocar cada una.
+ * ===================================================================== */
+
+/* ---------- Tablas ---------- */
+[data-flux-table] {
+    color: var(--hh-texto);
+    font-variant-numeric: tabular-nums;
+}
+
+[data-flux-column] {
+    padding-block: 0.8rem;
+    color: var(--hh-texto-2);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--hh-borde-fuerte);
+    background: transparent;
+}
+
+[data-flux-cell] {
+    padding-block: 0.85rem;
+    color: var(--hh-texto);
+    border-color: var(--hh-borde);
+}
+
+[data-flux-row] > [data-flux-cell] {
+    transition: background-color 0.15s ease;
+}
+
+[data-flux-row]:hover > [data-flux-cell] {
+    background: var(--hh-marca-suave);
+}
+
+/* Las tablas que ocupan todo el ancho de una tarjeta llevan aire a los lados */
+.hh-panel [data-flux-column]:first-child,
+.hh-panel [data-flux-cell]:first-child {
+    padding-inline-start: 1.25rem;
+}
+
+.hh-panel [data-flux-column]:last-child,
+.hh-panel [data-flux-cell]:last-child {
+    padding-inline-end: 1.25rem;
+}
+
+/* ---------- Campos de formulario ---------- */
+input[data-flux-control],
+textarea[data-flux-control],
+select[data-flux-control] {
+    border-color: var(--hh-borde-fuerte);
+    border-radius: 0.7rem;
+    background-color: var(--hh-superficie-solida);
+    color: var(--hh-texto);
+    box-shadow: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+input[data-flux-control]::placeholder,
+textarea[data-flux-control]::placeholder {
+    color: var(--hh-texto-2);
+    opacity: 0.75;
+}
+
+input[data-flux-control]:hover,
+textarea[data-flux-control]:hover,
+select[data-flux-control]:hover {
+    border-color: var(--hh-marca);
+}
+
+input[data-flux-control]:focus,
+textarea[data-flux-control]:focus,
+select[data-flux-control]:focus {
+    border-color: var(--hh-marca);
+    box-shadow: 0 0 0 3px var(--hh-marca-suave);
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-ring-offset-shadow: 0 0 #0000;
+    outline: none;
+}
+
+[data-flux-label] {
+    color: var(--hh-texto);
+    font-weight: 600;
+}
+
+[data-flux-description],
+[data-flux-field] > [data-flux-description] {
+    color: var(--hh-texto-2);
+}
+
+[data-flux-error] {
+    color: var(--hh-peligro);
+    font-weight: 500;
+}
+
+input[data-flux-control][aria-invalid='true'],
+[data-invalid] input[data-flux-control] {
+    border-color: var(--hh-peligro);
+}
+
+/* ---------- Modales ---------- */
+[data-flux-modal] > dialog:not([data-flux-flyout]) {
+    background: var(--hh-superficie-solida);
+    color: var(--hh-texto);
+    border: 1px solid var(--hh-borde);
+    border-radius: 1.1rem;
+    box-shadow: 0 30px 80px rgb(6 27 63 / 0.35);
+}
+
+[data-flux-modal] > dialog::backdrop {
+    background: rgb(6 27 63 / 0.55);
+    backdrop-filter: blur(4px);
+}
+
+[data-flux-modal] > dialog [data-flux-heading] {
+    color: var(--hh-texto);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes hh-modal-entra {
+        from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.98);
+        }
+    }
+
+    [data-flux-modal] > dialog[open]:not([data-flux-flyout]) {
+        animation: hh-modal-entra 0.3s var(--hh-curva);
+    }
+}
+
+/* ---------- Menús desplegables ---------- */
+[data-flux-menu],
+[data-flux-popover] {
+    background: var(--hh-superficie-solida);
+    color: var(--hh-texto);
+    border: 1px solid var(--hh-borde);
+    border-radius: 0.9rem;
+    box-shadow: var(--hh-sombra-md);
+}
+
+/* ---------- Botones ---------- */
+[data-flux-button] {
+    border-radius: 0.7rem;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s var(--hh-curva),
+        box-shadow 0.15s ease;
+}
+
+[data-flux-button]:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+/* ---------- Textos de encabezado y de ayuda ---------- */
+[data-flux-heading] {
+    color: var(--hh-texto);
+}
+
+[data-flux-subheading] {
+    color: var(--hh-texto-2);
+}
+
+[data-flux-text] {
+    color: var(--hh-texto-2);
+}

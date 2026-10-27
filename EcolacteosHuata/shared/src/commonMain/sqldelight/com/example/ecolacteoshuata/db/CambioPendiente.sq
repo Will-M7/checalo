@@ -1,0 +1,42 @@
+-- Lo que se creó, editó o eliminó en el teléfono y todavía no se subió a Laravel. Lo llenan
+-- triggers (ver RegistroCambios.kt) en cada tabla que Laravel también tiene.
+CREATE TABLE cambio_pendiente (
+    orden INTEGER PRIMARY KEY AUTOINCREMENT,
+    tabla TEXT NOT NULL,
+    registro_id TEXT NOT NULL,
+    -- 'guardar' (alta o cambio) o 'eliminar'.
+    operacion TEXT NOT NULL,
+    actor_id TEXT
+);
+
+-- Una sola fila: aplicando = 1 mientras se guarda lo que llegó de Laravel, para que los
+-- triggers no lo anoten como cambio del teléfono.
+CREATE TABLE sync_control (
+    id INTEGER NOT NULL PRIMARY KEY,
+    aplicando INTEGER NOT NULL DEFAULT 0
+);
+
+selectTodos:
+SELECT * FROM cambio_pendiente ORDER BY orden;
+
+contarRegistros:
+SELECT COUNT(*) FROM (SELECT DISTINCT tabla, registro_id FROM cambio_pendiente);
+
+borrarHasta:
+DELETE FROM cambio_pendiente WHERE orden <= ?;
+
+olvidar:
+DELETE FROM cambio_pendiente WHERE tabla = ? AND registro_id = ?;
+
+cambiarRegistroId:
+UPDATE cambio_pendiente SET registro_id = ? WHERE tabla = ? AND registro_id = ?;
+
+asegurarControl:
+INSERT OR IGNORE INTO sync_control(id, aplicando) VALUES (1, 0);
+
+marcarAplicando:
+UPDATE sync_control SET aplicando = ? WHERE id = 1;
+
+-- Cambios que no salen de un trigger (ej. "notificación leída").
+anotar:
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion, actor_id) VALUES (?, ?, ?, (SELECT usuario_id FROM autorizacion_sesion WHERE id = 1));

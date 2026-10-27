@@ -1,0 +1,28 @@
+CREATE TABLE producto (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    descripcion TEXT NOT NULL DEFAULT '',
+    precio REAL NOT NULL,
+    activo INTEGER NOT NULL DEFAULT 1
+);
+
+selectAll:
+SELECT * FROM producto ORDER BY nombre;
+
+selectActivos:
+SELECT * FROM producto WHERE activo = 1 ORDER BY nombre;
+
+selectById:
+SELECT * FROM producto WHERE id = ?;
+
+countActivos:
+SELECT COUNT(*) FROM producto WHERE activo = 1;
+
+insert:
+INSERT INTO producto(id, nombre, descripcion, precio, activo) VALUES (?, ?, ?, ?, ?);
+
+update:
+UPDATE producto SET nombre = ?, descripcion = ?, precio = ?, activo = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM producto WHERE id = ?;

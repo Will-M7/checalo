@@ -1,0 +1,28 @@
+-- Descuentos que el vendedor puede activar en el punto de venta (tabla `descuentos` de Laravel).
+CREATE TABLE descuento (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    porcentaje REAL NOT NULL,
+    activo INTEGER NOT NULL DEFAULT 1
+);
+
+selectAll:
+SELECT * FROM descuento ORDER BY nombre COLLATE NOCASE;
+
+selectDisponibles:
+SELECT * FROM descuento WHERE activo = 1 ORDER BY nombre COLLATE NOCASE;
+
+insert:
+INSERT INTO descuento(id, nombre, porcentaje, activo) VALUES (?, ?, ?, ?);
+
+update:
+UPDATE descuento SET nombre = ?, porcentaje = ?, activo = ? WHERE id = ?;
+
+setActivo:
+UPDATE descuento SET activo = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM descuento WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO descuento(id, nombre, porcentaje, activo) VALUES (?, ?, ?, ?);

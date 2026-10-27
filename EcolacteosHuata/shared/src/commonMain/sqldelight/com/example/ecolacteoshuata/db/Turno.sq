@@ -1,0 +1,33 @@
+CREATE TABLE turno (
+    id TEXT NOT NULL PRIMARY KEY,
+    acopiador_id TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    hora_inicio TEXT NOT NULL,
+    hora_fin TEXT NOT NULL,
+    FOREIGN KEY (acopiador_id) REFERENCES acopiador(id)
+);
+
+selectAll:
+SELECT * FROM turno ORDER BY hora_inicio;
+
+-- Solo turnos de ruta: descarta cualquier id que también exista como turno de producción.
+selectRuta:
+SELECT * FROM turno WHERE id NOT IN (SELECT id FROM turno_produccion) ORDER BY hora_inicio;
+
+selectByAcopiador:
+SELECT * FROM turno WHERE acopiador_id = ? ORDER BY hora_inicio;
+
+selectById:
+SELECT * FROM turno WHERE id = ?;
+
+insert:
+INSERT INTO turno(id, acopiador_id, nombre, hora_inicio, hora_fin) VALUES (?, ?, ?, ?, ?);
+
+update:
+UPDATE turno SET nombre = ?, hora_inicio = ?, hora_fin = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM turno WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO turno(id, acopiador_id, nombre, hora_inicio, hora_fin) VALUES (?, ?, ?, ?, ?);

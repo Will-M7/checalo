@@ -1,0 +1,51 @@
+CREATE TABLE compra (
+    id TEXT NOT NULL PRIMARY KEY,
+    fecha TEXT NOT NULL,
+    proveedor_insumo TEXT NOT NULL DEFAULT '',
+    descripcion TEXT NOT NULL DEFAULT '',
+    total REAL NOT NULL
+);
+
+CREATE TABLE compra_detalle (
+    id TEXT NOT NULL PRIMARY KEY,
+    compra_id TEXT NOT NULL,
+    insumo_id TEXT NOT NULL,
+    cantidad REAL NOT NULL,
+    costo_unitario REAL NOT NULL,
+    subtotal REAL NOT NULL,
+    FOREIGN KEY (compra_id) REFERENCES compra(id),
+    FOREIGN KEY (insumo_id) REFERENCES insumo(id)
+);
+
+CREATE INDEX idx_compra_fecha ON compra(fecha);
+CREATE INDEX idx_compra_detalle_compra ON compra_detalle(compra_id);
+
+-- rowid desempata las compras del mismo día: la última registrada va primero.
+selectAll:
+SELECT * FROM compra ORDER BY fecha DESC, rowid DESC;
+
+selectById:
+SELECT * FROM compra WHERE id = ?;
+
+insert:
+INSERT INTO compra(id, fecha, proveedor_insumo, descripcion, total) VALUES (?, ?, ?, ?, ?);
+
+selectDetalleByCompra:
+SELECT * FROM compra_detalle WHERE compra_id = ?;
+
+selectDetalleAll:
+SELECT * FROM compra_detalle;
+
+insertDetalle:
+INSERT INTO compra_detalle(id, compra_id, insumo_id, cantidad, costo_unitario, subtotal) VALUES (?, ?, ?, ?, ?, ?);
+
+deleteDetalleByCompra:
+DELETE FROM compra_detalle WHERE compra_id = ?;
+
+-- proveedor_insumo es exclusivo del dispositivo (Laravel no lo tiene): esta actualización de
+-- sync no lo toca. total se recalcula siempre desde el detalle que manda el servidor.
+actualizarDatosSync:
+UPDATE compra SET fecha = ?, descripcion = ?, total = ? WHERE id = ?;
+
+upsertDetalleFromSync:
+INSERT OR REPLACE INTO compra_detalle(id, compra_id, insumo_id, cantidad, costo_unitario, subtotal) VALUES (?, ?, ?, ?, ?, ?);

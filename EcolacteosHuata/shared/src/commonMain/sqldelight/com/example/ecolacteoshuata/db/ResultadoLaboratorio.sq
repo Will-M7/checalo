@@ -1,0 +1,76 @@
+CREATE TABLE resultado_laboratorio (
+    id TEXT NOT NULL PRIMARY KEY,
+    proveedor_id TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    turno_id TEXT,
+    resultado TEXT NOT NULL,
+    densidad REAL,
+    acidez REAL,
+    temperatura REAL,
+    observaciones TEXT NOT NULL DEFAULT '',
+    conforme INTEGER NOT NULL,
+    -- Mismos campos que el formulario de Laravel (litraje + análisis SmartScan AI).
+    litros REAL,
+    grasa REAL,
+    sng REAL,
+    proteina REAL,
+    lactosa REAL,
+    sales REAL,
+    total_solidos REAL,
+    agua_anadida REAL,
+    punto_congelacion REAL,
+    ph REAL,
+    -- Datos del ticket del analizador SmartScan AI: número de serie, modo y hora/fecha del análisis.
+    sn TEXT,
+    modo TEXT,
+    hora_analisis TEXT,
+    fecha_analisis TEXT,
+    -- 1 cuando planta ya envió esta leche a producción (se sumó al stock del insumo leche).
+    enviado_produccion INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (proveedor_id) REFERENCES proveedor(id),
+    FOREIGN KEY (turno_id) REFERENCES turno(id)
+);
+
+CREATE INDEX idx_lab_proveedor ON resultado_laboratorio(proveedor_id);
+
+selectAll:
+SELECT * FROM resultado_laboratorio ORDER BY fecha DESC;
+
+selectByProveedor:
+SELECT * FROM resultado_laboratorio WHERE proveedor_id = ? ORDER BY fecha DESC;
+
+selectById:
+SELECT * FROM resultado_laboratorio WHERE id = ?;
+
+countNoConformes:
+SELECT COUNT(*) FROM resultado_laboratorio WHERE proveedor_id = ? AND conforme = 0;
+
+insert:
+INSERT INTO resultado_laboratorio(
+    id, proveedor_id, fecha, turno_id, resultado, densidad, acidez, temperatura, observaciones, conforme,
+    litros, grasa, sng, proteina, lactosa, sales, total_solidos, agua_anadida, punto_congelacion, ph,
+    sn, modo, hora_analisis, fecha_analisis
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+upsertFromSync:
+INSERT OR REPLACE INTO resultado_laboratorio(
+    id, proveedor_id, fecha, turno_id, resultado, densidad, acidez, temperatura, observaciones, conforme,
+    litros, grasa, sng, proteina, lactosa, sales, total_solidos, agua_anadida, punto_congelacion, ph,
+    sn, modo, hora_analisis, fecha_analisis, enviado_produccion
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- "Resultados de laboratorio" de planta: los 30 más recientes, como en Laravel.
+selectRecientes:
+SELECT * FROM resultado_laboratorio ORDER BY fecha DESC, rowid DESC LIMIT 30;
+
+update:
+UPDATE resultado_laboratorio SET
+    proveedor_id = ?, fecha = ?, turno_id = ?, resultado = ?, densidad = ?, temperatura = ?, observaciones = ?, conforme = ?,
+    litros = ?, grasa = ?, sng = ?, proteina = ?, lactosa = ?, sales = ?, total_solidos = ?, agua_anadida = ?,
+    punto_congelacion = ?, ph = ?, sn = ?, modo = ?, hora_analisis = ?, fecha_analisis = ?
+WHERE id = ?;
+
+marcarEnviadoProduccion:
+UPDATE resultado_laboratorio SET enviado_produccion = 1 WHERE id = ? AND conforme = 1 AND enviado_produccion = 0;

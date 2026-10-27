@@ -1,0 +1,41 @@
+-- "Tomar asistencia" en el teléfono, igual que en Laravel: quién la toma (lo asigna el
+-- administrador), horarios y días de los acopiadores, asistencias y justificaciones.
+ALTER TABLE usuario ADD COLUMN toma_asistencia INTEGER NOT NULL DEFAULT 0;
+
+CREATE TABLE horario_asistencia (
+    id TEXT NOT NULL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    hora_inicio TEXT NOT NULL,
+    hora_limite_presente TEXT NOT NULL,
+    hora_limite_tardanza TEXT NOT NULL,
+    activo INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE dia_asistencia_acopiador (
+    id TEXT NOT NULL PRIMARY KEY,
+    fecha TEXT NOT NULL
+);
+
+CREATE TABLE asistencia (
+    id TEXT NOT NULL PRIMARY KEY,
+    usuario_id TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    horario_asistencia_id TEXT,
+    estado TEXT NOT NULL,
+    hora_marcada TEXT,
+    registrado_por TEXT
+);
+
+CREATE INDEX asistencia_fecha ON asistencia(fecha);
+
+CREATE TABLE justificacion (
+    id TEXT NOT NULL PRIMARY KEY,
+    asistencia_id TEXT NOT NULL,
+    motivo TEXT NOT NULL,
+    tiene_archivo INTEGER NOT NULL DEFAULT 0,
+    estado TEXT NOT NULL,
+    enviada_en TEXT
+);
+
+-- Descarga completa: trae a quién se le asignó tomar asistencia y lo ya registrado en Laravel.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

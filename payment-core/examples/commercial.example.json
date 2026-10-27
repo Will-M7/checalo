@@ -1,0 +1,15 @@
+{
+  "matchSecret": "",
+  "allowLocalHttp": true,
+  "ttlSeconds": 300,
+  "clients": [
+    {
+      "id": "huata-local",
+      "key": "",
+      "receivers": [],
+      "receiverAdministration": true
+    }
+  ],
+  "receivers": [],
+  "devices": []
+}

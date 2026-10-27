@@ -1,0 +1,22 @@
+CREATE TABLE precio_leche (
+    id TEXT NOT NULL PRIMARY KEY,
+    precio_litro REAL NOT NULL,
+    vigente_desde TEXT NOT NULL
+);
+
+-- Como `PrecioLeche::vigente()` de Laravel: el más reciente cuya vigencia ya empezó.
+selectVigente:
+SELECT * FROM precio_leche WHERE vigente_desde <= date('now', 'localtime') ORDER BY vigente_desde DESC LIMIT 1;
+
+-- Historial de la pantalla de precios (los 10 más recientes).
+selectHistorial:
+SELECT * FROM precio_leche ORDER BY vigente_desde DESC LIMIT 10;
+
+selectAll:
+SELECT * FROM precio_leche ORDER BY vigente_desde DESC;
+
+insert:
+INSERT INTO precio_leche(id, precio_litro, vigente_desde) VALUES (?, ?, ?);
+
+upsertFromSync:
+INSERT OR REPLACE INTO precio_leche(id, precio_litro, vigente_desde) VALUES (?, ?, ?);

@@ -1,0 +1,7 @@
+-- Varios roles por usuario y comunicados dirigidos a roles, igual que en Laravel
+-- (`users.roles` y `comunicados.roles`, ambos listas de roles).
+ALTER TABLE usuario ADD COLUMN roles TEXT NOT NULL DEFAULT '';
+ALTER TABLE comunicado ADD COLUMN roles TEXT;
+-- Fuerza una descarga completa en el próximo sync: los usuarios y comunicados que no cambiaron
+-- en Laravel no volverían a llegar y se quedarían sin sus roles.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

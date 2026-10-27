@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solo pruebas LAN. El servidor Huata se configura en la aplicación; Core permanece privado.
+     Release no habilita tráfico HTTP en claro. No existe dependencia de USB o túneles. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:usesCleartextTraffic="true" />
+</manifest>

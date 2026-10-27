@@ -1,0 +1,7 @@
+-- Mis entregas del proveedor como en Laravel: lo que entregó (`litros_entregados`) y el litraje
+-- que llegó a planta y se paga (`litros`, que el acopiador puede corregir).
+ALTER TABLE recojo ADD COLUMN litros_entregados REAL;
+UPDATE recojo SET litros_entregados = litros;
+
+-- Descarga completa: trae los litros entregados de los recojos ya registrados.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

@@ -1,0 +1,39 @@
+-- Subida app -> Laravel: cola de cambios hechos en el teléfono (la llenan triggers creados por
+-- RegistroCambios.kt) y bandera para no anotar lo que llega del servidor.
+CREATE TABLE IF NOT EXISTS cambio_pendiente (
+    orden INTEGER PRIMARY KEY AUTOINCREMENT,
+    tabla TEXT NOT NULL,
+    registro_id TEXT NOT NULL,
+    operacion TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sync_control (
+    id INTEGER NOT NULL PRIMARY KEY,
+    aplicando INTEGER NOT NULL DEFAULT 0
+);
+
+INSERT OR IGNORE INTO sync_control(id, aplicando) VALUES (1, 0);
+
+-- Lo que ya se había creado en el teléfono (id UUID, no numérico como los de Laravel) se sube
+-- en la próxima sincronización. Primero los registros de los que dependen los demás.
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'usuario', id, 'guardar' FROM usuario WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'acopiador', id, 'guardar' FROM acopiador WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'proveedor', id, 'guardar' FROM proveedor WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'empresa', id, 'guardar' FROM empresa WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'precio_leche', id, 'guardar' FROM precio_leche WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'descuento', id, 'guardar' FROM descuento WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'turno', id, 'guardar' FROM turno WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'turno_produccion', id, 'guardar' FROM turno_produccion WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'ruta', id, 'guardar' FROM ruta WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'cliente', id, 'guardar' FROM cliente WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'unidad_medida', id, 'guardar' FROM unidad_medida WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'insumo', id, 'guardar' FROM insumo WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'receta', id, 'guardar' FROM receta WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'receta_detalle', id, 'guardar' FROM receta_detalle WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'comunicado', id, 'guardar' FROM comunicado WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'recojo', id, 'guardar' FROM recojo WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'resultado_laboratorio', id, 'guardar' FROM resultado_laboratorio WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'entrega_planta', id, 'guardar' FROM entrega_planta WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'pago_proveedor', id, 'guardar' FROM pago_proveedor WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'compra', id, 'guardar' FROM compra WHERE id GLOB '*[^0-9]*';
+INSERT INTO cambio_pendiente(tabla, registro_id, operacion) SELECT 'compra_detalle', id, 'guardar' FROM compra_detalle WHERE id GLOB '*[^0-9]*';

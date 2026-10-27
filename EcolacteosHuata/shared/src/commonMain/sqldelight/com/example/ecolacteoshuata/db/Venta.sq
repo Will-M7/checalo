@@ -1,0 +1,68 @@
+CREATE TABLE venta (
+    id TEXT NOT NULL PRIMARY KEY,
+    numero_boleta TEXT NOT NULL,
+    cliente_id TEXT,
+    cliente_nombre_libre TEXT,
+    cliente_doc_libre TEXT,
+    fecha TEXT NOT NULL,
+    subtotal REAL NOT NULL,
+    descuento REAL NOT NULL,
+    descuento_tipo TEXT NOT NULL DEFAULT '',
+    total REAL NOT NULL,
+    metodo_pago TEXT NOT NULL,
+    efectivo_recibido REAL,
+    vuelto REAL,
+    vendedor_id TEXT,
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id)
+);
+
+CREATE TABLE venta_item (
+    id TEXT NOT NULL PRIMARY KEY,
+    venta_id TEXT NOT NULL,
+    producto_id TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    precio_unitario REAL NOT NULL,
+    cantidad INTEGER NOT NULL,
+    subtotal REAL NOT NULL,
+    -- Producción de la que salió lo vendido (como en Laravel); producto_id guarda el mismo id.
+    produccion_id TEXT,
+    FOREIGN KEY (venta_id) REFERENCES venta(id),
+    FOREIGN KEY (producto_id) REFERENCES producto(id)
+);
+
+CREATE INDEX idx_venta_fecha ON venta(fecha);
+CREATE INDEX idx_venta_item_venta ON venta_item(venta_id);
+
+selectAll:
+SELECT * FROM venta ORDER BY fecha DESC;
+
+selectById:
+SELECT * FROM venta WHERE id = ?;
+
+selectEntreFechas:
+SELECT * FROM venta WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+
+countAll:
+SELECT COUNT(*) FROM venta;
+
+insert:
+INSERT INTO venta(id, numero_boleta, cliente_id, cliente_nombre_libre, cliente_doc_libre, fecha, subtotal, descuento, descuento_tipo, total, metodo_pago, efectivo_recibido, vuelto, vendedor_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+upsertFromSync:
+INSERT OR REPLACE INTO venta(id, numero_boleta, cliente_id, cliente_nombre_libre, cliente_doc_libre, fecha, subtotal, descuento, descuento_tipo, total, metodo_pago, efectivo_recibido, vuelto, vendedor_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteItemsByVenta:
+DELETE FROM venta_item WHERE venta_id = ?;
+
+selectItemsByVenta:
+SELECT * FROM venta_item WHERE venta_id = ?;
+
+insertItem:
+INSERT INTO venta_item(id, venta_id, producto_id, nombre, precio_unitario, cantidad, subtotal, produccion_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+-- "Limpiar historial": la boleta se borra con sus ítems (no repone stock, como en Laravel).
+deleteById:
+DELETE FROM venta WHERE id = ?;

@@ -1,0 +1,5 @@
+-- Mapa de rutas: el camino que planta traza para el acopiador (lista "lat,lng;lat,lng")
+-- y el orden de recojo de cada parada, igual que `rutas.trazo` y `ruta_proveedor.orden`
+-- del sistema Laravel.
+ALTER TABLE ruta ADD COLUMN trazo TEXT;
+ALTER TABLE ruta_proveedor ADD COLUMN orden INTEGER NOT NULL DEFAULT 0;

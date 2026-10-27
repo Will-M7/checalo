@@ -1,0 +1,13 @@
+-- Resultado de laboratorio con los mismos campos que Laravel: litraje y análisis completo.
+ALTER TABLE resultado_laboratorio ADD COLUMN litros REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN grasa REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN sng REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN proteina REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN lactosa REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN sales REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN total_solidos REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN agua_anadida REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN punto_congelacion REAL;
+ALTER TABLE resultado_laboratorio ADD COLUMN ph REAL;
+-- Descarga completa en el próximo sync para traer los análisis que ya existen en Laravel.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

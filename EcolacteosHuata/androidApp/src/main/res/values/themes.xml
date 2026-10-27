@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="huata_crema">#FFFCF3</color>
+    <color name="huata_verde_profundo">#0F2E1E</color>
+
+    <style name="Theme.EcolacteosHuata" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <!-- Mientras arranca la app se ve color "leche" en vez del blanco genérico. -->
+        <item name="android:windowBackground">@color/huata_crema</item>
+        <item name="android:statusBarColor">@color/huata_verde_profundo</item>
+    </style>
+</resources>

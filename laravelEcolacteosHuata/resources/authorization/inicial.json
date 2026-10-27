@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "asignaciones": {
+    "administrador": [
+      "admin.panel",
+      "admin.usuarios",
+      "admin.asignar-roles",
+      "admin.roles",
+      "admin.descuentos",
+      "admin.precios",
+      "admin.turnos",
+      "admin.empresa",
+      "planta.rutas",
+      "planta.pagos",
+      "planta.comunicados",
+      "vendedor.pedidos-web",
+      "vendedor.configuracion-pagos",
+      "asistencia.mis",
+      "asistencia.tomar"
+    ],
+    "personal_planta": [
+      "planta.rutas",
+      "planta.comunicados",
+      "planta.panel",
+      "planta.laboratorio",
+      "planta.entregas",
+      "planta.pagos",
+      "asistencia.mis"
+    ],
+    "acopiador": [
+      "acopiador.panel",
+      "acopiador.recojo",
+      "acopiador.mapa-recojo",
+      "acopiador.entrega",
+      "acopiador.inventario",
+      "asistencia.mis"
+    ],
+    "proveedor": [
+      "proveedor.panel",
+      "proveedor.entregas",
+      "proveedor.laboratorio",
+      "proveedor.comunicados"
+    ],
+    "vendedor": [
+      "vendedor.configuracion-pagos",
+      "vendedor.pedidos-web",
+      "vendedor.panel",
+      "vendedor.ventas",
+      "vendedor.produccion",
+      "vendedor.historial",
+      "vendedor.clientes",
+      "vendedor.inventario",
+      "asistencia.mis"
+    ],
+    "produccion": [
+      "produccion.panel",
+      "produccion.registros",
+      "produccion.recetas",
+      "produccion.insumos",
+      "produccion.unidades",
+      "produccion.productos",
+      "produccion.compras",
+      "produccion.inventario",
+      "asistencia.mis"
+    ]
+  },
+  "origen": {
+    "descripcion": "Distribución Inicial aprobada el 27/10/2026. No se aplica a instalaciones operativas."
+  }
+}

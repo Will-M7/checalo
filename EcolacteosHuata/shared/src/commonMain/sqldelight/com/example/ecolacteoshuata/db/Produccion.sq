@@ -1,0 +1,56 @@
+CREATE TABLE produccion (
+    id TEXT NOT NULL PRIMARY KEY,
+    fecha TEXT NOT NULL,
+    receta_id TEXT NOT NULL,
+    producto_id TEXT,
+    cantidad_lotes REAL NOT NULL,
+    cantidad_producida REAL NOT NULL,
+    observaciones TEXT NOT NULL DEFAULT '',
+    -- Turno de producción (opcional), como en Laravel.
+    turno_id TEXT,
+    -- PLANIFICADA hasta que se publica (COMPLETADA).
+    estado TEXT NOT NULL DEFAULT 'PLANIFICADA',
+    -- Como en Laravel, la producción publicada es lo que se vende: su stock es
+    -- cantidad_producida - cantidad_vendida.
+    nombre TEXT NOT NULL DEFAULT '',
+    lote TEXT NOT NULL DEFAULT '',
+    cantidad_vendida REAL NOT NULL DEFAULT 0,
+    responsable_id TEXT,
+    FOREIGN KEY (receta_id) REFERENCES receta(id),
+    FOREIGN KEY (producto_id) REFERENCES producto(id)
+);
+
+CREATE INDEX idx_produccion_fecha ON produccion(fecha);
+
+selectAll:
+SELECT * FROM produccion ORDER BY fecha DESC;
+
+selectCompletadas:
+SELECT * FROM produccion WHERE estado = 'COMPLETADA' ORDER BY fecha DESC;
+
+selectById:
+SELECT * FROM produccion WHERE id = ?;
+
+insert:
+INSERT INTO produccion(id, fecha, receta_id, producto_id, cantidad_lotes, cantidad_producida, observaciones, turno_id, nombre, lote, responsable_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Editar / actualizar: vuelve a PLANIFICADA, igual que Laravel.
+update:
+UPDATE produccion
+SET receta_id = ?, producto_id = ?, cantidad_lotes = ?, cantidad_producida = ?, turno_id = ?, nombre = ?, estado = 'PLANIFICADA'
+WHERE id = ?;
+
+publicar:
+UPDATE produccion SET estado = 'COMPLETADA' WHERE id = ?;
+
+-- Como Produccion::vender() de Laravel: nunca se vende más de lo producido.
+sumarVendido:
+UPDATE produccion SET cantidad_vendida = MIN(cantidad_producida, cantidad_vendida + ?) WHERE id = ?;
+
+deleteById:
+DELETE FROM produccion WHERE id = ?;
+
+upsertFromSync:
+INSERT OR REPLACE INTO produccion(id, fecha, receta_id, producto_id, cantidad_lotes, cantidad_producida, observaciones, turno_id, estado, nombre, lote, cantidad_vendida, responsable_id)
+VALUES (?, ?, ?, NULL, ?, ?, '', ?, ?, ?, ?, ?, ?);

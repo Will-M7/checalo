@@ -1,0 +1,10 @@
+-- Notificaciones de la campana como en Laravel (comunicados y asesoramiento, etc.).
+CREATE TABLE notificacion (
+    id TEXT NOT NULL PRIMARY KEY,
+    tipo TEXT NOT NULL,
+    titulo TEXT NOT NULL,
+    mensaje TEXT NOT NULL,
+    leida INTEGER NOT NULL DEFAULT 0,
+    creada_en TEXT NOT NULL,
+    avisada INTEGER NOT NULL DEFAULT 0
+);

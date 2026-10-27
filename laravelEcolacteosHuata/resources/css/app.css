@@ -1,0 +1,139 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+@import './sistema.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --font-display: 'Bricolage Grotesque', 'Figtree', ui-sans-serif, system-ui, sans-serif;
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    /* Huata Corporate: azul corporativo de la marca (los nombres huata-verde-* se conservan para no tocar cada vista) */
+    --color-huata-verde-50: #f2f8fd;
+    --color-huata-verde-100: #eaf3fb;
+    --color-huata-verde-200: #dce9f5;
+    --color-huata-verde-300: #a9c8e8;
+    --color-huata-verde-400: #6ea3de;
+    --color-huata-verde-500: #4a82c8;
+    --color-huata-verde-600: #2864b4;
+    --color-huata-verde-700: #1f5299;
+    --color-huata-verde-800: #173d72;
+    --color-huata-verde-900: #112e57;
+    --color-huata-verde-950: #0c2140;
+
+    /* Verde Huata: identidad productiva y acciones secundarias */
+    --color-huata-pasto-50: #eefaf4;
+    --color-huata-pasto-100: #d5f1e3;
+    --color-huata-pasto-300: #7fcfa6;
+    --color-huata-pasto-500: #2fa371;
+    --color-huata-pasto-600: #23865b;
+    --color-huata-pasto-700: #1b6b49;
+
+    --color-huata-celeste-50: #eff9ff;
+    --color-huata-celeste-100: #def0ff;
+    --color-huata-celeste-200: #b6e4ff;
+    --color-huata-celeste-300: #77d1ff;
+    --color-huata-celeste-400: #2fbaff;
+    --color-huata-celeste-500: #049fef;
+    --color-huata-celeste-600: #007fcc;
+    --color-huata-celeste-700: #0165a5;
+    --color-huata-celeste-800: #075587;
+    --color-huata-celeste-900: #0b4770;
+
+    --color-huata-amarillo-400: #f5d35c;
+    --color-huata-amarillo-500: #f2c230;
+    --color-huata-amarillo-600: #d4a516;
+
+    --color-huata-rojo-500: #d84557;
+    --color-huata-rojo-600: #c93445;
+    --color-huata-rojo-700: #a52a39;
+
+    --color-accent: var(--color-huata-verde-600);
+    --color-accent-content: var(--color-huata-verde-600);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-huata-verde-400);
+        --color-accent-content: var(--color-huata-verde-300);
+        --color-accent-foreground: var(--color-huata-verde-950);
+    }
+}
+
+@layer utilities {
+    @keyframes huata-fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(0.75rem);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-huata-in {
+        animation: huata-fade-in-up 0.5s ease-out both;
+    }
+
+    .animate-huata-in-delay-1 {
+        animation: huata-fade-in-up 0.5s ease-out 0.08s both;
+    }
+
+    .animate-huata-in-delay-2 {
+        animation: huata-fade-in-up 0.5s ease-out 0.16s both;
+    }
+
+    .animate-huata-in-delay-3 {
+        animation: huata-fade-in-up 0.5s ease-out 0.24s both;
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */

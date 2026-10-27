@@ -1,0 +1,30 @@
+CREATE TABLE entrega_planta (
+    id TEXT NOT NULL PRIMARY KEY,
+    acopiador_id TEXT NOT NULL,
+    turno_id TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    litros_total REAL NOT NULL,
+    total_pagado REAL NOT NULL,
+    total_deuda REAL NOT NULL,
+    proveedores_no_recogidos INTEGER NOT NULL,
+    guia TEXT NOT NULL,
+    FOREIGN KEY (acopiador_id) REFERENCES acopiador(id),
+    FOREIGN KEY (turno_id) REFERENCES turno(id)
+);
+
+selectAll:
+SELECT * FROM entrega_planta ORDER BY fecha DESC;
+
+selectByAcopiador:
+SELECT * FROM entrega_planta WHERE acopiador_id = ? ORDER BY fecha DESC;
+
+selectEntreFechas:
+SELECT * FROM entrega_planta WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+
+insert:
+INSERT INTO entrega_planta(id, acopiador_id, turno_id, fecha, litros_total, total_pagado, total_deuda, proveedores_no_recogidos, guia)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+upsertFromSync:
+INSERT OR REPLACE INTO entrega_planta(id, acopiador_id, turno_id, fecha, litros_total, total_pagado, total_deuda, proveedores_no_recogidos, guia)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);

@@ -1,0 +1,7 @@
+-- Insumo con costo unitario y stock actual (formulario igual a Laravel).
+ALTER TABLE insumo ADD COLUMN costo_unitario REAL NOT NULL DEFAULT 0;
+ALTER TABLE insumo ADD COLUMN stock_actual REAL NOT NULL DEFAULT 0;
+-- Producción con turno de producción opcional.
+ALTER TABLE produccion ADD COLUMN turno_id TEXT;
+-- Descarga completa en el próximo sync para traer el costo unitario de los insumos.
+UPDATE conexion_servidor SET ultima_sincronizacion = NULL;

@@ -1,0 +1,62 @@
+CREATE TABLE autorizacion_local (
+    usuario_id TEXT NOT NULL PRIMARY KEY,
+    version TEXT NOT NULL,
+    documento TEXT NOT NULL
+);
+CREATE TABLE autorizacion_sesion (
+    id INTEGER NOT NULL PRIMARY KEY,
+    usuario_id TEXT
+);
+INSERT INTO autorizacion_sesion(id, usuario_id) VALUES (1, NULL);
+CREATE TABLE autorizacion_pantalla (
+    usuario_id TEXT NOT NULL,
+    pantalla TEXT NOT NULL,
+    PRIMARY KEY(usuario_id, pantalla)
+);
+CREATE TABLE cambio_revision (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    actor_id TEXT,
+    version TEXT,
+    tabla TEXT NOT NULL,
+    registro_id TEXT NOT NULL,
+    operacion TEXT NOT NULL,
+    documento TEXT NOT NULL,
+    motivo TEXT NOT NULL,
+    creado_en TEXT NOT NULL
+);
+
+selectUsuario:
+SELECT * FROM autorizacion_local WHERE usuario_id = ?;
+
+guardar:
+INSERT OR REPLACE INTO autorizacion_local(usuario_id, version, documento) VALUES (?, ?, ?);
+
+borrarPantallas:
+DELETE FROM autorizacion_pantalla WHERE usuario_id = ?;
+
+asignarPantalla:
+INSERT OR IGNORE INTO autorizacion_pantalla(usuario_id, pantalla) VALUES (?, ?);
+
+sesion:
+UPDATE autorizacion_sesion SET usuario_id = ? WHERE id = 1;
+
+revisiones:
+SELECT * FROM cambio_revision ORDER BY id;
+
+revisar:
+INSERT INTO cambio_revision(actor_id, version, tabla, registro_id, operacion, documento, motivo, creado_en) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+selectTodas:
+SELECT * FROM autorizacion_local;
+
+CREATE TABLE autorizacion_migracion (id INTEGER NOT NULL PRIMARY KEY, importada INTEGER NOT NULL);
+INSERT INTO autorizacion_migracion(id,importada) VALUES (1,1);
+
+estadoMigracion:
+SELECT importada FROM autorizacion_migracion WHERE id = 1;
+
+terminarMigracion:
+UPDATE autorizacion_migracion SET importada = 1 WHERE id = 1;
+
+sesionActual:
+SELECT usuario_id FROM autorizacion_sesion WHERE id = 1 AND usuario_id IS NOT NULL;

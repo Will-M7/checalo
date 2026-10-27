@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS conexion_servidor (
+    id INTEGER NOT NULL PRIMARY KEY,
+    host TEXT NOT NULL,
+    puerto TEXT NOT NULL,
+    activa INTEGER NOT NULL
+);
