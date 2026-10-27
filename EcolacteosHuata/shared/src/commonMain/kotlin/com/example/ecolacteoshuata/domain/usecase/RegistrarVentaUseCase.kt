@@ -32,8 +32,13 @@ class RegistrarVentaUseCase(
     private val clienteRepository: ClienteRepository,
     private val productoRepository: ProductoRepository,
     private val borradores: com.example.ecolacteoshuata.domain.repository.BorradorVentaYapeRepository? = null,
+    private val sesion: com.example.ecolacteoshuata.domain.repository.SessionRepository? = null,
 ) {
     suspend operator fun invoke(input: RegistrarVentaInput): AppResult<Venta> {
+        sesion?.let {
+            val a = it.usuarioActual.value?.autorizacion
+            if (a == null || "vendedor.ventas" !in a.capacidades_comerciales) return AppResult.Error("Se requiere capacidad comercial explícita. Actualiza tus autorizaciones con el servidor.")
+        }
         if (input.items.isEmpty()) return AppResult.Error("Agrega al menos un producto al carrito.")
         if (input.metodoPago == MetodoPago.YAPE) {
             val drafts=borradores

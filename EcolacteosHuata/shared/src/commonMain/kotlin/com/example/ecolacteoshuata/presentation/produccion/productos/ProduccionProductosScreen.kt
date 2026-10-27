@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.produccion.productos
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,27 +55,33 @@ fun ProduccionProductosScreen(
     /** Vendedor: el estado de stock de Laravel (Sin stock / Cantidad baja / Disponible) en vez de "Completada". */
     estadoStock: Boolean = false,
 ) {
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val productosFiltrados = remember(productos, filtrosLista) { productos.filter { coincideStock(it.registro.disponible, filtrosLista["stock"].orEmpty()) && coincideFecha(it.registro.fecha.toString(), filtrosLista["desde"].orEmpty(), filtrosLista["hasta"].orEmpty()) } }
+
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
         item {
-            AppTextField(busqueda, onBusquedaChange, "Buscar por receta...")
+            FiltrosListado(busqueda, onBusquedaChange, listOf(
+                CampoFiltro("stock", "Disponibilidad", filtrosLista["stock"].orEmpty(), listOf("disponible" to "Con stock", "bajo" to "Cantidad baja (hasta 5)", "agotado" to "Sin stock")),
+                CampoFiltro("desde", "Desde", filtrosLista["desde"].orEmpty()), CampoFiltro("hasta", "Hasta", filtrosLista["hasta"].orEmpty()),
+            ), { k, v -> filtrosLista = filtrosLista + (k to v) }, { filtrosLista = emptyMap(); onBusquedaChange("") }, "Buscar por receta...")
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                KpiCard("Unidades disponibles", cantidad(productos.sumOf { it.registro.disponible }), AcentoVerde, Modifier.weight(1f), Icons.Filled.Inventory2)
-                KpiCard("Valor total", formatMoney(productos.sumOf { it.precioTotal }), AcentoCeleste, Modifier.weight(1f), Icons.Filled.Payments)
+                KpiCard("Unidades disponibles", cantidad(productosFiltrados.sumOf { it.registro.disponible }), AcentoVerde, Modifier.weight(1f), Icons.Filled.Inventory2)
+                KpiCard("Valor total", formatMoney(productosFiltrados.sumOf { it.precioTotal }), AcentoCeleste, Modifier.weight(1f), Icons.Filled.Payments)
             }
         }
-        item { TituloSeccion("Listos para vender (${productos.size})") }
-        if (productos.isEmpty()) {
+        item { TituloSeccion("Listos para vender (${productosFiltrados.size})") }
+        if (productosFiltrados.isEmpty()) {
             item {
                 EmptyState(
-                    "Sin productos",
-                    if (busqueda.isBlank()) "Publica una producción para que aparezca aquí." else "No se encontraron producciones.",
+                    "Sin productosFiltrados",
+                    if (busqueda.isBlank() && filtrosLista.values.all { it.isBlank() }) "Publica una producción para que aparezca aquí." else "No se encontraron producciones.",
                     icono = Icons.Filled.Storefront,
                 )
             }
         }
-        itemsIndexed(productos, key = { _, it -> it.registro.id }) { index, producto ->
+        itemsIndexed(productosFiltrados, key = { _, it -> it.registro.id }) { index, producto ->
             val registro = producto.registro
             StaggeredListItem(index = index) {
                 SectionCard {

@@ -12,6 +12,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public ?int $proveedorId = null;
 
     public ?int $recojoEditId = null;
@@ -31,7 +33,7 @@ new class extends Component
         $acopiador = auth()->user()->acopiador;
 
         $proveedores = $acopiador
-            ? $acopiador->proveedores()->with('user')->orderBy('id')->get()
+            ? $acopiador->proveedores()->with('user')->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->orderBy('id')->get()
             : collect();
 
         // Una vez que el acopiador entrega a planta, sus recojos de hoy quedan marcados como
@@ -46,7 +48,7 @@ new class extends Component
 
         return [
             'acopiador' => $acopiador,
-            'proveedores' => $proveedores,
+            'proveedores' => $proveedores->filter(fn ($p) => $this->filtro('recogido') === '' || ($this->filtro('recogido') === '1') === $recojosHoyPorProveedor->has($p->id)),
             'recogidosHoyIds' => $recojosHoyPorProveedor->keys(),
             'litrosHoyPorProveedor' => $recojosHoyPorProveedor->map(fn ($recojos) => $recojos->sum('litros')),
             'ultimoRecojoPorProveedor' => $recojosHoyPorProveedor->map(fn ($recojos) => $recojos->sortByDesc('id')->first()),
@@ -148,6 +150,8 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <x-ui.titulo titulo="Recojo de ruta">{{ $acopiador?->ruta_nombre ?? 'Sin ruta asignada' }}</x-ui.titulo>
+    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar proveedor..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Ronda actual" wire:model.live="filtros.recogido"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Con recojo</flux:select.option><flux:select.option value="0">Sin recojo</flux:select.option></flux:select></x-ui.filtros></div>
+
 
     <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
         <flux:table>

@@ -7,6 +7,7 @@ Route::prefix('{current_team}/admin')
     ->middleware(['auth:web', EnsureTeamMembership::class, 'role:administrador'])
     ->name('admin.')
     ->group(function () {
+        Route::livewire('finanzas', 'pages::admin.finanzas')->name('finanzas');
         Route::livewire('roles', 'pages::admin.roles')->name('roles');
         Route::livewire('panel', 'pages::admin.panel')->name('panel');
         Route::livewire('usuarios', 'pages::admin.usuarios')->name('usuarios');

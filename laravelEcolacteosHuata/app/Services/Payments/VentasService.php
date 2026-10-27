@@ -60,7 +60,7 @@ class VentasService
 
     public function presencialManual(User $seller, array $items, array $discounts, string $method, array $customer, ?int $cash, string $reference): Venta
     {
-        abort_unless($seller->activo && $seller->puedePantalla('vendedor.ventas'), 403);
+        abort_unless($seller->activo && $seller->puedeVender('vendedor.ventas'), 403);
         if (in_array($method, ['yape', 'saldo'], true)) {
             throw ValidationException::withMessages(['pago' => 'Este método exige su flujo de pago verificado.']);
         }
@@ -81,11 +81,11 @@ class VentasService
         }, 5);
     }
 
-    public function registrar(array $quote, User $seller, string $method, array $customer = [], ?int $cash = null, ?IntentoPago $payment = null): Venta
+    public function registrar(array $quote, User $seller, string $method, array $customer = [], ?int $cash = null, ?IntentoPago $payment = null, ?PedidoWeb $order = null): Venta
     {
         // A previously assigned, verified incoming payment must survive deactivation of its seller.
-        $boundPayment = $method === 'yape' && $payment && $payment->estado === 'PAID' && $payment->user_id === $seller->id;
-        abort_unless($boundPayment || ($seller->activo && ($seller->puedePantalla('vendedor.ventas') || $seller->puedePantalla('vendedor.pedidos-web'))), 403);
+        $boundPayment = $method === 'yape' && $payment && $payment->estado === 'PAID' && ($payment->user_id === $seller->id || ($order && $payment->pedido_web_id === $order->id && $order->vendedor_asignado_id === $seller->id));
+        abort_unless($boundPayment || ($seller->activo && ($seller->puedeVender('vendedor.ventas') || $seller->puedeVender('vendedor.pedidos-web'))), 403);
         if (! in_array($method, [...array_column(MetodoPago::options(), 'value'), 'saldo'], true)) {
             throw ValidationException::withMessages(['pago' => 'Método inválido.']);
         }
@@ -96,7 +96,7 @@ class VentasService
             throw ValidationException::withMessages(['efectivo' => 'El efectivo recibido debe cubrir el total.']);
         }
 
-        return DB::transaction(function () use ($quote, $seller, $method, $customer, $cash) {
+        return DB::transaction(function () use ($quote, $seller, $method, $customer, $cash, $payment, $order) {
             $number = self::numeroBoleta();
             foreach ($quote['lines'] as $line) {
                 $p = Produccion::find($line['produccion_id']);
@@ -115,6 +115,7 @@ class VentasService
                 Cliente::whereKey($customer['cliente_id'])->increment('compras_count');
             }
 
+            app(\App\Services\Finanzas\FinanzasService::class)->venta($sale, $payment, $order);
             return $sale;
         }, 5);
     }
@@ -126,13 +127,16 @@ class VentasService
             DB::table('integracion_secuencias')->where('clave', 'boleta')->increment('valor', 0);
             $order = PedidoWeb::findOrFail($order->id);
             if ($order->vendedor_asignado_id && $order->vendedor_asignado_id !== $seller->id) {
-                abort_unless($seller->activo && $seller->puedeAdministracionCritica(), 403);
+                abort_unless($seller->activo && $seller->puedeAdministracionCritica() && $seller->puedeVender('vendedor.pedidos-web'), 403);
                 $seller = User::findOrFail($order->vendedor_asignado_id);
             }
             if ($order->estado !== EstadoPedidoWeb::Pendiente) {
                 throw new \RuntimeException('Ese pedido ya fue atendido.');
             }
-            $payment = IntentoPago::where('pedido_web_id', $order->id)->first();
+            if ($order->metodo_pago === 'pendiente') {
+                throw new \RuntimeException('El comprador debe pagar este pedido con saldo desde Mi cuenta.');
+            }
+            $payment = IntentoPago::where('pedido_web_id', $order->id)->where('estado', 'PAID')->latest('id')->first();
             if ($order->metodo_pago === 'yape') {
                 if (! $payment || $payment->estado !== 'PAID' || $payment->applied_at) {
                     throw new \RuntimeException('Primero se debe verificar el ingreso Yape en Payment Core.');
@@ -152,7 +156,7 @@ class VentasService
             $total = Dinero::minor($order->total);
             $quote = ['lines' => $lines, 'subtotal_minor' => $meta['subtotal_minor'] ?? $total, 'discount_minor' => $meta['discount_minor'] ?? 0, 'amount_minor' => $total, 'descuento_tipo' => $meta['descuento_tipo'] ?? ''];
             $customer = ['cliente_id' => $meta['cliente_id'] ?? null, 'cliente_nombre_libre' => $order->nombre, 'cliente_doc_libre' => $meta['cliente_doc_libre'] ?? null];
-            $sale = $this->registrar($quote, $seller, $chosen, $customer, $chosen === 'efectivo' ? $total : null, $payment);
+            $sale = $this->registrar($quote, $seller, $chosen, $customer, $chosen === 'efectivo' ? $total : null, $payment, $order);
             $order->update(['estado' => EstadoPedidoWeb::Confirmado, 'venta_id' => $sale->id, 'pago_estado' => $chosen === 'yape' ? 'pagado' : 'declarado']);
             if ($payment) {
                 $payment->update(['venta_id' => $sale->id, 'applied_at' => now()]);

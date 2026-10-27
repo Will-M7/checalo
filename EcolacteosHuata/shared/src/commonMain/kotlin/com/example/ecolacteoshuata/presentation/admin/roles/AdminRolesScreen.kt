@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.admin.roles
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -27,10 +32,19 @@ fun AdminRolesScreen(
     onActivo: (Boolean) -> Unit, onPantalla: (String) -> Unit, onGuardar: () -> Unit,
     onConsumirMensaje: () -> Unit, onAsignarUsuarios: (() -> Unit)?,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(state.catalogo?.roles.orEmpty(), busquedaFiltro, filtrosLista) { state.catalogo?.roles.orEmpty().filter { (it.nombre.contains(busquedaFiltro, true) || it.codigo.contains(busquedaFiltro, true)) && (filtrosLista["estado"].isNullOrEmpty() || it.activo == (filtrosLista["estado"] == "1")) && (filtrosLista["pantalla"].isNullOrEmpty() || filtrosLista["pantalla"] in it.pantallas) } }
+
     var distribuciones by remember { mutableStateOf(false) }
     if (distribuciones) DistribucionesSheet(onDismiss = { distribuciones = false; onRecargar() })
     Box(Modifier.fillMaxSize()) {
         LazyColumn(Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("estado", "Estado", filtrosLista["estado"].orEmpty(), listOf("1" to "Activos", "0" to "Inactivos")), CampoFiltro("pantalla", "Pantalla asignada", filtrosLista["pantalla"].orEmpty(), state.catalogo?.pantallas.orEmpty().map { it.id to it.nombre })), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && state.catalogo?.roles.orEmpty().isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
             item {
                 Text("Configuración central de Laravel. Requiere conexión.", style = CuerpoStyle, color = GrisTexto)
                 BotonAccion("Distribuciones", Icons.Filled.Shield, VerdeOscuro, { distribuciones = true })
@@ -39,7 +53,7 @@ fun AdminRolesScreen(
                 if (state.cargando) Text("Consultando roles…", style = CuerpoStyle, color = GrisTexto)
                 if (state.form == null && state.error != null) MensajeError(state.error)
             }
-            itemsIndexed(state.catalogo?.roles.orEmpty(), key = { _, r -> r.registro_id }) { index, r ->
+            itemsIndexed(filtrados, key = { _, r -> r.registro_id }) { index, r ->
                 StaggeredListItem(index) {
                     TarjetaLista(
                         titulo = r.nombre, subtitulo = r.codigo + if (r.protegido) " · Protegido" else "",

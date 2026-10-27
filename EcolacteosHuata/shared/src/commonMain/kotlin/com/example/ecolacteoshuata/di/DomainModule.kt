@@ -142,7 +142,7 @@ val domainModule = module {
     factory { SetPrecioLecheUseCase(get()) }
 
     factory { CalcularTotalesCarritoUseCase() }
-    factory { RegistrarVentaUseCase(get(), get(), get(), get()) }
+    factory { RegistrarVentaUseCase(get(), get(), get(), get(), get()) }
 
     factory { RegistrarRecojoUseCase(get(), get(), get()) }
     factory { SincronizarPendientesUseCase(get(), get()) }

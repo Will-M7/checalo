@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.proveedor.entregas
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,7 +65,16 @@ fun ProveedorEntregasScreen(
     onVerDetalle: (FilaEntrega) -> Unit,
     onCerrarDetalle: () -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(state.entregas, busquedaFiltro, filtrosLista) { state.entregas.filter { (it.recojo.estadoOtro.contains(busquedaFiltro, true) || it.turno.orEmpty().contains(busquedaFiltro, true)) && (filtrosLista["pagado"].isNullOrEmpty() || it.recojo.pagado == (filtrosLista["pagado"] == "1")) && (filtrosLista["entregado"].isNullOrEmpty() || it.recojo.entregado == (filtrosLista["entregado"] == "1")) } }
+
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("pagado", "Pago", filtrosLista["pagado"].orEmpty(), listOf("1" to "Pagado", "0" to "Pendiente")), CampoFiltro("entregado", "Recepción", filtrosLista["entregado"].orEmpty(), listOf("1" to "Entregado a planta", "0" to "Pendiente de entrega"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && state.entregas.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
         item(key = "ayuda") {
             Text("Historial de leche entregada y estado de pago.", style = CuerpoStyle, color = GrisTexto)
         }
@@ -79,7 +93,7 @@ fun ProveedorEntregasScreen(
                 EmptyState("Sin entregas", "No tienes entregas registradas en este período.", icono = Icons.Filled.LocalShipping)
             }
         } else {
-            itemsIndexed(state.entregas, key = { _, f -> f.recojo.id }) { index, fila ->
+            itemsIndexed(filtrados, key = { _, f -> f.recojo.id }) { index, fila ->
                 StaggeredListItem(index = index) {
                     TarjetaLista(
                         titulo = fila.recojo.fecha.ddMmYyyy(),

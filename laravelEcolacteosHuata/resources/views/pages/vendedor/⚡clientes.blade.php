@@ -8,6 +8,7 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
     use WithPagination;
 
     public string $busqueda = '';
@@ -27,7 +28,7 @@ new class extends Component
 
     public function with(): array
     {
-        $clientes = Cliente::query()
+        $clientes = Cliente::query()->when($this->filtro('compras') === 'con', fn ($q) => $q->where('compras_count', '>', 0))->when($this->filtro('compras') === 'sin', fn ($q) => $q->where('compras_count', 0))
             ->when($this->busqueda, fn ($q) => $q->where('nombres', 'like', "%{$this->busqueda}%")
                 ->orWhere('apellidos', 'like', "%{$this->busqueda}%")
                 ->orWhere('documento', 'like', "%{$this->busqueda}%"))
@@ -115,12 +116,12 @@ new class extends Component
         </div>
     @endif
 
-    <flux:input
+    <div class="flex flex-wrap items-center gap-3"><flux:input
         wire:model.live.debounce.300ms="busqueda"
         icon="magnifying-glass"
         placeholder="Buscar cliente..."
         class="max-w-sm"
-    />
+    /><x-ui.filtros :activos="$filtros"><flux:select label="Compras registradas" wire:model.live="filtros.compras"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="con">Con compras</flux:select.option><flux:select.option value="sin">Sin compras</flux:select.option></flux:select></x-ui.filtros></div>
 
     <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
         <flux:table :paginate="$clientes">
@@ -153,7 +154,7 @@ new class extends Component
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="5" class="text-center text-zinc-500">
-                            No hay clientes registrados todavía.
+                            {{ $busqueda !== '' || count($filtros) ? 'No se encontraron clientes con estos filtros.' : 'No hay clientes registrados todavía.' }}
                         </flux:table.cell>
                     </flux:table.row>
                 @endforelse

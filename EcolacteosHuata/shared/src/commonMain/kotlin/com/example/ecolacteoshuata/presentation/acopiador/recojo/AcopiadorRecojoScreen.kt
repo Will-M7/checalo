@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.acopiador.recojo
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.material.icons.filled.Agriculture
 import com.example.ecolacteoshuata.core.ui.BotonesFormulario
 import com.example.ecolacteoshuata.core.ui.EncabezadoFormulario
@@ -83,8 +88,17 @@ fun AcopiadorRecojoScreen(
     onEstadoOtroChange: (String) -> Unit,
     onGuardar: () -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(state.proveedores, state.recogidosHoy, busquedaFiltro, filtrosLista) { state.proveedores.filter { it.nombreCompleto.contains(busquedaFiltro, true) && (filtrosLista["recogido"].isNullOrEmpty() || (it.id in state.recogidosHoy) == (filtrosLista["recogido"] == "1")) } }
+
     val recogidos = state.proveedores.count { it.id in state.recogidosHoy }
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("recogido", "Ronda actual", filtrosLista["recogido"].orEmpty(), listOf("1" to "Con recojo", "0" to "Sin recojo"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && state.proveedores.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
         // 1. Turno en el que se registra.
         item {
             SelectorTurnosRuta(turnos = state.turnos, seleccionado = state.turnoSeleccionado, onSeleccionar = onSeleccionarTurno)
@@ -99,7 +113,7 @@ fun AcopiadorRecojoScreen(
         if (state.proveedores.isEmpty()) {
             item { EmptyState("Sin proveedores", "No tienes proveedores asignados.") }
         }
-        itemsIndexed(state.proveedores) { index, proveedor ->
+        itemsIndexed(filtrados, key = { _, it -> it.id }) { index, proveedor ->
             val recogido = proveedor.id in state.recogidosHoy
             StaggeredListItem(index = index) {
                 TarjetaLista(

@@ -16,6 +16,7 @@ use App\Services\Payments\{CobrosService, VentasService, Dinero};
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
     public array $carrito = [];
 
     public string $busquedaProducto = '';
@@ -67,6 +68,12 @@ new class extends Component
 
         return [
             'producciones' => Produccion::query()
+                ->when($this->filtro('stock') === 'disponible', fn ($q) => $q->whereRaw('(cantidad_producida - cantidad_vendida) > 0'))
+                ->when($this->filtro('stock') === 'bajo', fn ($q) => $q->whereRaw('(cantidad_producida - cantidad_vendida) > 0 AND (cantidad_producida - cantidad_vendida) <= 5'))
+                ->when($this->filtro('stock') === 'agotado', fn ($q) => $q->whereRaw('(cantidad_producida - cantidad_vendida) <= 0'))
+                ->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))
+                ->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))
+                
                 ->where('estado', EstadoProduccion::Completada)
                 ->with('receta.detalles.insumo')
                 ->when($this->busquedaProducto, fn ($q) => $q->where(
@@ -300,12 +307,12 @@ new class extends Component
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <flux:input
+            <div class="flex flex-wrap items-center gap-3"><flux:input
                 wire:model.live.debounce.300ms="busquedaProducto"
                 icon="magnifying-glass"
                 placeholder="Filtrar por nombre..."
                 class="max-w-sm"
-            />
+            /><x-ui.filtros :activos="$filtros"><flux:select label="Disponibilidad" wire:model.live="filtros.stock"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="disponible">Con stock</flux:select.option><flux:select.option value="bajo">Cantidad baja (hasta 5)</flux:select.option><flux:select.option value="agotado">Sin stock</flux:select.option></flux:select><flux:input label="Desde" type="date" wire:model.live="filtros.desde" /><flux:input label="Hasta" type="date" wire:model.live="filtros.hasta" /></x-ui.filtros></div>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

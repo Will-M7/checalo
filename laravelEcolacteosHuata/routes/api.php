@@ -35,3 +35,17 @@ Route::post('/bridge/notifications', [YapeBridgeController::class, 'notification
 
 Route::post('/bridge/enroll', [\App\Http\Controllers\Api\BridgeEnrollmentController::class, 'enroll'])->middleware('throttle:10,1');
 Route::post('/mobile/bridge/assertion', [\App\Http\Controllers\Api\BridgeEnrollmentController::class, 'assertion'])->middleware([AuthenticateMobileToken::class, 'throttle:120,1']);
+
+Route::prefix('/mobile/finanzas')->middleware(AuthenticateMobileToken::class)->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\MobileFinanzasController::class, 'index']);
+    Route::get('/clientes', [\App\Http\Controllers\Api\MobileFinanzasController::class, 'clientes']);
+    Route::get('/clientes/{cliente}/pedidos', [\App\Http\Controllers\Api\MobileFinanzasController::class, 'pedidos'])->whereNumber('cliente');
+    Route::post('/rendiciones', [\App\Http\Controllers\Api\MobileFinanzasController::class, 'rendir']);
+});
+
+Route::prefix('/mobile/vendedores-web')->middleware(AuthenticateMobileToken::class)->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\MobileVendedoresWebController::class, 'index']);
+    Route::get('/propio', [\App\Http\Controllers\Api\MobileVendedoresWebController::class, 'propio']);
+    Route::post('/pausa', [\App\Http\Controllers\Api\MobileVendedoresWebController::class, 'pausar']);
+    Route::post('/{usuario}/autorizacion', [\App\Http\Controllers\Api\MobileVendedoresWebController::class, 'autorizar'])->whereNumber('usuario');
+});

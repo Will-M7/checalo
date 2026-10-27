@@ -11,6 +11,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public string $periodo = 'semana';
 
     public string $fecha = '';
@@ -33,7 +35,7 @@ new class extends Component
         $periodo = Periodo::from($this->periodo);
         [$inicio, $fin] = $periodo->rangoParaFecha(Carbon::parse($this->fecha));
 
-        $filas = Proveedor::with('user')->get()->map(function (Proveedor $proveedor) use ($inicio, $fin) {
+        $filas = Proveedor::with('user')->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->get()->map(function (Proveedor $proveedor) use ($inicio, $fin) {
             // El litraje acumulado es el confirmado por el laboratorio (recojo.litros), que es
             // el mismo que determina el monto a pagar; no el litraje entregado originalmente.
             $totalLitros = Recojo::query()
@@ -65,7 +67,7 @@ new class extends Component
             'metodos' => MetodoPago::options(),
             'inicio' => $inicio,
             'fin' => $fin,
-            'filas' => $filas,
+            'filas' => $filas->filter(fn ($f) => $this->filtro('pago') === '' || ($this->filtro('pago') === 'pendiente' ? $f['pendiente'] > 0 : $f['pendiente'] <= 0)),
             'historialProveedor' => $this->historialProveedorId
                 ? Proveedor::with('user')->find($this->historialProveedorId)
                 : null,
@@ -98,7 +100,8 @@ new class extends Component
         $periodo = Periodo::from($this->periodo);
         [$inicio, $fin] = $periodo->rangoParaFecha(Carbon::parse($this->fecha));
 
-        PagoProveedor::create([
+        \Illuminate\Support\Facades\DB::transaction(function () use ($inicio, $fin) {
+        $pago = PagoProveedor::create([
             'proveedor_id' => $this->proveedorPagarId,
             'fecha' => now()->toDateString(),
             'monto' => $this->montoPagar,
@@ -110,6 +113,8 @@ new class extends Component
             ->where('proveedor_id', $this->proveedorPagarId)
             ->whereBetween('fecha', [$inicio->toDateString(), $fin->toDateString()])
             ->update(['pagado' => true, 'metodo_pago' => $this->metodoPago]);
+        app(\App\Services\Finanzas\FinanzasService::class)->egresoProveedor($pago, auth('web')->user());
+        }, 5);
 
         Flux::modal('pago-form')->close();
         Flux::toast('Pago registrado correctamente.', variant: 'success');
@@ -119,6 +124,8 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <x-ui.titulo titulo="Pago a proveedores">Revisa quiénes están pagados y quiénes faltan por período.</x-ui.titulo>
+        <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar proveedor..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Saldo del período" wire:model.live="filtros.pago"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="pendiente">Con pendiente</flux:select.option><flux:select.option value="pagado">Sin pendiente</flux:select.option></flux:select></x-ui.filtros></div>
+
 
     <div class="flex flex-wrap items-end gap-3 rounded-xl border border-huata-verde-100 p-4 dark:border-zinc-700 huata-cuadro">
         <flux:select label="Período" wire:model.live="periodo" class="max-w-xs">
@@ -133,7 +140,7 @@ new class extends Component
     </div>
 
     <div class="max-h-80 overflow-x-auto overflow-y-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
-        <flux:table>
+    <flux:table>
             <flux:table.columns sticky class="bg-white/80 dark:bg-zinc-800/80">
                 <flux:table.column>Proveedor</flux:table.column>
                 <flux:table.column>Fecha</flux:table.column>
@@ -177,7 +184,7 @@ new class extends Component
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="7" class="text-center text-zinc-500">No hay proveedores registrados.</flux:table.cell>
+                        <flux:table.cell colspan="7" class="text-center text-zinc-500">{{ $busqueda !== '' || count($filtros) ? 'No se encontraron proveedores con estos filtros.' : 'No hay proveedores registrados.' }}</flux:table.cell>
                     </flux:table.row>
                 @endforelse
             </flux:table.rows>

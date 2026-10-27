@@ -12,6 +12,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public ?int $resultadoId = null;
 
     public ?int $enviarProduccionId = null;
@@ -106,8 +108,7 @@ new class extends Component
                 ->whereHas('recojos', fn ($q) => $q->where('entregado', true))
                 ->get(),
             'turnos' => Turno::where('es_produccion', true)->orderBy('hora_inicio')->get(),
-            'resultados' => ResultadoLaboratorio::with('proveedor.user', 'turno')
-                ->orderByDesc('fecha')
+            'resultados' => ResultadoLaboratorio::with('proveedor.user', 'turno')->when($this->busqueda !== '', fn ($q) => $q->whereHas('proveedor.user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->when($this->filtro('conforme') !== '', fn ($q) => $q->where('conforme', $this->filtro('conforme') === '1'))->orderByDesc('fecha')
                 ->limit(30)
                 ->get(),
             'resultadoDetalle' => $this->detalleId
@@ -291,6 +292,8 @@ new class extends Component
 
 <div class="flex flex-col gap-8">
     <x-ui.titulo titulo="Laboratorio">Registra resultados de calidad de leche por proveedor.</x-ui.titulo>
+            <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar proveedor del historial..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Análisis" wire:model.live="filtros.conforme"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Conforme</flux:select.option><flux:select.option value="0">No conforme</flux:select.option></flux:select><flux:input label="Desde" type="date" wire:model.live="filtros.desde" /><flux:input label="Hasta" type="date" wire:model.live="filtros.hasta" /></x-ui.filtros></div>
+
 
     <div>
         <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -302,7 +305,7 @@ new class extends Component
             </flux:modal.trigger>
         </div>
         <div class="max-h-[36rem] overflow-x-auto overflow-y-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
-            <flux:table>
+    <flux:table>
                 <flux:table.columns sticky class="bg-white/80 dark:bg-zinc-800/80">
                     <flux:table.column>Proveedor</flux:table.column>
                     <flux:table.column>Fecha</flux:table.column>

@@ -31,6 +31,8 @@ data class VendedorHistorialUiState(
     val ventas: List<FilaVenta> = emptyList(),
     val confirmarLimpiar: Boolean = false,
     val mensaje: String? = null,
+    val vendedorId: String = "",
+    val opcionesVendedor: List<Pair<String, String>> = emptyList(),
 ) {
     val totalPeriodo: Double get() = redondear2(ventas.sumOf { it.venta.total })
     val boletasPeriodo: Int get() = ventas.size
@@ -43,6 +45,7 @@ private data class FiltroHistorial(
     val busqueda: String = "",
     val confirmarLimpiar: Boolean = false,
     val mensaje: String? = null,
+    val vendedorId: String = "",
 )
 
 /**
@@ -70,6 +73,7 @@ class VendedorHistorialViewModel(
         val filas = ventas
             .filter { it.fecha.date >= f.desde && it.fecha.date <= f.hasta }
             .filter { f.metodoPago == null || it.metodoPago == f.metodoPago }
+            .filter { f.vendedorId.isEmpty() || it.vendedorId == f.vendedorId }
             .map { venta ->
                 val cliente = venta.clienteId?.let { clientesPorId[it] }?.nombreCompleto
                     ?: venta.clienteNombreLibre?.takeIf { it.isNotBlank() }
@@ -77,7 +81,7 @@ class VendedorHistorialViewModel(
                 FilaVenta(venta, cliente, venta.vendedorId?.let { usuariosPorId[it]?.nombreCompleto })
             }
             .filter { texto.isEmpty() || it.venta.numeroBoleta.contains(texto, true) || it.cliente.contains(texto, true) }
-        VendedorHistorialUiState(f.desde, f.hasta, f.metodoPago, f.busqueda, filas, f.confirmarLimpiar, f.mensaje)
+        VendedorHistorialUiState(f.desde, f.hasta, f.metodoPago, f.busqueda, filas, f.confirmarLimpiar, f.mensaje, f.vendedorId, ventas.mapNotNull { v -> v.vendedorId?.let { id -> id to (usuariosPorId[id]?.nombreCompleto ?: "Vendedor registrado") } }.distinctBy { it.first })
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), VendedorHistorialUiState(hoy.plusDias(-30), hoy))
 
     fun onDesde(fecha: LocalDate) = filtro.update { it.copy(desde = fecha) }
@@ -85,6 +89,10 @@ class VendedorHistorialViewModel(
     fun onHasta(fecha: LocalDate) = filtro.update { it.copy(hasta = fecha) }
 
     fun onMetodo(metodo: MetodoPago?) = filtro.update { it.copy(metodoPago = metodo) }
+
+    fun onVendedor(id: String) = filtro.update { it.copy(vendedorId = id) }
+
+    fun limpiarFiltros() = filtro.update { it.copy(desde = hoy.plusDias(-30), hasta = hoy, busqueda = "", metodoPago = null, vendedorId = "") }
 
     fun onBusqueda(texto: String) = filtro.update { it.copy(busqueda = texto) }
 

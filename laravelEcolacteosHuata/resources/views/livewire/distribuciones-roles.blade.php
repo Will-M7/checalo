@@ -8,15 +8,16 @@
                 <flux:button wire:loading.attr="disabled" wire:click="nueva">Nueva distribución</flux:button>
                 <flux:button wire:loading.attr="disabled" wire:click="copiar(true)">Guardar asignaciones actuales como copia</flux:button>
             </div>
+            <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" placeholder="Buscar distribución..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Tipo" wire:model.live="filtros.tipo"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="base">Base protegida</flux:select.option><flux:select.option value="personalizada">Personalizada</flux:select.option></flux:select><flux:select label="Contiene rol" wire:model.live="filtros.rol"><flux:select.option value="">Todos</flux:select.option>@foreach($datos['roles'] as $r)<flux:select.option :value="$r['codigo']">{{ $r['nombre'] }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
             <div class="grid gap-3 sm:grid-cols-2">
-                @foreach($datos['distribuciones'] as $d)
+                @forelse($distribucionesFiltradas as $d)
                 <div class="rounded-xl border border-huata-verde-100 p-3 dark:border-zinc-700" wire:key="distribucion-{{ $d['id'] }}">
                     <flux:heading>{{ $d['nombre'] }}</flux:heading>
                     <flux:text>v{{ $d['version'] }} · {{ $d['tipo'] === 'base' ? 'Base protegida' : 'Personalizada' }}{{ $d['predeterminada'] ? ' · Predeterminada para instalaciones nuevas' : '' }}</flux:text>
                     <flux:text>{{ $d['coincide'] ? 'Sus roles coinciden con las asignaciones actuales' : 'Contiene diferencias respecto de las asignaciones actuales' }}</flux:text>
                     <flux:button wire:loading.attr="disabled" size="sm" wire:click="ver({{ $d['id'] }})">Consultar / editar</flux:button>
                 </div>
-                @endforeach
+                @empty<flux:text>No se encontraron distribuciones.</flux:text>@endforelse
             </div>
             <flux:separator />
             <flux:input label="Nombre de la distribución" wire:model="nombre" :readonly="$base" />

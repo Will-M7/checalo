@@ -102,11 +102,16 @@ fun AdminRootScreen(usuario: Usuario, onCerrarSesion: () -> Unit, soloContenido:
                 val vm = koinViewModel<AdminUsuariosViewModel>()
                 val usuarios by vm.usuarios.collectAsState()
                 AdminUsuariosScreen(
+                    catalogoRoles = usuario.autorizacion?.catalogo_roles.orEmpty(),
                     usuarios = usuarios,
                     onAgregar = { usuarioFormId = null; usuarioFormSesion++; mostrarUsuarioForm = true },
                     onEditar = { usuarioFormId = it.id; usuarioFormSesion++; mostrarUsuarioForm = true },
                     onEliminar = { vm.eliminar(it.id) },
                 )
+            }
+            Screen.AdminFinanzas -> {
+                val vm = koinViewModel<com.example.ecolacteoshuata.presentation.admin.finanzas.FinanzasViewModel>()
+                com.example.ecolacteoshuata.presentation.admin.finanzas.FinanzasScreen(vm)
             }
             Screen.AdminRoles -> {
                 val vm = koinViewModel<AdminRolesViewModel>()
@@ -121,6 +126,7 @@ fun AdminRootScreen(usuario: Usuario, onCerrarSesion: () -> Unit, soloContenido:
                 val form by vm.form.collectAsState()
                 val mensaje by vm.mensaje.collectAsState()
                 AdminAsignarRolesScreen(
+                    catalogoRoles = usuario.autorizacion?.catalogo_roles.orEmpty(),
                     usuarios = usuarios, form = form, mensaje = mensaje,
                     onAbrir = vm::abrir, onCerrar = vm::cerrar, onAlternarRol = vm::alternarRol,
                     onGuardar = vm::guardar, onConsumirMensaje = vm::consumirMensaje,

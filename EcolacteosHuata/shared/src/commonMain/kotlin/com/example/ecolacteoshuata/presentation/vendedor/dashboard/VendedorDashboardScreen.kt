@@ -55,8 +55,9 @@ private fun cantidad(valor: Double): String =
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun VendedorDashboardScreen(state: VendedorDashboardUiState, modulos: List<ModuloItem>) {
+fun VendedorDashboardScreen(state: VendedorDashboardUiState, modulos: List<ModuloItem>, disponibilidad: @Composable () -> Unit = {}) {
     PanelScroll {
+        disponibilidad()
         // 1. Ventas de hoy.
         HeroMetricCard(
             etiqueta = "Ventas de hoy",

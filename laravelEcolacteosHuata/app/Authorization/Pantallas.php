@@ -19,6 +19,8 @@ final class Pantallas
         }
         $items['admin.roles'] = ['route' => 'admin.roles', 'label' => 'Roles y funciones', 'icon' => 'shield-check', 'android' => self::android()['admin.roles']];
 
+        $items['admin.finanzas'] = ['route' => 'admin.finanzas', 'label' => 'Finanzas', 'icon' => 'banknotes', 'android' => 'AdminFinanzas'];
+
         foreach ($items as &$item) {
             $item['area'] = match (explode('.', $item['route'])[0]) {
                 'admin' => 'Administración', 'planta' => 'Planta', 'vendedor' => 'Ventas', 'produccion' => 'Producción', 'acopiador' => 'Acopio', 'proveedor' => 'Proveedor', default => 'Asistencia'
@@ -32,7 +34,7 @@ final class Pantallas
     public static function android(): array
     {
         return [
-            'admin.panel' => 'AdminDashboard', 'admin.usuarios' => 'AdminUsuarios', 'admin.roles' => 'AdminRoles',
+            'admin.finanzas' => 'AdminFinanzas', 'admin.panel' => 'AdminDashboard', 'admin.usuarios' => 'AdminUsuarios', 'admin.roles' => 'AdminRoles',
             'admin.asignar-roles' => 'AdminAsignarRoles', 'admin.descuentos' => 'AdminDescuentos',
             'admin.precios' => 'AdminPrecios', 'admin.turnos' => 'AdminTurnos', 'admin.empresa' => 'AdminEmpresa',
             'planta.panel' => 'PlantaDashboard', 'planta.laboratorio' => 'PlantaLaboratorio',

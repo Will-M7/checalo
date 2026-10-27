@@ -17,6 +17,7 @@ data class AutorizacionUsuario(
     val catalogo_roles: List<RolAsignado> = emptyList(),
     val pantallas: List<String> = emptyList(),
     val pantallas_adicionales: List<String> = emptyList(),
+    val capacidades_comerciales: List<String> = emptyList(),
     val mapeo_android: Map<String, String> = emptyMap(),
     val politica_offline: String = "ultima_autorizacion_conocida",
 ) {

@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.acopiador.inventario
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +46,10 @@ import com.example.ecolacteoshuata.core.util.litrosConDecimales
 
 @Composable
 fun AcopiadorInventarioScreen(pendientes: List<Recojo>, turnos: Map<String, Turno>) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val filtrados = remember(pendientes, busquedaFiltro, filtrosLista) { pendientes.filter { it.proveedorNombre.contains(busquedaFiltro, true) && (filtrosLista["pagado"].isNullOrEmpty() || it.pagado == (filtrosLista["pagado"] == "1")) && coincideFecha(it.fecha.toString(), filtrosLista["desde"].orEmpty(), filtrosLista["hasta"].orEmpty()) } }
+
     if (pendientes.isEmpty()) {
         EmptyState(
             "Sin leche pendiente",
@@ -50,11 +59,13 @@ fun AcopiadorInventarioScreen(pendientes: List<Recojo>, turnos: Map<String, Turn
         )
         return
     }
-    val porFecha = pendientes.groupBy { it.fecha }
+    val porFecha = filtrados.groupBy { it.fecha }
     val totalLitros = pendientes.sumOf { it.litros }
     val totalSoles = pendientes.sumOf { it.total }
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+        item { FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("pagado", "Pago", filtrosLista["pagado"].orEmpty(), listOf("1" to "Pagado", "0" to "Pendiente")), CampoFiltro("desde", "Desde", filtrosLista["desde"].orEmpty()), CampoFiltro("hasta", "Hasta", filtrosLista["hasta"].orEmpty())), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Buscar proveedor...") }
+        if (filtrados.isEmpty() && pendientes.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
         item {
             HeroMetricCard(
                 etiqueta = "Pendiente de entregar",

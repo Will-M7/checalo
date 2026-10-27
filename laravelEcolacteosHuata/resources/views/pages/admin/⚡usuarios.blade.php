@@ -11,6 +11,7 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
     use WithPagination;
 
     public string $busqueda = '';
@@ -54,7 +55,12 @@ new class extends Component
     public function with(): array
     {
         return [
-            'usuarios' => User::query()
+            'rolesFiltro' => \App\Models\RolDinamico::orderBy('nombre')->get(),
+            'usuarios' => User::query()->with('rolesDinamicos')
+                ->when($this->filtro('rol'), fn ($q, $rol) => $q->whereHas('rolesDinamicos', fn ($r) => $r->where('codigo', $rol)))
+                ->when($this->filtro('estado') !== '', fn ($q) => $q->where('activo', $this->filtro('estado') === '1'))
+                ->when($this->filtro('cantidad') === 'varios', fn ($q) => $q->has('rolesDinamicos', '>', 1))
+                ->when($this->filtro('cantidad') === 'ninguno', fn ($q) => $q->doesntHave('rolesDinamicos'))
                 ->when($this->busqueda, fn ($q) => $q->where(function ($q) {
                     $q->where('nombres', 'like', "%{$this->busqueda}%")
                         ->orWhere('apellidos', 'like', "%{$this->busqueda}%")
@@ -148,6 +154,20 @@ new class extends Component
         $user->update(['activo' => ! $user->activo]);
     }
 
+    public function desactivarReferenciado(): void
+    {
+        $user = User::findOrFail($this->eliminarId);
+        \App\Authorization\Autorizacion::autorizarGestionUsuario(auth('web')->user(), $user);
+        $user->update(['activo' => false]);
+        $this->resetValidation('usuario');
+        Flux::toast('Usuario desactivado. Se conserva todo su historial.', variant: 'success');
+    }
+
+    public function autorizarWeb(int $id, bool $valor): void
+    {
+        app(\App\Services\VendedoresWeb::class)->cambiar(auth('web')->user(), User::findOrFail($id), $valor, true);
+    }
+
     public function pedirEliminar(int $id): void
     {
         $this->eliminarId = $id;
@@ -158,7 +178,18 @@ new class extends Component
     {
         $user = User::findOrFail($this->eliminarId);
         \App\Authorization\Autorizacion::autorizarGestionUsuario(auth('web')->user(), $user);
-        $user->delete();
+        try {
+            \Illuminate\Support\Facades\DB::transaction(fn () => $user->delete());
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Flux::modal('confirmar-eliminar-usuario')->close();
+            if ($e->validator->errors()->has('usuario')) $this->addError('usuario', $e->validator->errors()->first('usuario'));
+            else Flux::toast($e->validator->errors()->first(), variant: 'warning');
+            return;
+        } catch (\Illuminate\Database\QueryException $e) {
+            $this->addError('usuario', \App\Services\EliminarUsuarioSeguro::MENSAJE);
+            Flux::modal('confirmar-eliminar-usuario')->close();
+            return;
+        }
 
         Flux::modal('confirmar-eliminar-usuario')->close();
         Flux::toast('Usuario eliminado.', variant: 'success');
@@ -175,21 +206,22 @@ new class extends Component
         </flux:modal.trigger>
     </div>
 
-    <flux:input
+    <div class="flex flex-wrap items-center gap-3"><flux:input
         wire:model.live.debounce.300ms="busqueda"
         icon="magnifying-glass"
         placeholder="Buscar por nombre, usuario o documento..."
         class="max-w-sm"
-    />
+    /><x-ui.filtros :activos="$filtros"><flux:select label="Rol actual" wire:model.live="filtros.rol"><flux:select.option value="">Todos</flux:select.option>@foreach($rolesFiltro as $r)<flux:select.option :value="$r->codigo">{{ $r->nombre }}{{ $r->activo ? "" : " (Inactivo)" }}</flux:select.option>@endforeach</flux:select><flux:select label="Estado" wire:model.live="filtros.estado"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Activos</flux:select.option><flux:select.option value="0">Inactivos</flux:select.option></flux:select><flux:select label="Asignaciones" wire:model.live="filtros.cantidad"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="varios">Varios roles</flux:select.option><flux:select.option value="ninguno">Sin roles</flux:select.option></flux:select></x-ui.filtros></div>
 
     <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
     <flux:table :paginate="$usuarios">
-        <flux:table.columns class="bg-white/80 dark:bg-zinc-800/80">
+        @error('usuario')<div role="alert"><flux:text>{{ $message }}</flux:text><flux:button wire:click="desactivarReferenciado">Desactivar usuario</flux:button></div>@enderror
+    <flux:table.columns class="bg-white/80 dark:bg-zinc-800/80">
             <flux:table.column>Nombre</flux:table.column>
             <flux:table.column>Rol</flux:table.column>
             <flux:table.column>Documento</flux:table.column>
             <flux:table.column>Usuario</flux:table.column>
-            <flux:table.column>Estado</flux:table.column>
+            <flux:table.column>Estado</flux:table.column><flux:table.column>Pedidos web</flux:table.column>
             <flux:table.column class="w-px whitespace-nowrap">Acciones</flux:table.column>
         </flux:table.columns>
 
@@ -211,6 +243,11 @@ new class extends Component
                         </flux:badge>
                     </flux:table.cell>
                     <flux:table.cell>
+                        @php($disponibilidad = app(\App\Services\VendedoresWeb::class)->estado($user))
+                        <flux:text>{{ ucfirst($disponibilidad['estado']) }}</flux:text>
+                        @if($disponibilidad['capacidad'])<flux:button size="sm" wire:click="autorizarWeb({{ $user->id }}, {{ $user->pedidos_web_autorizado ? 'false' : 'true' }})">{{ $user->pedidos_web_autorizado ? 'Desautorizar recepción' : 'Autorizar recepción' }}</flux:button>@endif
+                    </flux:table.cell>
+                    <flux:table.cell>
                         <div class="flex gap-2">
                             <flux:modal.trigger name="usuario-form">
                                 <flux:button size="sm" variant="ghost" icon="pencil" wire:click="editar({{ $user->id }})" />
@@ -224,7 +261,7 @@ new class extends Component
             @empty
                 <flux:table.row>
                     <flux:table.cell colspan="6" class="text-center text-zinc-500">
-                        No hay usuarios registrados todavía.
+                        {{ $busqueda !== '' || count($filtros) ? 'No se encontraron usuarios con estos filtros.' : 'No hay usuarios registrados todavía.' }}
                     </flux:table.cell>
                 </flux:table.row>
             @endforelse

@@ -175,6 +175,8 @@ class MobileCambiosController extends Controller
                     }
                 } catch (CambioMovilRechazado $e) {
                     $errores[] = ['tabla' => $tabla, 'id' => $id, 'message' => $e->getMessage()];
+                } catch (ValidationException $e) {
+                    $errores[] = ['tabla' => $tabla, 'id' => $id, 'message' => $e->validator->errors()->first()];
                 } catch (QueryException $e) {
                     report($e);
                     $errores[] = ['tabla' => $tabla, 'id' => $id, 'message' => $cambio['operacion'] === 'eliminar'
@@ -659,7 +661,7 @@ class MobileCambiosController extends Controller
      */
     private function guardarVenta(?Venta $venta, array $d, User $user): Venta
     {
-        if (! $user->activo || ! $user->puedePantalla('vendedor.ventas')) {
+        if (! $user->activo || ! $user->puedeVender('vendedor.ventas')) {
             throw new CambioMovilRechazado('Solo vendedores autorizados pueden importar ventas.');
         }
         if ($venta !== null) {

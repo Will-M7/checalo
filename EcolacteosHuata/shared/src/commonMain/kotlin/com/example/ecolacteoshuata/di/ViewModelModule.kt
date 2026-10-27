@@ -55,6 +55,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
+    viewModel { com.example.ecolacteoshuata.presentation.vendedor.DisponibilidadWebViewModel(get()) }
+    viewModel { com.example.ecolacteoshuata.presentation.admin.finanzas.FinanzasViewModel(get()) }
     viewModel { LoginViewModel(get(), get(), get()) }
 
     viewModel { AdminRootViewModel(get(), get()) }

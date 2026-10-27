@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.planta.comunicados
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.ui.MensajeError
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Campaign
@@ -73,12 +78,21 @@ fun PlantaComunicadosScreen(
     onPublicar: (TipoComunicado, String, String, Set<Rol>?) -> Unit,
     onEliminar: (String) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(comunicados, busquedaFiltro, filtrosLista) { comunicados.filter { (it.titulo.contains(busquedaFiltro, true) || it.descripcion.contains(busquedaFiltro, true)) && (filtrosLista["tipo"].isNullOrEmpty() || it.tipo.name == filtrosLista["tipo"]) } }
+
     Box(modifier = Modifier.fillMaxSize()) {
         if (comunicados.isEmpty()) {
             EmptyState("Sin comunicados", "Publica el primer aviso para los proveedores.", modifier = Modifier.padding(24.dp))
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
-                itemsIndexed(comunicados) { index, comunicado ->
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("tipo", "Tipo", filtrosLista["tipo"].orEmpty(), com.example.ecolacteoshuata.domain.model.TipoComunicado.entries.map { it.name to it.name.lowercase().replaceFirstChar { c -> c.uppercase() } })), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && comunicados.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
+                itemsIndexed(filtrados, key = { _, it -> it.id }) { index, comunicado ->
                     StaggeredListItem(index = index) {
                         val esAsesoria = comunicado.tipo == TipoComunicado.ASESORAMIENTO
                         TarjetaLista(

@@ -11,6 +11,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public ?int $rutaAsignarId = null;
 
     public string $buscarProveedorAsignar = '';
@@ -97,7 +99,7 @@ new class extends Component
         $rutaMapa = $this->rutaMapa();
 
         return [
-            'rutas' => Ruta::with(['acopiador.user', 'turnos', 'proveedores'])->orderBy('nombre')->get(),
+            'rutas' => Ruta::with(['acopiador.user', 'turnos', 'proveedores'])->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('estado') !== '', fn ($q) => $q->where('activa', $this->filtro('estado') === '1'))->when($this->filtro('acopiador'), fn ($q, $v) => $q->where('acopiador_id', $v))->orderBy('nombre')->get(),
             'acopiadores' => Acopiador::with('user')->get(),
             'proveedoresRecogidosHoy' => Recojo::whereDate('fecha', now()->toDateString())->pluck('proveedor_id')->unique(),
             'rutaDetalle' => $this->rutaDetalleId
@@ -530,9 +532,11 @@ new class extends Component
             <flux:button size="sm" variant="primary" icon="plus" wire:click="nuevaRuta">Nueva ruta</flux:button>
         </flux:modal.trigger>
     </div>
+        <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar ruta..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Estado" wire:model.live="filtros.estado"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Activas</flux:select.option><flux:select.option value="0">Inactivas</flux:select.option></flux:select><flux:select label="Acopiador" wire:model.live="filtros.acopiador"><flux:select.option value="">Todos</flux:select.option>@foreach($acopiadores as $a)<flux:select.option :value="$a->id">{{ $a->user->nombreCompleto() }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
+
 
     <div class="max-h-[36rem] overflow-x-auto overflow-y-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
-        <flux:table>
+    <flux:table>
             <flux:table.columns sticky class="bg-white/80 dark:bg-zinc-800/80">
                 <flux:table.column>Ruta</flux:table.column>
                 <flux:table.column>Acopiador</flux:table.column>
@@ -578,7 +582,7 @@ new class extends Component
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="6" class="text-center text-zinc-500">
-                            No hay rutas creadas todavía. Usa "Nueva ruta" para crear la primera.
+                            {{ $busqueda !== '' || count($filtros) ? 'No se encontraron rutas con estos filtros.' : 'No hay rutas creadas todavía. Usa "Nueva ruta" para crear la primera.' }}
                         </flux:table.cell>
                     </flux:table.row>
                 @endforelse

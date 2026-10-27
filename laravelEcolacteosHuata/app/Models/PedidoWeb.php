@@ -71,6 +71,25 @@ class PedidoWeb extends Model
         return $this->belongsTo(Venta::class);
     }
 
+    public function vendedor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'vendedor_asignado_id');
+    }
+
+    public function whatsappPagado(): ?string
+    {
+        if (! $this->venta_id || $this->estado !== EstadoPedidoWeb::Confirmado || $this->pago_estado !== 'pagado') {
+            return null;
+        }
+        $phone = $this->receptor_snapshot['vendedor_whatsapp'] ?? ReceptorPago::where('user_id', $this->vendedor_asignado_id)->value('whatsapp');
+        if (! is_string($phone) || ! preg_match('/^51[0-9]{9}$/', $phone)) {
+            return null;
+        }
+        $detail = $this->items->map(fn ($i) => $i->cantidad.' × '.$i->producto)->implode(', ');
+        $message = 'Hola. Pedido #'.$this->id.': '.$detail.'. Total S/ '.$this->total.'. Pago confirmado.';
+        return 'https://wa.me/'.$phone.'?text='.rawurlencode($message);
+    }
+
     /**
      * Confirma el pedido registrando la venta con su boleta. Descuenta el stock de cada producción
      * (lo hace el ítem de venta al crearse) y deja el pedido ligado a esa venta. Todo o nada: si una

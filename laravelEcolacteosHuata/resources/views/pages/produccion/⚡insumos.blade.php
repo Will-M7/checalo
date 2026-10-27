@@ -8,6 +8,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     // --- Insumo ---
     public ?int $insumoId = null;
 
@@ -37,7 +39,7 @@ new class extends Component
 
         return [
             'unidades' => UnidadMedida::orderBy('nombre')->get(),
-            'insumos' => Insumo::with('unidadMedida')->orderByDesc('es_leche')->orderBy('nombre')->get(),
+            'insumos' => Insumo::with('unidadMedida')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('unidad'), fn ($q, $v) => $q->where('unidad_medida_id', $v))->when($this->filtro('leche') !== '', fn ($q) => $q->where('es_leche', $this->filtro('leche') === '1'))->orderByDesc('es_leche')->orderBy('nombre')->get(),
         ];
     }
 
@@ -171,6 +173,8 @@ new class extends Component
             </flux:button>
         </div>
     </div>
+        <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar insumo..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Tipo" wire:model.live="filtros.leche"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Leche</flux:select.option><flux:select.option value="0">Otros insumos</flux:select.option></flux:select><flux:select label="Unidad" wire:model.live="filtros.unidad"><flux:select.option value="">Todas</flux:select.option>@foreach($unidades as $u)<flux:select.option :value="$u->id">{{ $u->nombre }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
+
 
     {{-- Insumos --}}
     <div>
@@ -181,7 +185,7 @@ new class extends Component
             </flux:modal.trigger>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
+    <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
             <flux:table>
                 <flux:table.columns class="bg-white/80 dark:bg-zinc-800/80">
                     <flux:table.column>Insumo</flux:table.column>

@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.produccion.inventario
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,15 +47,21 @@ import com.example.ecolacteoshuata.presentation.produccion.dashboard.stockBajo
 
 @Composable
 fun ProduccionInventarioScreen(items: List<InventarioInsumoItem>) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val filtrados = remember(items, busquedaFiltro, filtrosLista) { items.filter { it.insumo.nombre.contains(busquedaFiltro, true) && (filtrosLista["unidad"].isNullOrEmpty() || it.insumo.unidadMedidaId == filtrosLista["unidad"]) && when (filtrosLista["stock"]) { "agotado" -> it.stock <= 0; "bajo" -> it.stock > 0 && it.stockBajo(); "disponible" -> it.stock > 0; else -> true } } }
+
     if (items.isEmpty()) {
         EmptyState("Sin insumos", "Registra insumos y compras para ver el inventario.", modifier = Modifier.padding(24.dp), icono = Icons.Filled.Inventory)
         return
     }
     // Los de stock bajo primero, para verlos de inmediato.
-    val ordenados = items.sortedWith(compareByDescending<InventarioInsumoItem> { it.stockBajo() }.thenBy { it.insumo.nombre })
+    val ordenados = filtrados.sortedWith(compareByDescending<InventarioInsumoItem> { it.stockBajo() }.thenBy { it.insumo.nombre })
     val bajos = items.count { it.stockBajo() }
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+        item { FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("unidad", "Unidad", filtrosLista["unidad"].orEmpty(), items.map { it.insumo.unidadMedidaId to it.insumo.unidadMedidaSimbolo }.distinctBy { it.first }), CampoFiltro("stock", "Disponibilidad", filtrosLista["stock"].orEmpty(), listOf("disponible" to "Con stock", "bajo" to "Stock bajo", "agotado" to "Sin stock"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Buscar insumo...") }
+        if (filtrados.isEmpty() && items.isNotEmpty()) item { EmptyState("Sin coincidencias", "Limpia los filtros para ver todos los insumos.") }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 KpiCard("Insumos", items.size.toString(), AcentoVerde, Modifier.weight(1f), Icons.Filled.Inventory2)

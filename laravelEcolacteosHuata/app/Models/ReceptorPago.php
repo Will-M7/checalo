@@ -22,9 +22,9 @@ class ReceptorPago extends Model
 
     public function snapshot(): array
     {
-        $seller = $this->relationLoaded('vendedorCobro') ? $this->getRelation('vendedorCobro') : $this->vendedor;
+        $seller = $this->relationLoaded('vendedorCobro') ? $this->getRelation('vendedorCobro') : null;
         return ['receptor_id' => $this->id, 'external_reference' => $this->referencia_externa, 'version' => $this->version,
             'nombre' => $this->nombre_receptor, 'celular' => $this->celular, 'qr_path' => $this->qr_path,
-            'qr_sha256' => $this->qr_sha256, 'whatsapp' => $this->whatsapp, 'vendedor_nombre' => $seller->nombreCompleto(), 'vendedor_id' => $seller->id];
+            'qr_sha256' => $this->qr_sha256, 'whatsapp' => $this->whatsapp, 'custodio_id' => $this->user_id, 'vendedor_nombre' => $seller?->nombreCompleto(), 'vendedor_id' => $seller?->id];
     }
 }

@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.admin.rutas
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -178,6 +183,10 @@ private fun ListaRutas(
     onEditar: (RutaFila) -> Unit,
     onEliminar: (RutaFila) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val filtrados = state.rutas.filter { it.ruta.nombre.contains(busquedaFiltro, true) && (filtrosLista["estado"].isNullOrEmpty() || it.ruta.activa == (filtrosLista["estado"] == "1")) && (filtrosLista["acopiador"].isNullOrEmpty() || it.ruta.acopiadorId == filtrosLista["acopiador"]) }
+
     val tema = LocalTemaRol.current
     TituloSeccion("Rutas", modifier = Modifier.padding(horizontal = 16.dp)) {
         BotonChico("Nueva ruta", onClick = onNueva, icono = Icons.Filled.Add)
@@ -188,12 +197,14 @@ private fun ListaRutas(
         color = GrisTexto,
         modifier = Modifier.padding(horizontal = 16.dp),
     )
+    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("estado", "Estado", filtrosLista["estado"].orEmpty(), listOf("1" to "Activas", "0" to "Inactivas")), CampoFiltro("acopiador", "Acopiador", filtrosLista["acopiador"].orEmpty(), state.rutas.map { it.ruta.acopiadorId to it.acopiador }.distinctBy { it.first })), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Buscar ruta...")
+    if (filtrados.isEmpty() && state.rutas.isNotEmpty()) EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.")
     if (state.rutas.isEmpty()) {
         EmptyState("Sin rutas", "No hay rutas creadas todavía. Usa \"Nueva ruta\" para crear la primera.", icono = Icons.Filled.Route)
         return
     }
     Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        state.rutas.forEachIndexed { index, fila ->
+        filtrados.forEachIndexed { index, fila ->
             StaggeredListItem(index = index) {
                 TarjetaLista(
                     titulo = fila.ruta.nombre,

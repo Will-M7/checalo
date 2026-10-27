@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.common.asistencia
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -269,7 +274,7 @@ private fun LazyListScope.pestanaAsistencia(state: TomarAsistenciaUiState, vm: T
     }
 
     item(key = "busqueda") {
-        AppTextField(state.busqueda, vm::onBusqueda, "Buscar trabajador", placeholder = "Nombre, apellido o documento")
+        FiltrosListado(state.busqueda, vm::onBusqueda, listOf(CampoFiltro("asistencia", "Asistencia guardada", state.filtroAsistencia, listOf("PRESENTE" to "Presente", "TARDANZA" to "Tardanza", "FALTA" to "Falta", "sin_registro" to "Sin registro"))), { _, v -> vm.onFiltroAsistencia(v) }, vm::limpiarFiltrosAsistencia, "Nombre, apellido o documento")
     }
     if (state.editando) {
         item(key = "marcar-todos") { MarcarTodos(onMarcar = vm::marcarTodos) }

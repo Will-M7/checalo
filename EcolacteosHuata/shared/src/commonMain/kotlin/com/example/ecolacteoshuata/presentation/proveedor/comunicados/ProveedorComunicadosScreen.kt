@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.proveedor.comunicados
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +52,16 @@ fun ProveedorComunicadosScreen(
     filtroTipo: TipoComunicado?,
     onFiltrar: (TipoComunicado?) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(comunicados, busquedaFiltro, filtrosLista) { comunicados.filter { (it.titulo.contains(busquedaFiltro, true) || it.descripcion.contains(busquedaFiltro, true)) && coincideFecha(it.fecha.toString(), filtrosLista["desde"].orEmpty(), filtrosLista["hasta"].orEmpty()) } }
+
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("desde", "Desde", filtrosLista["desde"].orEmpty()), CampoFiltro("hasta", "Hasta", filtrosLista["hasta"].orEmpty())), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap(); onFiltrar(null) })
+                }
+                if (filtrados.isEmpty() && comunicados.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
         item(key = "ayuda") {
             Text("Avisos publicados por la planta.", style = CuerpoStyle, color = GrisTexto)
         }
@@ -73,7 +87,7 @@ fun ProveedorComunicadosScreen(
                 EmptyState("Sin comunicados", "No hay comunicados publicados todavía.", icono = Icons.Filled.Campaign)
             }
         }
-        itemsIndexed(comunicados, key = { _, c -> c.id }) { index, comunicado ->
+        itemsIndexed(filtrados, key = { _, c -> c.id }) { index, comunicado ->
             StaggeredListItem(index = index) {
                 // Mismo formato que la lista de comunicados de planta.
                 val esAsesoria = comunicado.tipo == TipoComunicado.ASESORAMIENTO

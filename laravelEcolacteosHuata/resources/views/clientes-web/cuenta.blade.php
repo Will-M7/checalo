@@ -19,11 +19,7 @@
                         <h2 id="saldo-titulo" class="text-lg font-bold">Saldo a favor</h2>
                         <p class="mt-2 font-display text-3xl font-bold">S/ {{ number_format($client->saldoMinor() / 100, 2) }}</p>
                         <flux:text class="mt-2">Para compras en Huata. Sin retiros ni transferencias.</flux:text>
-                        <form method="POST" action="{{ route('cliente.recarga') }}" class="mt-5 flex flex-col gap-3">@csrf
-                            <input type="hidden" name="referencia" value="{{ old('referencia', (string) \Illuminate\Support\Str::uuid()) }}">
-                            <flux:input name="importe" label="Recarga con Yape (S/)" type="number" step="0.01" min="1" max="999999.99" required />
-                            <flux:button type="submit">Iniciar recarga</flux:button>
-                        </form>
+                        <flux:modal.trigger name="recargar-saldo"><flux:button class="mt-5" variant="primary">RECARGAR SALDO</flux:button></flux:modal.trigger>
                     </section>
                     <section class="huata-cuadro min-w-0 rounded-xl border p-5 sm:p-6" aria-labelledby="perfil-titulo">
                         <h2 id="perfil-titulo" class="text-lg font-bold">Mi perfil</h2>
@@ -48,13 +44,27 @@
                         <h2 id="pedidos-titulo" class="text-lg font-bold">Mis pedidos</h2>
                         <div class="mt-3 divide-y divide-[var(--hh-borde)]">
                             @forelse($orders as $order)
-                                <div class="flex flex-wrap items-center justify-between gap-3 py-3">
-                                    <div class="min-w-0">
-                                        <flux:link :href="route('cliente.pedido', $order->id)">Pedido #{{ $order->id }}</flux:link>
-                                        <flux:text>{{ $order->estado->label() }} · {{ str_replace('_', ' ', $order->pago_estado) }}</flux:text>
+                                <article id="pedido-{{ $order->id }}" class="py-4 scroll-mt-6">
+                                    <div class="flex flex-wrap justify-between gap-3">
+                                        <div>
+                                            <flux:link :href="route('cliente.pedido', $order->id)">Pedido #{{ $order->id }}</flux:link>
+                                            <flux:text>{{ $order->created_at->format('d/m/Y H:i') }} · {{ $order->receptor_snapshot['vendedor_nombre'] ?? $order->vendedor?->nombreCompleto() ?? 'Vendedor registrado' }}</flux:text>
+                                        </div>
+                                        <strong>S/ {{ $order->total }}</strong>
                                     </div>
-                                    <span class="font-semibold">S/ {{ $order->total }}</span>
-                                </div>
+                                    <ul class="my-2 text-sm">@foreach($order->items as $item)<li>{{ $item->cantidad }} × {{ $item->producto }} · S/ {{ $item->subtotal }}</li>@endforeach</ul>
+                                    <flux:text>Pedido: {{ $order->estado->label() }} · Pago: {{ str_replace('_', ' ', $order->pago_estado) }}</flux:text>
+                                    @if($order->estado === \App\Enums\EstadoPedidoWeb::Pendiente && !$order->venta_id)
+                                        <p class="mt-2 font-semibold">PENDIENTE DE PAGO</p>
+                                        @php $falta = max(0, \App\Services\Payments\Dinero::minor($order->total) - $client->saldoMinor()); @endphp
+                                        @if($falta > 0)<flux:text>Faltan S/ {{ \App\Services\Payments\Dinero::decimal($falta) }}. Recarga tu saldo para pagar.</flux:text>@endif
+                                        <form method="POST" action="{{ route('cliente.pedido.saldo', $order->id) }}" class="mt-3">@csrf
+                                            <flux:button type="submit" variant="primary" :disabled="$falta > 0">PAGAR CON SALDO</flux:button>
+                                        </form>
+                                    @endif
+                                    @if($order->venta_id)<flux:button class="mt-3" as="a" :href="$order->urlBoleta()" target="_blank">Ver comprobante</flux:button>@endif
+                                    @if($whatsapp = $order->whatsappPagado())<flux:button class="mt-3" as="a" :href="$whatsapp" target="_blank" rel="noopener">ABRIR WHATSAPP</flux:button>@endif
+                                </article>
                             @empty <flux:text class="py-3">Aún no tienes pedidos.</flux:text> @endforelse
                         </div>
                         @if($orders->hasPages())
@@ -100,6 +110,7 @@
                 </div>
             </div>
         </main>
+        @include('clientes-web.recarga-modal')
         @fluxScripts
     </body>
 </html>

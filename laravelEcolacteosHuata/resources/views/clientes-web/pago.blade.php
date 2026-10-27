@@ -34,13 +34,8 @@
         @if($order?->venta_id)
             <flux:button as="a" :href="$order->urlBoleta()" target="_blank" variant="primary">Ver mi boleta</flux:button>
         @endif
-        @if($snapshot && ($order?->estado === \App\Enums\EstadoPedidoWeb::Confirmado || (!$order && $payment?->applied_at)))
-            @php
-                $detail = $order ? $order->items->map(fn($l) => $l->cantidad.' × '.$l->producto)->implode(', ') : 'Recarga de saldo';
-                $message = 'Hola '.$snapshot['vendedor_nombre'].'. '.($order ? 'Pedido #'.$order->id : 'Recarga #'.$payment->id).': '.$detail.'. Total S/ '.($order?->total ?? number_format($payment->amount_minor/100, 2, '.', '')).'. Estado confirmado.';
-            @endphp
-            <p>Atención: {{ $snapshot['vendedor_nombre'] }} · {{ $snapshot['whatsapp'] }}</p>
-            <flux:button as="a" :href="'https://wa.me/'.$snapshot['whatsapp'].'?text='.rawurlencode($message)" target="_blank" rel="noopener">Contactar a mi vendedor por WhatsApp</flux:button>
+        @if($order && ($whatsapp = $order->whatsappPagado()))
+            <flux:button as="a" :href="$whatsapp" target="_blank" rel="noopener">ABRIR WHATSAPP</flux:button>
         @endif
         @if($payment && !$paymentError && !$payment->applied_at && !in_array($payment->estado, ['EXPIRED', 'CANCELLED']))
             <script>

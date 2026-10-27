@@ -18,6 +18,7 @@ Route::prefix('mi-cuenta')->name('cliente.')->group(function () {
         Route::post('salir', [AuthController::class, 'logout'])->name('logout');
         Route::post('perfil', [CuentaController::class, 'perfil'])->middleware('throttle:5,1')->name('perfil');
         Route::get('pedidos/{id}', [CuentaController::class, 'pedido'])->name('pedido');
+        Route::post('pedidos/{id}/saldo', [CuentaController::class, 'pagarSaldo'])->middleware('throttle:10,1')->name('pedido.saldo');
         Route::post('recargas', [CuentaController::class, 'recarga'])->middleware('throttle:8,1')->name('recarga');
         Route::get('pagos/{id}', [CuentaController::class, 'pago'])->name('pago');
         Route::get('pagos/{id}/estado', [CuentaController::class, 'consultar'])->middleware('throttle:30,1')->name('pago.estado');

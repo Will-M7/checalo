@@ -39,6 +39,7 @@ new class extends Component
 ?>
 
 <div class="flex flex-col gap-8">
+    @if(auth('web')->user()->puedePantalla('vendedor.pedidos-web'))<livewire:disponibilidad-web />@endif
     <x-ui.page-header
         titulo="Panel de ventas"
         :subtitulo="'Bienvenido, '.auth()->user()->nombreCompleto().'. Vende, factura y atiende los pedidos de la web.'"

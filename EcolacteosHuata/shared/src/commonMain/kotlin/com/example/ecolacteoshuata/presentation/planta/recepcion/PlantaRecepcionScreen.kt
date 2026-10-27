@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.planta.recepcion
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Alignment
@@ -42,12 +47,18 @@ private fun estiloEstado(estado: EstadoLeche) = when (estado) {
 
 @Composable
 fun PlantaRecepcionScreen(state: PlantaRecepcionUiState) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val filtrados = state.grupos.filter { it.recojos.isNotEmpty() && it.acopiador.nombreCompleto.contains(busquedaFiltro, true) && (filtrosLista["entrega"].isNullOrEmpty() || it.recojos.any { r -> r.entregado } == (filtrosLista["entrega"] == "1")) }
+
     if (state.grupos.all { it.recojos.isEmpty() }) {
         EmptyState("Sin recepción hoy", "Aún no se registran recojos para hoy.", modifier = Modifier.padding(24.dp))
         return
     }
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
-        items(state.grupos.filter { it.recojos.isNotEmpty() }) { grupo ->
+        item { FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("entrega", "Entrega a planta", filtrosLista["entrega"].orEmpty(), listOf("1" to "Con entregas", "0" to "Sin entregas"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Buscar acopiador...") }
+        if (filtrados.isEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
+        items(filtrados, key = { it.acopiador.id }) { grupo ->
             TarjetaLista(
                 titulo = grupo.acopiador.nombreCompleto,
                 subtitulo = "${grupo.recojos.size} recojo(s)",

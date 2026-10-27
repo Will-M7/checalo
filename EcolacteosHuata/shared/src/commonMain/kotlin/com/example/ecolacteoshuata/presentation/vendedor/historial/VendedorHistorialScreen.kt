@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.vendedor.historial
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -100,6 +105,8 @@ fun VendedorHistorialScreen(
     onCancelarLimpiar: () -> Unit,
     onLimpiar: () -> Unit,
     onConsumirMensaje: () -> Unit,
+    onVendedor: (String) -> Unit = {},
+    onLimpiarFiltros: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
@@ -145,7 +152,7 @@ fun VendedorHistorialScreen(
                             )
                         }
                     }
-                    AppTextField(state.busqueda, onBusqueda, "Buscar", placeholder = "Boleta o cliente...", modifier = Modifier.padding(top = 10.dp))
+                    FiltrosListado(state.busqueda, onBusqueda, listOf(CampoFiltro("vendedor", "Vendedor", state.vendedorId, state.opcionesVendedor)), { _, v -> onVendedor(v) }, onLimpiarFiltros, "Buscar", modifier = Modifier.padding(top = 10.dp), placeholder = "Boleta o cliente...")
                 }
             }
             item(key = "totales") {

@@ -442,32 +442,9 @@
                 <div class="shrink-0 border-t border-tinta/10 bg-white px-5 pb-5 pt-4">
                     <dl class="flex flex-col gap-1 text-sm">
                         <div class="flex justify-between"><dt class="text-tinta-suave">Productos</dt><dd id="carrito-unidades" class="tabular font-semibold"></dd></div>
+                        <div class="flex justify-between"><dt class="text-tinta-suave">Subtotal</dt><dd id="carrito-subtotal" class="tabular font-semibold"></dd></div>
                         <div class="flex items-end justify-between border-t border-tinta/10 pt-3"><dt class="font-semibold">Total</dt><dd id="carrito-total" class="tabular font-display text-3xl font-extrabold"></dd></div>
                     </dl>
-
-                    <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="pedido-nombre" class="text-sm font-semibold">Tu nombre</label>
-                            <input value="{{ auth('cliente')->user()?->nombreCompleto() }}" readonly id="pedido-nombre" type="text" autocomplete="name" maxlength="80" required class="mt-1 min-h-12 w-full rounded-xl border border-tinta/20 bg-white px-4 text-base placeholder:text-tinta-suave/70" placeholder="Ej. María Quispe">
-                        </div>
-                        <div>
-                            <label for="pedido-celular" class="text-sm font-semibold">Celular de tu cuenta</label>
-                            <input value="{{ auth('cliente')->user()?->celular }}" id="pedido-celular" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" required class="mt-1 min-h-12 w-full rounded-xl border border-tinta/20 bg-white px-4 text-base placeholder:text-tinta-suave/70" placeholder="9xx xxx xxx o +51 9xx xxx xxx">
-                        </div>
-                    </div>
-
-                    <fieldset class="mt-4">
-                        <legend class="text-sm font-semibold">¿Cómo vas a pagar?</legend>
-                        <div class="mt-2 grid grid-cols-3 gap-2">
-                            @foreach ([['yape', 'Yape'], ['saldo', 'Saldo a favor'], ['plin', 'Plin'], ['efectivo', 'Efectivo']] as $i => [$valor, $nombreMetodo])
-                                <label class="metodo-pago relative flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-2 border-tinta/15 px-2 text-sm font-bold has-[:checked]:border-cobalto-600 has-[:checked]:bg-cielo-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-cobalto-700">
-                                    <input type="radio" name="pedido-metodo" value="{{ $valor }}" class="sr-only" @checked($i === 0)>{{ $nombreMetodo }}
-                                </label>
-                            @endforeach
-                        </div>
-                        <p id="pago-instrucciones" class="mt-3 rounded-xl bg-cielo-50 p-3 text-sm">Primero guardaremos tu pedido. Después verás el receptor asignado, su QR y el importe exacto.</p>
-                        <p class="mt-2 text-sm">No se reserva stock durante el pago. Si el ingreso se confirma sin stock, el importe pasa a tu saldo a favor.</p>
-                    </fieldset>
 
                     <p id="pedido-error" class="mt-3 hidden rounded-xl bg-rojo-600/10 px-4 py-3 text-sm font-semibold text-rojo-700" role="alert"></p>
 
@@ -504,6 +481,7 @@
             productos: @json($productos->values()),
             whatsapp: @json($whatsapp),
             urlPedidos: @json(route('pedidos-web.store')),
+            referenciaPedido: @json((string) \Illuminate\Support\Str::uuid()),
             clienteAutenticado: @json(auth('cliente')->check()),
             urlLoginCliente: @json(route('cliente.login'))
         };
@@ -705,6 +683,7 @@
                 if (!vacio) {
                     pintarLineas();
                     $('carrito-unidades').textContent = cuenta;
+                    $('carrito-subtotal').textContent = soles(tot);
                     $('carrito-total').textContent = soles(tot);
                 }
 
@@ -713,7 +692,6 @@
                 requestAnimationFrame(function () { barra.classList.toggle('translate-y-full', vacio || drawerAbierto()); });
                 $('barra-cuenta').textContent = cuenta;
                 $('barra-total').textContent = soles(tot);
-                actualizarPago();
             }
 
             function cambiar(id, delta, avisar) {
@@ -802,11 +780,6 @@
             }
 
             var boton = $('pedido-wa');
-            function metodo() { return document.querySelector('input[name="pedido-metodo"]:checked')?.value || 'yape'; }
-            function actualizarPago() {
-                $('pago-instrucciones').textContent = metodo() === 'yape' ? 'Guardaremos tu pedido y asignaremos un receptor habilitado antes de mostrarte su QR.' : (metodo() === 'saldo' ? 'Usaremos tu saldo si cubre el total. No hay pagos mixtos.' : 'La tienda confirmará este método conforme a sus reglas; no tiene validación automática.');
-            }
-            document.querySelectorAll('input[name="pedido-metodo"]').forEach(r => r.addEventListener('change', actualizarPago));
             // Conserva el carrito al autenticar y fija una referencia para recuperar reintentos.
             function error(texto) {
                 var caja = $('pedido-error');
@@ -818,16 +791,15 @@
                 error('');
                 if (!ids().length) { error('Tu carrito está vacío.'); return; }
                 if (!window.HUATA.clienteAutenticado) { guardar(); location.href = window.HUATA.urlLoginCliente; return; }
-                if (!$('pedido-celular').reportValidity()) return;
                 let key = localStorage.getItem('huata-checkout-reference');
-                const fingerprint = JSON.stringify([carrito, metodo()]);
+                const fingerprint = JSON.stringify(carrito);
                 if (!key || localStorage.getItem('huata-checkout-fingerprint') !== fingerprint) {
-                    key = crypto.randomUUID(); localStorage.setItem('huata-checkout-reference', key); localStorage.setItem('huata-checkout-fingerprint', fingerprint);
+                    key = window.HUATA.referenciaPedido; localStorage.setItem('huata-checkout-reference', key); localStorage.setItem('huata-checkout-fingerprint', fingerprint);
                 }
                 boton.disabled = true; boton.textContent = 'Guardando tu pedido…';
                 try {
                     const response = await fetch(window.HUATA.urlPedidos, {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]').content},
-                        body:JSON.stringify({items:ids().map(id => ({produccion_id:porId[id].id,cantidad:carrito[id]})),metodo_pago:metodo(),celular:$('pedido-celular').value,idempotency_key:key})});
+                        body:JSON.stringify({items:ids().map(id => ({produccion_id:porId[id].id,cantidad:carrito[id]})),idempotency_key:key})});
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.errors ? Object.values(data.errors).flat()[0] : (data.message || 'No pudimos guardar tu pedido.'));
                     carrito={};guardar();localStorage.removeItem('huata-checkout-reference');localStorage.removeItem('huata-checkout-fingerprint');

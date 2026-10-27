@@ -28,8 +28,10 @@ class SaldoService
                 throw ValidationException::withMessages(['saldo' => 'Saldo insuficiente. No se efectuó la compra.']);
             }
 
-            return MovimientoSaldo::create(['cliente_web_id' => $client->id, 'tipo' => $type, 'amount_minor' => $minor, 'currency' => '604', 'idempotencia' => $key, 'origen' => $source,
+            $movement = MovimientoSaldo::create(['cliente_web_id' => $client->id, 'tipo' => $type, 'amount_minor' => $minor, 'currency' => '604', 'idempotencia' => $key, 'origen' => $source,
                 'intento_pago_id' => $payment?->id, 'pedido_web_id' => $order?->id, 'autorizado_por' => $actor?->id, 'reverso_de_id' => $reversal?->id]);
+            app(\App\Services\Finanzas\FinanzasService::class)->saldo($movement);
+            return $movement;
         }, 5);
     }
 

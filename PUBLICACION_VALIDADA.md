@@ -1,5 +1,15 @@
 # Validación de la publicación
 
+## Actualización de fuentes posterior al respaldo e3e6c928af57d39738ebe79716fc6a3ba85e77fc
+
+La actualización conserva el historial de `main`, las instrucciones de instalación, el seeder inicial y los cuatro componentes publicados. Incorpora las fuentes locales acumuladas de pedidos/saldo, Finanzas Web y Android, clientes/saldos, disponibilidad, roles/distribuciones y filtros, incluidos archivos de datos Kotlin que faltaban en el respaldo anterior.
+
+Se verifican inclusión y coincidencia de fuentes, migraciones y documentación, exclusión de secretos/artefactos operativos y el manifiesto SHA-256. Se conservan las adaptaciones portables de las herramientas de integración y las configuraciones públicas de ejemplo. Core y Bridge mantienen sus fuentes publicadas: coinciden con las fuentes locales correspondientes; no se publica la ruta personal de Java ni muestras privadas.
+
+Las validaciones funcionales previas a esta publicación están documentadas en `laravelEcolacteosHuata/docs/FINANZAS_ANDROID_DISPONIBILIDAD_WEB.md`: 33 pruebas Laravel focalizadas y 11 Kotlin aprobadas. Durante la publicación no se ejecutan migraciones, suites, builds de APK ni reinicios de servicios. No se atribuye al árbol nuevo la instalación limpia descrita en el registro histórico siguiente.
+
+## Registro histórico de la publicación inicial
+
 Fecha: 27/10/2026. Instalación preparada en carpeta y SQLite nuevas de `/tmp`, sin copiar `.env`,
 bases, claves o dependencias de la instalación operativa.
 

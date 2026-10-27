@@ -9,6 +9,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public string $fecha = '';
 
     public ?int $recojoEditId = null;
@@ -29,7 +31,7 @@ new class extends Component
     public function with(): array
     {
         return [
-            'acopiadores' => Acopiador::with(['user', 'proveedores.user'])->orderBy('id')->get(),
+            'acopiadores' => Acopiador::with(['user', 'proveedores.user'])->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('recepcion') === 'si', fn ($q) => $q->whereIn('id', EntregaPlanta::whereDate('fecha', $this->fecha)->select('acopiador_id')))->when($this->filtro('recepcion') === 'no', fn ($q) => $q->whereNotIn('id', EntregaPlanta::whereDate('fecha', $this->fecha)->select('acopiador_id')))->orderBy('id')->get(),
             'recojosPorProveedor' => Recojo::with('turno')
                 ->whereDate('fecha', $this->fecha)
                 ->get()
@@ -129,9 +131,11 @@ new class extends Component
 
         <flux:input type="date" wire:model.live="fecha" class="max-w-xs" />
     </div>
+        <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar acopiador..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Entrega a planta" wire:model.live="filtros.recepcion"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="si">Entregó</flux:select.option><flux:select.option value="no">Sin entrega</flux:select.option></flux:select></x-ui.filtros></div>
+
 
     <div class="max-h-[36rem] overflow-x-auto overflow-y-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
-        <flux:table>
+    <flux:table>
             <flux:table.columns sticky class="bg-white/80 dark:bg-zinc-800/80">
                 <flux:table.column>Acopiador</flux:table.column>
                 <flux:table.column>Entregado a planta</flux:table.column>
@@ -178,7 +182,7 @@ new class extends Component
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="6" class="text-center text-zinc-500">No hay acopiadores registrados.</flux:table.cell>
+                        <flux:table.cell colspan="6" class="text-center text-zinc-500">{{ $busqueda !== '' || count($filtros) ? 'No se encontraron acopiadores con estos filtros.' : 'No hay acopiadores registrados.' }}</flux:table.cell>
                     </flux:table.row>
                 @endforelse
             </flux:table.rows>

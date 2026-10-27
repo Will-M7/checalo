@@ -9,6 +9,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     use WithPagination;
 
     /** Estado que se está viendo: pendiente, confirmado, cancelado o todos. */
@@ -18,9 +20,14 @@ new class extends Component
 
     public string $metodoPago = 'efectivo';
 
+    public function limpiarFiltros(): void
+    {
+        $this->filtros = []; $this->busqueda = ''; $this->filtro = 'todos'; $this->resetPage();
+    }
+
     public function with(): array
     {
-        $pedidos = PedidoWeb::query()
+        $pedidos = $this->pedidosVisibles()->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')->orWhere('celular', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('created_at', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('created_at', '<=', $v))->when($this->filtro('pago'), fn ($q, $v) => $q->where('pago_estado', $v))->when($this->filtro('vendedor'), fn ($q, $v) => $q->where('vendedor_asignado_id', $v))
             ->with('items')
             ->when($this->filtro !== 'todos', fn ($q) => $q->where('estado', $this->filtro))
             ->latest()
@@ -28,10 +35,36 @@ new class extends Component
 
         return [
             'pedidos' => $pedidos,
-            'pendientes' => PedidoWeb::query()->where('estado', EstadoPedidoWeb::Pendiente)->count(),
+            'vendedoresFiltro' => \App\Models\User::whereIn('id', PedidoWeb::select('vendedor_asignado_id'))->orderBy('nombres')->get(),
+            'estadosPagoFiltro' => PedidoWeb::distinct()->pluck('pago_estado'),
+            'disponibilidad' => app(\App\Services\VendedoresWeb::class)->estado(auth('web')->user()),
+            'reasignables' => \App\Models\User::disponibleWeb()->orderBy('nombres')->get(),
+            'pendientes' => $this->pedidosVisibles()->where('estado', EstadoPedidoWeb::Pendiente)->count(),
             'metodos' => MetodoPago::options(),
-            'pedidoPorConfirmar' => $this->confirmarId ? PedidoWeb::with('items')->find($this->confirmarId) : null,
+            'pedidoPorConfirmar' => $this->confirmarId ? $this->pedidosVisibles()->with('items')->find($this->confirmarId) : null,
         ];
+    }
+
+    public string $nuevoVendedor = '';
+    public string $motivoReasignacion = '';
+
+    private function pedidosVisibles()
+    {
+        $actor = auth('web')->user();
+        abort_unless($actor?->puedePantalla('vendedor.pedidos-web'), 403);
+        return PedidoWeb::query()->when(! $actor->puedePantalla('admin.usuarios'), fn ($q) => $q->where('vendedor_asignado_id', $actor->id));
+    }
+
+    public function pausarWeb(bool $pausa): void
+    {
+        app(\App\Services\VendedoresWeb::class)->cambiar(auth('web')->user(), auth('web')->user(), $pausa, false);
+    }
+
+    public function reasignar(int $id): void
+    {
+        $this->validate(['nuevoVendedor' => 'required|integer', 'motivoReasignacion' => 'required|string|min:10|max:250']);
+        app(\App\Services\VendedoresWeb::class)->reasignar(auth('web')->user(), $id, (int) $this->nuevoVendedor, $this->motivoReasignacion);
+        Flux::toast('Responsable actualizado. Los cobros e historial se conservan.', variant: 'success');
     }
 
     public function updatedFiltro(): void
@@ -41,8 +74,14 @@ new class extends Component
 
     public function pedirConfirmar(int $id): void
     {
+        abort_unless(auth('web')->user()->puedeVender('vendedor.pedidos-web'), 403);
+        $pedido = $this->pedidosVisibles()->findOrFail($id);
+        if ($pedido->metodo_pago === 'pendiente') {
+            Flux::toast('El comprador paga este pedido con saldo desde Mi cuenta.', variant: 'warning');
+            return;
+        }
         $this->confirmarId = $id;
-        $this->metodoPago = PedidoWeb::findOrFail($id)->metodo_pago;
+        $this->metodoPago = $pedido->metodo_pago;
         Flux::modal('confirmar-pedido')->show();
     }
 
@@ -51,7 +90,8 @@ new class extends Component
      */
     public function confirmar(): void
     {
-        $pedido = PedidoWeb::findOrFail($this->confirmarId);
+        abort_unless(auth('web')->user()->puedeVender('vendedor.pedidos-web'), 403);
+        $pedido = $this->pedidosVisibles()->findOrFail($this->confirmarId);
 
         try {
             $venta = $pedido->confirmarComoVenta(auth()->user(), MetodoPago::from($this->metodoPago));
@@ -71,7 +111,8 @@ new class extends Component
 
     public function cancelar(int $id): void
     {
-        $pedido = PedidoWeb::findOrFail($id);
+        abort_unless(auth('web')->user()->puedeVender('vendedor.pedidos-web'), 403);
+        $pedido = $this->pedidosVisibles()->findOrFail($id);
 
         if ($pedido->estado !== EstadoPedidoWeb::Pendiente) {
             Flux::toast('Ese pedido ya fue atendido.', variant: 'warning');
@@ -86,10 +127,20 @@ new class extends Component
 ?>
 
 <div class="flex flex-col gap-6">
+    <flux:text>Recepción web: {{ ucfirst($disponibilidad['estado']) }}. Pausar conserva tus pedidos e historial.</flux:text>
+    @if($disponibilidad['capacidad'])<flux:button wire:click="pausarWeb({{ $disponibilidad['pausado'] ? 'false' : 'true' }})" :disabled="! $disponibilidad['autorizado']">{{ $disponibilidad['pausado'] ? 'Activar recepción web' : 'Pausar recepción web' }}</flux:button>@endif
+    @error('disponibilidad')<flux:text role="alert">{{ $message }}</flux:text>@enderror
+    @if(auth('web')->user()->puedePantalla('admin.usuarios'))
+        <div class="flex flex-wrap gap-3"><flux:select label="Nuevo responsable disponible" wire:model="nuevoVendedor"><flux:select.option value="">Seleccionar</flux:select.option>@foreach($reasignables as $v)<flux:select.option :value="$v->id">{{ $v->nombreCompleto() }}</flux:select.option>@endforeach</flux:select><flux:input label="Motivo de reasignación (mínimo 10 caracteres)" wire:model="motivoReasignacion" /></div>
+    @endif
+    @error('pedido')<flux:text role="alert">{{ $message }}</flux:text>@enderror
+
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <x-ui.titulo titulo="Compras por web">Compras que los clientes hacen en la página de inicio, sin iniciar sesión. Verifica el pago (Yape, Plin o efectivo) y confirma para generar la boleta.</x-ui.titulo>
         <flux:badge :color="$pendientes > 0 ? 'amber' : 'zinc'">{{ $pendientes }} {{ $pendientes === 1 ? 'pendiente' : 'pendientes' }}</flux:badge>
     </div>
+    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar comprador o celular..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Estado del pago" wire:model.live="filtros.pago"><flux:select.option value="">Todos</flux:select.option>@foreach($estadosPagoFiltro as $e)<flux:select.option :value="$e">{{ str_replace("_", " ", $e) }}</flux:select.option>@endforeach</flux:select><flux:select label="Vendedor" wire:model.live="filtros.vendedor"><flux:select.option value="">Todos</flux:select.option>@foreach($vendedoresFiltro as $v)<flux:select.option :value="$v->id">{{ $v->nombreCompleto() }}</flux:select.option>@endforeach</flux:select><flux:input label="Desde" type="date" wire:model.live="filtros.desde" /><flux:input label="Hasta" type="date" wire:model.live="filtros.hasta" /></x-ui.filtros></div>
+
 
     <flux:radio.group wire:model.live="filtro" variant="segmented" class="max-w-lg">
         <flux:radio value="pendiente" label="Pendientes" />
@@ -137,8 +188,11 @@ new class extends Component
                         <flux:table.cell>
                             @if ($pedido->estado === \App\Enums\EstadoPedidoWeb::Pendiente)
                                 <div class="flex gap-2">
+                                    @if(auth('web')->user()->puedePantalla('admin.usuarios'))<flux:button size="sm" wire:click="reasignar({{ $pedido->id }})">Reasignar</flux:button>@endif
+                                    @if(auth('web')->user()->puedeVender('vendedor.pedidos-web'))
                                     <flux:button size="sm" variant="primary" icon="check" wire:click="pedirConfirmar({{ $pedido->id }})">Confirmar y facturar</flux:button>
                                     <flux:button size="sm" variant="ghost" icon="x-mark" wire:click="cancelar({{ $pedido->id }})">Cancelar</flux:button>
+                                    @endif
                                 </div>
                             @elseif ($pedido->venta_id)
                                 <flux:button size="sm" variant="ghost" icon="document-text" :href="route('vendedor.ventas.boleta', $pedido->venta_id)" target="_blank">Boleta</flux:button>

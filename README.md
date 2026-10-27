@@ -10,12 +10,27 @@ La instalación inicial permite entrar como administrador sin cuentas, bases ni 
 | `payment-core/` | Motor canónico Kotlin/JVM, pruebas y herramientas |
 | `yape-bridge/` | Captura cifrada Android, inscripción y comprobación Huata–Bridge |
 
-Se conservan 41 pantallas, seis roles base, roles personalizados y distribuciones Inicial/En desarrollo.
+El catálogo actual incluye 42 pantallas, 40 correspondencias Android, seis roles base, roles personalizados y distribuciones Inicial/En desarrollo. Las plantillas históricas se conservan.
 El administrador inicial recibe el rol real `administrador` y la distribución Inicial vigente
-(15 pantallas, incluidas Usuarios, Asignar roles y Roles y funciones). Como administrador protegido
+(16 pantallas tras la migración de Finanzas, incluidas Usuarios, Asignar roles y Roles y funciones). Como administrador protegido
 puede administrar y delegar las funciones del catálogo; no se cambia la distribución aprobada
 para conceder automáticamente todas las operaciones comerciales. Las demás funciones continúan
 bajo sus asignaciones y reglas de propiedad, stock y pagos.
+
+## Funcionalidades actuales
+
+- Carrito simplificado, pedidos pendientes, recargas y pago con saldo; WhatsApp del vendedor después del pago.
+- Finanzas en Web y Android, clientes y saldos, custodia, rendiciones e historial por pedido, con autorización dinámica.
+- Disponibilidad administrativa y pausa del vendedor; reparto equilibrado por pedido, sin vendedor permanente del comprador ni dependencia de Bridge.
+- Roles dinámicos, distribuciones y filtros en las 27 páginas Web y 24 componentes Kotlin documentados.
+- Eliminación segura de usuarios relacionados, con alternativa de desactivación.
+
+El administrador no vende ni recibe pedidos automáticamente: debe tener además un rol comercial explícito.
+Para probar compras en una instalación nueva, crea/asigna un vendedor con `vendedor.pedidos-web`, mantén su usuario activo y su recepción autorizada y sin pausa. Para usar Finanzas, asigna `admin.finanzas` mediante el gestor existente; no se exige Administración General adicional. Android debe actualizar sus autorizaciones con conexión.
+
+Detalles y pruebas: [pedidos, saldo y finanzas](laravelEcolacteosHuata/docs/PEDIDOS_SALDO_FINANZAS.md),
+[filtros Web/Kotlin](laravelEcolacteosHuata/docs/FILTROS_WEB_KOTLIN.md) y
+[Finanzas Android y disponibilidad](laravelEcolacteosHuata/docs/FINANZAS_ANDROID_DISPONIBILIDAD_WEB.md).
 
 ## Requisitos
 
@@ -64,7 +79,7 @@ existente. El seeder no sustituye el flujo autorizado de recuperación de contra
 ## Pagos opcionales, sin bloquear el login
 
 El ejemplo deja `PAYMENT_CORE_ENABLED=false`. El administrador puede entrar y configurar el
-sistema; el checkout informa indisponibilidad y no simula pagos. No se incluyen receptores
+sistema. Los pedidos pendientes requieren vendedores disponibles y se guardan sin cobrar ni reservar stock; los cobros Yape requieren la configuración verificada correspondiente. No se incluyen receptores
 habilitados, dispositivo inscrito, evidencia bancaria ni claves reales.
 
 Para una integración propia, compila Core:

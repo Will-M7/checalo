@@ -8,6 +8,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     // --- Receta ---
     public ?int $recetaId = null;
 
@@ -23,7 +25,7 @@ new class extends Component
     {
         return [
             'insumos' => Insumo::with('unidadMedida')->orderBy('nombre')->get(),
-            'recetas' => Receta::with('detalles.insumo.unidadMedida')->orderBy('nombre')->get(),
+            'recetas' => Receta::with('detalles.insumo.unidadMedida')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('insumo'), fn ($q, $v) => $q->whereHas('detalles', fn ($d) => $d->where('insumo_id', $v)))->orderBy('nombre')->get(),
         ];
     }
 
@@ -117,6 +119,8 @@ new class extends Component
             <flux:button size="sm" variant="primary" icon="plus" wire:click="nuevaReceta">Nueva receta</flux:button>
         </flux:modal.trigger>
     </div>
+                <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar receta..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Contiene insumo" wire:model.live="filtros.insumo"><flux:select.option value="">Todos</flux:select.option>@foreach($insumos as $i)<flux:select.option :value="$i->id">{{ $i->nombre }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
+
 
     <div class="flex flex-col gap-4">
         @forelse ($recetas as $receta)
@@ -133,7 +137,7 @@ new class extends Component
                     </div>
                 </div>
 
-                <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid gap-4 md:grid-cols-3">
                     <div class="md:col-span-2">
                         <div class="max-h-64 overflow-x-auto overflow-y-auto rounded-xl border border-huata-verde-100 dark:border-zinc-700">
                             <flux:table>
@@ -181,7 +185,7 @@ new class extends Component
             </div>
         @empty
             <div class="rounded-xl border border-huata-verde-100 p-6 text-center text-zinc-500 dark:border-zinc-700 huata-cuadro">
-                No hay recetas registradas.
+                {{ $busqueda !== '' || count($filtros) ? 'No se encontraron recetas con estos filtros.' : 'No hay recetas registradas.' }}
             </div>
         @endforelse
     </div>

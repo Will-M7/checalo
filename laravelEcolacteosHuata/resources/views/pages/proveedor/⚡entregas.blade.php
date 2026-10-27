@@ -7,6 +7,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public string $periodo = 'semana';
 
     public string $fecha = '';
@@ -24,7 +26,7 @@ new class extends Component
         $periodo = Periodo::from($this->periodo);
         [$desde, $hasta] = $periodo->rangoParaFecha(Carbon::parse($this->fecha));
 
-        $recojos = Recojo::query()
+        $recojos = Recojo::query()->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('estado_otro', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('pagado') !== '', fn ($q) => $q->where('pagado', $this->filtro('pagado') === '1'))->when($this->filtro('entregado') !== '', fn ($q) => $q->where('entregado', $this->filtro('entregado') === '1'))
             ->with('turno')
             ->where('proveedor_id', $proveedor?->id)
             ->whereBetween('fecha', [$desde->toDateString(), $hasta->toDateString()])
@@ -52,6 +54,8 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <x-ui.titulo titulo="Mis entregas">Historial de leche entregada y estado de pago.</x-ui.titulo>
+    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar observación del recojo..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Pago" wire:model.live="filtros.pagado"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Pagado</flux:select.option><flux:select.option value="0">Pendiente</flux:select.option></flux:select><flux:select label="Recepción" wire:model.live="filtros.entregado"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Entregado a planta</flux:select.option><flux:select.option value="0">Pendiente de entrega</flux:select.option></flux:select></x-ui.filtros></div>
+
 
     <div class="flex flex-wrap items-end gap-4">
         <flux:select label="Período" wire:model.live="periodo" class="max-w-xs">

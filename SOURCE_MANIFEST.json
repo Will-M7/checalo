@@ -301,6 +301,10 @@
       "sha256": "7b302f05d4ca3048cbb3e43faaee700ec7b29fd452850f89ca5ea788539c7055"
     },
     {
+      "path": "EcolacteosHuata/shared/src/androidHostTest/kotlin/com/example/ecolacteoshuata/authorization/FinanzasAndroidTest.kt",
+      "sha256": "1f0db2e118f9fd6e8006c48a01ff75ac7db7485920f7e0f909a5115da272116d"
+    },
+    {
       "path": "EcolacteosHuata/shared/src/androidHostTest/kotlin/com/example/ecolacteoshuata/authorization/IntegracionRolesAdministrativosTest.kt",
       "sha256": "afd3df5cbb80b415334a080cce5c2b9044fcbe42aca1db59a6c8492418837d26"
     },
@@ -351,6 +355,26 @@
     {
       "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/core/util/Money.android.kt",
       "sha256": "bb4f4e09550f9a0068e00ca69c651bbd6cf46a8bae9f521e3c40229655cec48d"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/data/local/DatabaseDriverFactory.android.kt",
+      "sha256": "cbe96582b94d4b6a3acc5a60de02b2d76907038134c489b150ce05f8a61eb09a"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/data/platform/AndroidNetworkMonitor.kt",
+      "sha256": "b456e5d44136b642068b4142456871d45e5a2ee2c217f626bbecc4fb1ba644f9"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/data/platform/AndroidNotificadorSistema.kt",
+      "sha256": "36374b5483f7ed0cf8b2856f3eac9f56fcebc2116e097d7be42d4828f782a1e3"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/data/platform/AndroidTokenStorage.kt",
+      "sha256": "901f2808f52b60f70a142ee8b2ddaef60f62d4cbfd2a6405af5e51c8f727c2e8"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/data/sync/SincronizacionWorker.kt",
+      "sha256": "9773b58abae90ff7ea3a7c186946cd94a8749d00a4fbaab71b0dac39319ebd66"
     },
     {
       "path": "EcolacteosHuata/shared/src/androidMain/kotlin/com/example/ecolacteoshuata/di/PlatformModule.android.kt",
@@ -449,6 +473,10 @@
       "sha256": "4541157aad6b13ac9fedaa211a3911b72239670196564ddf7d8e86f6703b278c"
     },
     {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/core/ui/FiltrosListado.kt",
+      "sha256": "d3eb7cf151e916a7f8383f8f6e4c8e39d1227bd57ab40f988a069871577bb259"
+    },
+    {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/core/ui/Formularios.kt",
       "sha256": "a4c0677c4c02a7ed677e09e516bd8ccfdd4e6663f51e8fd031a127e51376f268"
     },
@@ -501,12 +529,216 @@
       "sha256": "d0476b226c22aa11c07f7b3dc1697fbafca003098c0eb8d3ffff1bd2fd46f035"
     },
     {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/local/DatabaseDriverFactory.kt",
+      "sha256": "cd5e5f5462fa989f1da19242c31c184e2580135d7c7a5bb468f3ea2824de5811"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/local/MigracionAutorizacionHeredada.kt",
+      "sha256": "d89fca72b50e73da7215dfc503c07ef20e74be3da7b67f9ca2d812ef7b9bb72a"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/AcopiadorMapper.kt",
+      "sha256": "ccc08ecdeecd151424e44c3fac844d0fe1866a60303355f5ed8c8bb65f34d3f9"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/AuthMapper.kt",
+      "sha256": "046d1f78d6bfee077bc17bee93eb4c61303b203a99340443207880df06ac2af2"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/ClienteMapper.kt",
+      "sha256": "7aac7c8408e9d00e758d4eff7cc4f59e25e9aec1ab6de01d8be418dd2fc48112"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/ConexionServidorMapper.kt",
+      "sha256": "e763b44a326fc6673decd15634f0d37d36b87c4cb2a11e2c5318b31902804dc8"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/PagoProveedorMapper.kt",
+      "sha256": "1e6bf57e7ba3a1141c12d80f7cee11234bbb090a1aec86417413665c62e89920"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/PrecioLecheMapper.kt",
+      "sha256": "92e92f794beea01308cd1761d23df795bd24fa377e3a325332d2a445b5b4c0fb"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/ProduccionMapper.kt",
+      "sha256": "5badf38de54ab48356cc9b6d41504cfa98a83f428b6a030a4e56412b8d9b9779"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/ProveedorMapper.kt",
+      "sha256": "31978495b0650816ff32b25492615ac2fb86be0ca86824a27e9d1d2386bb7ae7"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/RecojoMapper.kt",
+      "sha256": "5df8e5dfc1b72f89246bb8813ccb4daafebe422434e7c9bfc44e18049678a035"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/ResultadoLaboratorioMapper.kt",
+      "sha256": "e99349f7aaefe1e068d8ad5bb148cf8e5ee2c9bdada9dc74be2a429799584845"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/RutaMapper.kt",
+      "sha256": "3bb08e608847ce19b8bdbe82084429e11ac93ace8c1c90f068863bb8f919e4a2"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/UsuarioMapper.kt",
+      "sha256": "d676c215a3b979b86238928eef050ee6b4454aca82940d51446ec372f7fe0b31"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/mapper/VentaMapper.kt",
+      "sha256": "b2e4029cb0be45fbae328030e0ec0803863c3e67da411def9d10739694003109"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/ApiConfig.kt",
+      "sha256": "12db9719a4d889c1a25131b5b5ede302c47d4e7de17006f74ff392b6a56c18cf"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/BridgeSessionAssertion.kt",
+      "sha256": "bff68c25aa49c20968a32e3539bb88c7634feedbdc37184563236db2082396fc"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/HttpClientFactory.kt",
+      "sha256": "50e5d6f06e8f8a1b2bc33c7eca957e0ce72115f32233ea9080616add0ff534bd"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/datasource/AdministracionRolesRemota.kt",
+      "sha256": "64c3a492316e2a061f3852a5939be84096a6dcaebe1117844fffa2bac38d5f89"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/datasource/AuthRemoteDataSourceImpl.kt",
+      "sha256": "8600ae8e42d9058e5e4762651e6fdd37915bc090856dd29ebe5291e2f69d12c7"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/datasource/FinanzasRemota.kt",
+      "sha256": "05df62c4dbe1b3a7a68ee19d0049fa9365a0f7802551a4213c7d545ea85040a6"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/datasource/SyncRemoteDataSource.kt",
+      "sha256": "24a56e67165365ef993f99363dcf5a5d6ea27b11514e9ca131bfb7f3da52e5a6"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/dto/AuthDtos.kt",
+      "sha256": "4b77a948bd520d4b456e4520f7f821c316c5c7d80582a722bf2c1744751eb53d"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/dto/CambiosDtos.kt",
+      "sha256": "26864aee551ca6d3e81cbe46fde7a2f66cab6263bb9a162fc4f7fb01a7f669a8"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/remote/dto/SyncDtos.kt",
+      "sha256": "500b4fddd030a9bb4270245668aa3cc878ed149a5c8c2fff529124df5b55904e"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/AcopiadorRepositoryImpl.kt",
+      "sha256": "db0580f92524f4ab06082b4654d6ca79ab801a6853e3e1703d8118e349ce9bb7"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/AsistenciaRepositoryImpl.kt",
+      "sha256": "1b99708cda3bbc4e0eaa4cd6f5fe5cecf770be98e87dad080ceaf44c0e825f32"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/AutorizacionLocal.kt",
+      "sha256": "6132067d8e21c2b3e2def1fff228b2b1b9ec886f90f042ea34a645fd551c0057"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/BorradorVentaYapeRepositoryImpl.kt",
+      "sha256": "dee9a044a2410fe71dfa42a7be16076ca136c24dd435a2cd53634c2aa87c33d1"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ClienteRepositoryImpl.kt",
+      "sha256": "5c11499f7ab8b01564967d818807c74c437b85db50ec751717f0b68e2da985db"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ComunicadoRepositoryImpl.kt",
+      "sha256": "b75547f90c3e70a7bd20776417c850004480183df262c0d7dda7afdef1fde66d"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ConexionServidorRepositoryImpl.kt",
+      "sha256": "4435438274ce098cc36fb664ab0af54b56b9d7fc8302ecb883fb0c2b14fea3a6"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/DescuentoRepositoryImpl.kt",
+      "sha256": "4c7873c83a5868b47741637acb5a2411b2c8fa54c9716657077437d1809f826b"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/EntregaPlantaRepositoryImpl.kt",
+      "sha256": "8738348a0e9c03e3d22bbb5a1c9c51bc2eda7eeded3cfb20da00407d732243b1"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/NotificacionRepositoryImpl.kt",
+      "sha256": "02f60c51b60e9cc7eb411338c3eba1ef270d7a014ff08cadab3ba692db682bcf"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/PagoProveedorRepositoryImpl.kt",
+      "sha256": "3bf923f8894b73fb9a50015f4e3573c4e5ffdf2e814b72c05e52a66175911c73"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/PrecioLecheRepositoryImpl.kt",
+      "sha256": "c1681fcc10e35b410a8ccb005cec0fe2d06fc574d1acae110336914c5906bfea"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ProduccionRepositoriesImpl.kt",
+      "sha256": "41df2f65b6f628fc72cf87f5e125223204a5e0093289f2fc94db361b44640ba6"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ProductoRepositoryImpl.kt",
+      "sha256": "1f7c5f2f005fe69a01f94b23cac0c9f10f62d4a984f51bdcbe76c52283ee3407"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ProveedorRepositoryImpl.kt",
+      "sha256": "d44c48a50ea45b94d94d22c36f66680ddf50e70a40c8774a7b03e5fe4528c41b"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/RecojoRepositoryImpl.kt",
+      "sha256": "20235f853987b43eac4fda060211f3a3dbbb0e998956759e4b903476c56e681c"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/ResultadoLaboratorioRepositoryImpl.kt",
+      "sha256": "b6db6e09989e7728899e9c918f6aac9a25e78797fa7108e75f8a7e754887d115"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/RutaRepositoryImpl.kt",
+      "sha256": "f55a73adfaccab8d7b640ffbfb032b47e96313e50ffaae096e8f8abf0392112f"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/SessionRepositoryImpl.kt",
+      "sha256": "808758500e9fc396b69b74261447ed05fe2903b53e1b064581e485b866963c74"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/TurnoRepositoryImpl.kt",
+      "sha256": "03127c34cb6cbfc9171f9424739afc0e17434ea6a0c1af988021cef2a671221a"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/UsuarioRepositoryImpl.kt",
+      "sha256": "cc70671af506b45f784430c55bc2fad95011a3b43728f6b9ced05c8e8d47c016"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/repository/VentaRepositoryImpl.kt",
+      "sha256": "4f5d4862601015b11758dce16e013e1a24586bb279ccded4f64bf4f3f48fc9c6"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/seed/SeedData.kt",
+      "sha256": "0f94dc3eac84489fdaec29a0c812c72f9f8fc4eb1ff68179d53b6969827e4b35"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/sync/IdentidadUsuario.kt",
+      "sha256": "6760082afc200cfd75493dedec72fa34e8883b587798c137216c13ccc89b1724"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/sync/RegistroCambios.kt",
+      "sha256": "0344e309edb885973310bbb9bdacc4180aedc184225304737f8fae37613aa0de"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/data/sync/SyncService.kt",
+      "sha256": "49d5ed5a2a8559c0b7126616d6c6c612ba479d70572e1eab232c9bfc097cf241"
+    },
+    {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/di/AppModules.kt",
       "sha256": "a15f98264638f11bfed18853bc9c68ba872d58093cdf61832182b2a45214ec65"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/di/DataModule.kt",
-      "sha256": "745736e7520f07ed008445f94853686d1bcd0dc4811a85f27837e1eba4185c53"
+      "sha256": "7910b54e5aa0a1a0d1ce9966532717aeadaf04186233ab9d146cd945d211263a"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/di/DatabaseModule.kt",
@@ -514,7 +746,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/di/DomainModule.kt",
-      "sha256": "7657d02978785d1d99ac06bec538bf81bea5de5b72412ebe2842f98814b9fe5b"
+      "sha256": "3509dd335e9aac645f971f2e80deb92880682b4f8d364550fb96f89613fa7b1a"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/di/KoinInit.kt",
@@ -526,7 +758,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/di/ViewModelModule.kt",
-      "sha256": "cfa1da2f1d072ff91359ad30dd27637de05252b6600f838185408637eec9971e"
+      "sha256": "9e76f7896bbc260150ed4928d58a794e48c870e7b53a478c538944ad91cad868"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/domain/model/Acopiador.kt",
@@ -542,7 +774,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/domain/model/AutorizacionUsuario.kt",
-      "sha256": "b22f14dc77d09a4691e78dd67d531e83bc4c767f871187a58be70f91e66b18d5"
+      "sha256": "a396c0b0a7f8db9ca1b1e2b44907e1b0bed70f44d3a5a3306ee7761c2cd048eb"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/domain/model/BorradorVentaYape.kt",
@@ -798,7 +1030,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/domain/usecase/RegistrarVentaUseCase.kt",
-      "sha256": "d2e6f8066b81e7a52ec168ee4617563abd5c9dcdfbce6c05b50ed2bfddd4aeb5"
+      "sha256": "ad0033f7ee5c0c2d209bebc50ca3e888bc876b7a92921f035d994aef71fc9b96"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/domain/usecase/RutaUseCases.kt",
@@ -838,7 +1070,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/acopiador/inventario/AcopiadorInventarioScreen.kt",
-      "sha256": "ee625a9dda4cd6198bb73874eb03d0f28fef7811570594544c7493410082880f"
+      "sha256": "47872b170262348a3f3d999191743d90cf60d926ea4889702c82e3325ccdaed4"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/acopiador/inventario/AcopiadorInventarioViewModel.kt",
@@ -846,7 +1078,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/acopiador/recojo/AcopiadorRecojoScreen.kt",
-      "sha256": "cd7447ffafccef80fa77964192fa8fd0f3faf51d79bffcddcb1cc8e361870c69"
+      "sha256": "1891837a165d074f1e3900dbffdb2b73062b9a9decc11834c450cc4aacd4f300"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/acopiador/recojo/AcopiadorRecojoViewModel.kt",
@@ -854,7 +1086,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/AdminRootScreen.kt",
-      "sha256": "b662d9e1860acb96d7df38414976ed68f52a76929f5364b7e959dec0b22ca028"
+      "sha256": "7e2b5b1533b524a8c185b36913d961fd07185b3434117f5d789edbb87c64d7de"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/AdminRootViewModel.kt",
@@ -862,7 +1094,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/clientes/AdminClientesScreen.kt",
-      "sha256": "0c4eed5d0663f078e78f940d85107f3e8134749f0486d13858df56ccfc5ec58c"
+      "sha256": "ae2e61d73ac1569750106e62bc663d9b0a0946f303825462fc68f2f81eacabc9"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/clientes/AdminClientesViewModel.kt",
@@ -886,11 +1118,19 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/descuentos/AdminDescuentosScreen.kt",
-      "sha256": "c9d80faf2d236258ade2a8de5c4d6266bc0815854b50c6bc380b35ff02063297"
+      "sha256": "9209f4e79ea14f8510cf405bd4ef66692cb5917971bdeadc7f17f7fbedec24d8"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/descuentos/AdminDescuentosViewModel.kt",
       "sha256": "45b1e469687516ec7c31a6d93c9ef2509927e6aceeb25f6b4f6f14e6dbf63b01"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/finanzas/FinanzasScreen.kt",
+      "sha256": "8e03157c1a057d589d5feaf663346a7c580bbd97137f06b9e7e69f31a05336ca"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/finanzas/FinanzasViewModel.kt",
+      "sha256": "c4a5aac7670a6607185953f8c02514fd44e7721e3bc2427d98dce4428281436f"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/precios/AdminPreciosScreen.kt",
@@ -902,7 +1142,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/roles/AdminAsignarRolesScreen.kt",
-      "sha256": "81513b0d09dda8ec862c5a6455c582df1c35e800d4f61f05575958f83c1164f0"
+      "sha256": "97ba508062f6562334fec588029b7561ac6ec83d689313b0ea9d994b29b86141"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/roles/AdminAsignarRolesViewModel.kt",
@@ -910,7 +1150,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/roles/AdminRolesScreen.kt",
-      "sha256": "6419b2b1a6a22e50bab16343c427655ef22bd40326c659dfeabe8d99ab653604"
+      "sha256": "6a92b5067409747ef447166e30908dff22c80f9f1c2fb2885533de786c711fe5"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/roles/AdminRolesViewModel.kt",
@@ -918,7 +1158,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/roles/DistribucionesSheet.kt",
-      "sha256": "81cb0c386c0bbbfd5c1cbadbe36af9c549f2ba23f13e49e5a3f8bffd57e03e77"
+      "sha256": "457bf8695291431f5eace3f1fc520566d961138a4012d83872188c7c80d718ea"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/roles/DistribucionesViewModel.kt",
@@ -926,7 +1166,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/rutas/AdminRutasScreen.kt",
-      "sha256": "09eb650d59597684dc210a0f3939723a22781d194e853338aaed078eaaa57901"
+      "sha256": "8657c5fcb56e47b987daf15c973d925cf5a91222580059172637d9d266850384"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/rutas/AdminRutasViewModel.kt",
@@ -954,7 +1194,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/usuarios/AdminUsuariosScreen.kt",
-      "sha256": "c34f7582d4282f506a2174bdef192358313966e5def1e3656903ef8b36a6f901"
+      "sha256": "6a8d72750f97a3ebd9e66e3286639137f79ecf1689af48790f59118a295558fc"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/admin/usuarios/AdminUsuariosViewModel.kt",
@@ -998,11 +1238,11 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/common/asistencia/TomarAsistenciaScreen.kt",
-      "sha256": "8c329f71baad463a6bc50c4b29e4383659e1d67f1ec733111073162b2e394062"
+      "sha256": "6c0daa002459cffd5bdfbf8b77a53503ce6638a471e22d1dea1c59f0f62873cc"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/common/asistencia/TomarAsistenciaViewModel.kt",
-      "sha256": "565ad005381a6109f35ac38da73fc88bfede0b9c8a2dfe259be63d1e8d160604"
+      "sha256": "976ea99878ef4b7cf5b18d61e811c392c4f02e5b9ca502fc321ad57b7fee20aa"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/common/conexion/AvisoConexion.kt",
@@ -1019,6 +1259,10 @@
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/common/conexion/ConexionSyncViewModel.kt",
       "sha256": "2bd2391fadc6a8e503e028c6cafaebd6a6665c32dd7615947d6d2189c56bb32a"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/common/filtros/FiltrosLocales.kt",
+      "sha256": "014ed401cbea1e870fd34271bda66f701360c754010aa5e758a5ff96d9aa8d6e"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/common/mapa/MapaCanvas.kt",
@@ -1082,11 +1326,11 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/navigation/RootAutorizado.kt",
-      "sha256": "57386f9e7d5f31ce2c48007c525beb21ef9d78acf9bca72d195359b7a16d82e8"
+      "sha256": "786fee3bad6a0a216e47b998208617f4e3c47506fe3702c1c4290952af0de6ce"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/navigation/Screen.kt",
-      "sha256": "0e6a7b92afdeeb60b9d29cdfd09f095b802714e977e2390b278695ea7ed7cd13"
+      "sha256": "5a0116e314fd46569864e278ca60d82fdbe1af0672fb5c6da1f8b8aa30c99edd"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/PlantaRootScreen.kt",
@@ -1098,7 +1342,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/comunicados/PlantaComunicadosScreen.kt",
-      "sha256": "36ba6cff857c6496c2bbe33a811e382f643a77e0f8836f5d305294cb2f2c1c35"
+      "sha256": "4a777df0e7527bc5582d10201f32c2b63addab26183e553959809280dc347d8f"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/comunicados/PlantaComunicadosViewModel.kt",
@@ -1122,7 +1366,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/laboratorio/PlantaLaboratorioScreen.kt",
-      "sha256": "a11532dfefb5e0f289d558fb659e6408ab06b3e53cc3ea256ac794eb3655047f"
+      "sha256": "2785132bfa59dd42f6b0b83dbe66306ebbf2ce0eafc4f5cdc9c5d7b70cfe9227"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/laboratorio/PlantaLaboratorioViewModel.kt",
@@ -1130,7 +1374,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/pagos/PlantaPagosScreen.kt",
-      "sha256": "c7c89ea57db04eb07075db794d086d7900c2308b9ca79bf32730288f4469bde7"
+      "sha256": "bc0608b79ac1dedd04802482f51c22b73f4d92dd119b709f3d3819dfcac6262c"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/pagos/PlantaPagosViewModel.kt",
@@ -1138,7 +1382,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/recepcion/PlantaRecepcionScreen.kt",
-      "sha256": "0e3b22e9ebb20a10667045dac110b22ecb212e4d7feb1ce550e31bff400e346d"
+      "sha256": "c49c503308c48c469ca8dcc0843f596e7f3c69993bd2887f053026237839551b"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/planta/recepcion/PlantaRecepcionViewModel.kt",
@@ -1170,7 +1414,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/insumos/ProduccionInsumosScreen.kt",
-      "sha256": "6fe1f59a5012d4dde1651fcc5174b2f4e5b9a6b8542bc1caaed8d42d21d8e381"
+      "sha256": "17c9d23e3ccde91adffd1c034f98e6db5cb0bea7aa4de86533a1ee3d26a1de3a"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/insumos/ProduccionInsumosViewModel.kt",
@@ -1178,7 +1422,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/inventario/ProduccionInventarioScreen.kt",
-      "sha256": "38d81426f9b8eaa4c0a0a79a3dd1028c4de5ef5a2f79207e91796d2a2d0c291c"
+      "sha256": "bd0d009016065570bfc84d4d283de7b6c6a53d204612c087a1d047d358c7ef4a"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/inventario/ProduccionInventarioViewModel.kt",
@@ -1186,7 +1430,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/productos/ProduccionProductosScreen.kt",
-      "sha256": "d80646fbed0554126a31eb9e7e590fd8fb019e6e9e3dd9ac66eeb792dd006910"
+      "sha256": "aa441a67c7586a8b64476c65f17d83921ba81c5ff639f55281aa0bfd10b6940f"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/productos/ProduccionProductosViewModel.kt",
@@ -1194,7 +1438,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/recetas/ProduccionRecetasScreen.kt",
-      "sha256": "be089277f5b00dd11bcddc0c42da3cb283dbeff5d6df01566ca1032138bae406"
+      "sha256": "72f754b3b163c415177a6e750aee01c47ad1c7cb4a27339c943a6ef6d8e080f2"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/recetas/ProduccionRecetasViewModel.kt",
@@ -1202,7 +1446,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/registros/ProduccionRegistrosScreen.kt",
-      "sha256": "a6a423d594372ce55f5f8fadf384d3b4ad78352d711cef0cd6f25f21119ad0c6"
+      "sha256": "241f5648ab495cbb7f6d98af374d95d347ff7a5c1a7ea5b6ee9cff8f2bc168fc"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/produccion/registros/ProduccionRegistrosViewModel.kt",
@@ -1230,7 +1474,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/proveedor/comunicados/ProveedorComunicadosScreen.kt",
-      "sha256": "5c0601b9496964eb8310a24597afc4382df91bbaa0d9a28d1e9756fcdb5038d6"
+      "sha256": "c9c46969df95fbc463482a83d48e36e15441857c824066be4aa534a580429285"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/proveedor/comunicados/ProveedorComunicadosViewModel.kt",
@@ -1246,7 +1490,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/proveedor/entregas/ProveedorEntregasScreen.kt",
-      "sha256": "a28298332313f475c13c83fbf361288f10861d89ab28a5776f7d7558d37ac3a4"
+      "sha256": "bb997aa8b22312f22779d7662840b0f8983d2f34452b49dbd66921a3f32d7b21"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/proveedor/entregas/ProveedorEntregasViewModel.kt",
@@ -1254,15 +1498,19 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/proveedor/laboratorio/ProveedorLaboratorioScreen.kt",
-      "sha256": "9ed871c9feb8527700cd3073ff8303dc42e637087cc90ecc78d07cce4c61aceb"
+      "sha256": "47b389898f4dfd0155f2374ea370c0fbb4e30250e60b6739d4e064f624b5d51c"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/proveedor/laboratorio/ProveedorLaboratorioViewModel.kt",
       "sha256": "c4c200f62487f361fcc5154142551ab66be8705e0dae90805de09635ed34ebb9"
     },
     {
+      "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/DisponibilidadWebControl.kt",
+      "sha256": "b17846b07b6df80ad8af1fa7d5f38d3cf5450aa4cc5246cfd0873bdec3961e42"
+    },
+    {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/VendedorRootScreen.kt",
-      "sha256": "4144e812423fb380d55a744bfe6cdb0de33842f9aaef6e92bb9c90ec5f860466"
+      "sha256": "ef4f6d8ec2c81f5c9e9f5c2cee1b2558fe630fb9f7e502b8797e04a2c06826e9"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/VendedorRootViewModel.kt",
@@ -1270,7 +1518,7 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/dashboard/VendedorDashboardScreen.kt",
-      "sha256": "2c4bc9ea478eb04fccd03af5fbe40ae7ce4b828a37c9cc59c714aa94a0357333"
+      "sha256": "03d60f95dad114c61e8b8e2af2897b4fbaea70d21772e345dd0c6930f00cca4d"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/dashboard/VendedorDashboardViewModel.kt",
@@ -1278,19 +1526,19 @@
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/historial/VendedorHistorialScreen.kt",
-      "sha256": "d68f8e70a9b0cf31300061e473114c14b10989ee2af8f22519909dafb5de4ea5"
+      "sha256": "9bffe41099ff1900403a21d9fb5d1ba9f36f63678a0cab03688102d68f455cd3"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/historial/VendedorHistorialViewModel.kt",
-      "sha256": "e96250816a1fa5ba9580084cd792b8558fb2047e84fdd8172b543829f4e2b305"
+      "sha256": "947fbeee950ae8583fbfe9b72a4b7b253ff051a9c1b8b8e85cf582da8ea51492"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/inventario/VendedorInventarioScreen.kt",
-      "sha256": "b1b7cd433abed02417f45c8e7b419c9071800ec83bf72313174f2e36f2ae413a"
+      "sha256": "d4e2a07c7636c98b73e6c237cd71b535642264de174f1a518db3e9f8e30b1c09"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/venta/VendedorVentaScreen.kt",
-      "sha256": "d8028038c0e4036ec601201f5e3be8e59d7ffb8eeea9a254b7bea6e04077540c"
+      "sha256": "d8474376b2cec78f5106af9c22a2e2097b9dfd03edf4500bcd2ddac2aadddbf3"
     },
     {
       "path": "EcolacteosHuata/shared/src/commonMain/kotlin/com/example/ecolacteoshuata/presentation/vendedor/venta/VendedorVentaViewModel.kt",
@@ -1505,6 +1753,14 @@
       "sha256": "97da0b72cd3881cffc7a310e5e2d2783bab07334712b5f076d6248498edb1abc"
     },
     {
+      "path": "EcolacteosHuata/shared/src/commonTest/kotlin/com/example/ecolacteoshuata/data/mapper/AuthMapperTest.kt",
+      "sha256": "ee9f8185d7b8da8d6d58805c345d58523a96aca9515b0096cba012dc28da005a"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/commonTest/kotlin/com/example/ecolacteoshuata/data/remote/ApiConfigTest.kt",
+      "sha256": "5e28714f44d2ce409f80ab4f706a9d67bfcf1bb7fa8b0a4aaff61d0dffee8ce8"
+    },
+    {
       "path": "EcolacteosHuata/shared/src/commonTest/kotlin/com/example/ecolacteoshuata/domain/model/RolTest.kt",
       "sha256": "a4a018020dd6735cecf7e2319b55ece120e8c1f296f54271a50563d17ae48912"
     },
@@ -1533,6 +1789,10 @@
       "sha256": "e0bd43fccedc8909b20d25f8a5fc131568fe103c25ae3c3e726e20f2e8a6bd6f"
     },
     {
+      "path": "EcolacteosHuata/shared/src/commonTest/kotlin/com/example/ecolacteoshuata/presentation/common/filtros/FiltrosLocalesTest.kt",
+      "sha256": "856fed9253cfd11dd267e4483dd43f12ea5459f09bb420bc6e25ca281dd0b3f3"
+    },
+    {
       "path": "EcolacteosHuata/shared/src/commonTest/kotlin/com/example/ecolacteoshuata/presentation/produccion/compras/PeriodoComprasTest.kt",
       "sha256": "1bbf73c5a9615204bcf19853bdc5c61dd0abe69b47c9099838b434b742f26266"
     },
@@ -1551,6 +1811,22 @@
     {
       "path": "EcolacteosHuata/shared/src/iosMain/kotlin/com/example/ecolacteoshuata/core/util/Money.ios.kt",
       "sha256": "bb4f4e09550f9a0068e00ca69c651bbd6cf46a8bae9f521e3c40229655cec48d"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/iosMain/kotlin/com/example/ecolacteoshuata/data/local/DatabaseDriverFactory.ios.kt",
+      "sha256": "2bd619df8ce89bf873d7ccbce397b2c707271947b31cc33732cd61f987d88090"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/iosMain/kotlin/com/example/ecolacteoshuata/data/platform/IosNetworkMonitor.kt",
+      "sha256": "8b3257448002e6ecd89d20af0f1850c03ece93f6093530b6e01b977ba9016c01"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/iosMain/kotlin/com/example/ecolacteoshuata/data/platform/IosNotificadorSistema.kt",
+      "sha256": "13a107ad69b8b350dd730534dfea2e0fba5f3b6245a35d68b8ecc36d08ff9de3"
+    },
+    {
+      "path": "EcolacteosHuata/shared/src/iosMain/kotlin/com/example/ecolacteoshuata/data/platform/IosTokenStorage.kt",
+      "sha256": "86ee0e37ab6996d8360b07ddfc40fe7553966d4db8352e56bd13bbded88b8cfb"
     },
     {
       "path": "EcolacteosHuata/shared/src/iosMain/kotlin/com/example/ecolacteoshuata/di/KoinIos.kt",
@@ -1574,11 +1850,11 @@
     },
     {
       "path": "PUBLICACION_VALIDADA.md",
-      "sha256": "3f248b2857c335cc744e5b512f9abc5e19834ab95be4086000b152549f397816"
+      "sha256": "98a0fa37891c5458a97ae706c685c7aaa69237abc93117d78c71fde63f5872e4"
     },
     {
       "path": "README.md",
-      "sha256": "078f110b1df7524a98889e1a76b370f6e9e3bda3b5d9d67bfcdb073398714201"
+      "sha256": "dce7c050bbfee807a4f99c4694518d9d4d34971bf969b3c1b4b2238ac85e7639"
     },
     {
       "path": "UPSTREAM.md",
@@ -1638,7 +1914,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Authorization/Autorizacion.php",
-      "sha256": "c58932c420c237e60c40adbe69a60f84ee8d13ee5577de4dd00236efabab3bb0"
+      "sha256": "1bf0c09b4fe39f0fe6a66cd60c6a0b80e44c89f57c05de5a924379bc352fd7c8"
     },
     {
       "path": "laravelEcolacteosHuata/app/Authorization/AutorizarComponente.php",
@@ -1654,7 +1930,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Authorization/Pantallas.php",
-      "sha256": "411a016c192dff0c319e3a953138cc7f10181f7110e4c1e79c65e8eb62dcadf6"
+      "sha256": "ed0117cbe5abb470820853a40ebd4c9d8f297a02279ca4c296adfb351964c6ba"
     },
     {
       "path": "laravelEcolacteosHuata/app/Concerns/GeneratesUniqueTeamSlugs.php",
@@ -1762,15 +2038,23 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/Api/MobileCambiosController.php",
-      "sha256": "6216e29e298313125a9c781c7c61d84a29b67e0684a254f57d6c7d9424b747c5"
+      "sha256": "545a37f58f3c02dbc652281390e12f4cd21ba445d75e780240911881d15cb109"
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/Api/MobileDistribucionesController.php",
       "sha256": "f3a63fe704bf3c36395c064d138b14ef00606d3b5c56f76e76a21b7513125b02"
     },
     {
+      "path": "laravelEcolacteosHuata/app/Http/Controllers/Api/MobileFinanzasController.php",
+      "sha256": "100b6676648e2d250350af60a1b340af09e808704a76a9c79dd05bc5890c8972"
+    },
+    {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/Api/MobileSyncController.php",
       "sha256": "8eed100a2aa1d860ae12728bf6b3b848e457fad6e87ef88090542e7856001fc4"
+    },
+    {
+      "path": "laravelEcolacteosHuata/app/Http/Controllers/Api/MobileVendedoresWebController.php",
+      "sha256": "868205903e88ddc935a8b2f262ee27526f6b4bca7b0d74ce73132b58a63cc36e"
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/Api/YapeBridgeController.php",
@@ -1782,7 +2066,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/ClientesWeb/CuentaController.php",
-      "sha256": "2e5cfc11045878d2ad855bc877d898fcf4b8b2945fc7596fe477bee61741bb50"
+      "sha256": "78cb9a182e886e8d2c9b90ac396feaf8403b0251308af8cbb546168d7846fea0"
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/Controller.php",
@@ -1798,7 +2082,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/PedidoWebController.php",
-      "sha256": "ce5b4ff9afaafced280fac4228f0f2bf2011fba39a4004ead89a2c62ad9e1ac6"
+      "sha256": "b96f20cd270c91879ac84b598d4fb3c4ceded55850a1dccf5f0127ccc3f52841"
     },
     {
       "path": "laravelEcolacteosHuata/app/Http/Controllers/ResultadoLaboratorioPdfController.php",
@@ -1853,8 +2137,16 @@
       "sha256": "d04551c0e48c5736b7c0e762a6a696ed3715ea2e8b00c1d97a57838eae6e86bc"
     },
     {
+      "path": "laravelEcolacteosHuata/app/Livewire/Concerns/FiltrosListado.php",
+      "sha256": "4c7e3320cd7e817cc706b5039587a4298ae24679a33c8c7155f51ce59b954490"
+    },
+    {
+      "path": "laravelEcolacteosHuata/app/Livewire/DisponibilidadWeb.php",
+      "sha256": "edcd01ae8fe0ac2827c5072ad267ce2865219a163fc16e756d88456686a819d9"
+    },
+    {
       "path": "laravelEcolacteosHuata/app/Livewire/DistribucionesRoles.php",
-      "sha256": "47a669e6bd0d92bab578921a3014023042e76b7ed2c9eab18fddeb87a997ccd1"
+      "sha256": "1bfebda591631900fdccc61beb0e755a183621e970b7074cbc07be113bf03d88"
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/Acopiador.php",
@@ -1925,6 +2217,10 @@
       "sha256": "0787bf3ec71a5fb4d6072cd20eb70e94f2c829ca8d18ba985fbf5f36c9b1c207"
     },
     {
+      "path": "laravelEcolacteosHuata/app/Models/MovimientoFinanciero.php",
+      "sha256": "10562360c568c1db2a38ad0c5db9297bd187c8279344938f3f72903e46191add"
+    },
+    {
       "path": "laravelEcolacteosHuata/app/Models/MovimientoSaldo.php",
       "sha256": "44a4108638ff76a2c18d5eb0090c2d209ef8b076a16a045bcf3741a9390fae4a"
     },
@@ -1934,7 +2230,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/PedidoWeb.php",
-      "sha256": "5b014e0631b3f4ab76e20664ae1fcaeac388b9541613dd59e06e855918ffd26d"
+      "sha256": "e39d387579d6a507d8b32ca37a5161093e8dfd58e1dee92b96462b7fdd29599b"
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/PedidoWebItem.php",
@@ -1958,7 +2254,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/ReceptorPago.php",
-      "sha256": "7c98a01fa497d87646097921cd055299c915fc34af2d9715a3c7623c1e17d118"
+      "sha256": "17faf3fce0d2a13366579b9af4ff7f0f3904498ed055d9d62e9a1912b065f7f3"
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/Receta.php",
@@ -2002,7 +2298,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/User.php",
-      "sha256": "695b17386f6646ad61ddf3f2730cd464199aca86c4e3a79dbaa4605115d7842b"
+      "sha256": "0798e5c618a1b06c4aedb8f709757e61637a5bc03ff1774ab981a781c02765b5"
     },
     {
       "path": "laravelEcolacteosHuata/app/Models/Venta.php",
@@ -2045,6 +2341,18 @@
       "sha256": "166082b6b305d173badb87a2701f449e370c22915bb8f68348cf9768eb2e6de1"
     },
     {
+      "path": "laravelEcolacteosHuata/app/Services/EliminarUsuarioSeguro.php",
+      "sha256": "ddeefb76cba3af6e460496b0bb13440b6eadbd195d6573dfebb36abb4085db0a"
+    },
+    {
+      "path": "laravelEcolacteosHuata/app/Services/Finanzas/ConsultasFinanzas.php",
+      "sha256": "ccb359e8dd9e3ae69b5089ab6f1f2ac482b79bf097c4664bed6d826809f4cdd3"
+    },
+    {
+      "path": "laravelEcolacteosHuata/app/Services/Finanzas/FinanzasService.php",
+      "sha256": "dc3e81a115e4e4e847e10ee13b459a978c49585f60a36f1d855c529030466e6e"
+    },
+    {
       "path": "laravelEcolacteosHuata/app/Services/Payments/AsignacionesReceptor.php",
       "sha256": "8af6ba187d9cccd600aa6a265c81165485437e112a00c42718f6efa8fd0c1cad"
     },
@@ -2058,7 +2366,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Services/Payments/CobrosService.php",
-      "sha256": "dad8ba37a2a7d9584c01590023c35cbdebd1b0ba2106bec81bd1c78e115dc4e7"
+      "sha256": "ac04b410511ac6f7b30794ef5510d7f7a891964d59af2409f96fb734a343a4bd"
     },
     {
       "path": "laravelEcolacteosHuata/app/Services/Payments/Dinero.php",
@@ -2082,7 +2390,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Services/Payments/SaldoService.php",
-      "sha256": "cfb107fe28e1891130551c300131c2da36f5138a768054ec1a3cb127114df9b0"
+      "sha256": "48897d608eefaebd55a7aff98f4e194686124df08133cd635aecbe85de7813f8"
     },
     {
       "path": "laravelEcolacteosHuata/app/Services/Payments/StockInsuficiente.php",
@@ -2094,7 +2402,11 @@
     },
     {
       "path": "laravelEcolacteosHuata/app/Services/Payments/VentasService.php",
-      "sha256": "60d1c23d1dfdc14e5c0b2fcc4f0b62c97a33068af11a0b1a4578e4522fe4ee59"
+      "sha256": "397c75aa8668367d7a217c96b1744277f2671c0a1ea874dd6296e43102f5b3b1"
+    },
+    {
+      "path": "laravelEcolacteosHuata/app/Services/VendedoresWeb.php",
+      "sha256": "1f59510456ed74c41f3aaaf0bdeb05c04cc9399da6fe2730c359bd784a4079f7"
     },
     {
       "path": "laravelEcolacteosHuata/artisan",
@@ -2585,6 +2897,14 @@
       "sha256": "5a5d764d0891ac1725f19dc2a920383bbdb6342adf0866f8e5d857d195e4ea67"
     },
     {
+      "path": "laravelEcolacteosHuata/database/migrations/2026_10_27_180000_add_finanzas_operativas.php",
+      "sha256": "654d50890fd3234d34e4d3c7665313b707d6364d3c612b88f38571d4b1eafa0d"
+    },
+    {
+      "path": "laravelEcolacteosHuata/database/migrations/2026_10_27_210000_add_disponibilidad_vendedores_web.php",
+      "sha256": "f80144fb37b8cbf00655dfe7b916954cda3f605e28b1e46216878c729610e35a"
+    },
+    {
       "path": "laravelEcolacteosHuata/database/seeders/AdminInicialSeeder.php",
       "sha256": "b770a831d04f96d2e789fb5d76ef736a6fb46f43d6922d190114e7caaf733247"
     },
@@ -2613,8 +2933,20 @@
       "sha256": "55610c6690dc44f0b08c21be79f5f2db84201f7f00a716c37f9f73985ca7333a"
     },
     {
+      "path": "laravelEcolacteosHuata/docs/FILTROS_WEB_KOTLIN.md",
+      "sha256": "14b1b07067b9de46cff0a41e6d247c417dcafe3268133fd8d7c9cc68bcaf854c"
+    },
+    {
+      "path": "laravelEcolacteosHuata/docs/FINANZAS_ANDROID_DISPONIBILIDAD_WEB.md",
+      "sha256": "b7b2d3c187c54f98920667e3f6babc5e45e75e1ac86bfcfb1e55d661dbafc69c"
+    },
+    {
       "path": "laravelEcolacteosHuata/docs/PAGOS_OPERACION.md",
       "sha256": "9523c337f142e0593fa644435698ad733a1724a022a1a9f9c8d0bdec0f1b0645"
+    },
+    {
+      "path": "laravelEcolacteosHuata/docs/PEDIDOS_SALDO_FINANZAS.md",
+      "sha256": "86519a9a739b434cc23b2bfa736b39e473e560b4562afbc6a886176765beac0a"
     },
     {
       "path": "laravelEcolacteosHuata/docs/RESTAURACION_DISENO_WEB.md",
@@ -2675,6 +3007,14 @@
     {
       "path": "laravelEcolacteosHuata/docs/figuras/fig08_velocidad.png",
       "sha256": "882aa63ee986538f4c6ede947c17fca36b88e9c71acf33b7ccf524e6dcc87d0d"
+    },
+    {
+      "path": "laravelEcolacteosHuata/docs/roles-dinamicos/dos-funciones.jpg",
+      "sha256": "4687a5f2e1366dbf07f81d475cf7aa9cdf401881546240cae3b46be45e6a5dbc"
+    },
+    {
+      "path": "laravelEcolacteosHuata/docs/roles-dinamicos/roles-movil.jpg",
+      "sha256": "79670c9f420f3be42a04c94c4e5226e04345ed527af062394dab967286dd83c7"
     },
     {
       "path": "laravelEcolacteosHuata/lang/es.json",
@@ -2830,11 +3170,15 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/clientes-web/cuenta.blade.php",
-      "sha256": "b7d96a7633fa2b3863d2455b12458d82bd11c5572fa5056c8f6a822c417e0826"
+      "sha256": "9607ae380aed17b718400fc0acf05ed2934f1ae75170d1d3f41e3adfe62ff734"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/clientes-web/pago.blade.php",
-      "sha256": "1d7e089ba732665ae4819dec5841659ef882ef3cc3be05fb4c6136eaebdab3c5"
+      "sha256": "51a80729bec6053fae41b0d4e878d79428d4d4a697da804a1dd6b087534fb4fc"
+    },
+    {
+      "path": "laravelEcolacteosHuata/resources/views/clientes-web/recarga-modal.blade.php",
+      "sha256": "2108a60b47c77e20c33dda6593c68b14e9591499957d714a9226a6eb9d080e10"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/components/app-logo-icon.blade.php",
@@ -2895,6 +3239,10 @@
     {
       "path": "laravelEcolacteosHuata/resources/views/components/ui/accion.blade.php",
       "sha256": "73728ab1d0837d09b32bcda836c666aab9e2e60ea5bbc78dd6954a5d3a4b1892"
+    },
+    {
+      "path": "laravelEcolacteosHuata/resources/views/components/ui/filtros.blade.php",
+      "sha256": "638d088ee4e6903e91a60e722b9bb881ce36854c45c3591b2f2cd2cf4b1739d9"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/components/ui/kpi.blade.php",
@@ -2977,8 +3325,12 @@
       "sha256": "6e60823b314d8025f87a2682ddcc0455811a4fa423e7255fcea2d82096595e6d"
     },
     {
+      "path": "laravelEcolacteosHuata/resources/views/livewire/disponibilidad-web.blade.php",
+      "sha256": "4b0f89835d423ac23092cb45152ccb9af7c31e7f74ff832ddda5183b847fa45f"
+    },
+    {
       "path": "laravelEcolacteosHuata/resources/views/livewire/distribuciones-roles.blade.php",
-      "sha256": "2909a02ab640b6cf630bc47ed36740e29eeff106d639b1a6996feb9663238800"
+      "sha256": "72c7ed70e96c42b7803d52663fff7413431e0d8e8461c4b5edea0f5823cb62a3"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/acopiador/⚡entrega.blade.php",
@@ -2986,7 +3338,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/acopiador/⚡inventario.blade.php",
-      "sha256": "6fe401dc1f6d7185d896132975ed4f15edcfb7148af5e986204b35936dadfb63"
+      "sha256": "79724b2096482a4011f2b8a0dd01cf6d5c5cdb8c19c240cf41f092289289bedd"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/acopiador/⚡mapa-recojo.blade.php",
@@ -2998,7 +3350,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/acopiador/⚡recojo.blade.php",
-      "sha256": "b4eb5dd4887908da7093294025a91ef4a1321891ae3e2bab40815c75028352ea"
+      "sha256": "08e404bca812c12bdd01dd3b37a8f082d7502c3464ef5cbbaedee50d42cdae4c"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡acopiador-entrega.blade.php",
@@ -3010,15 +3362,19 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡asignar-roles.blade.php",
-      "sha256": "b759fae9a8811333223b49951fa26b3c25e87e89cef1f994eb07ac479b28c72c"
+      "sha256": "23e86e8e8d32b9ea5e3a3a244224f7438add287e68abd315db83c4efcedba69d"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡descuentos.blade.php",
-      "sha256": "aed05bbdfc6bfb6e5b88c147ae3d97a1597fcc98b41a33e0ebf43501602e5e8a"
+      "sha256": "377cecaaaf37a0d50051d6a764d6238e14ef458cc3e5efdf35fb977d741da1bc"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡empresa.blade.php",
       "sha256": "696133fc2d7595acc2ef575e5b5054f916896c60c5ac47bee916285070cb8eeb"
+    },
+    {
+      "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡finanzas.blade.php",
+      "sha256": "e225096ae946d821525cdceb7c3e064f3060f220266f4501152639bfd5e6e9c0"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡panel.blade.php",
@@ -3038,7 +3394,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡roles.blade.php",
-      "sha256": "0f7f3bf4af83f7741279734d454d8b3b9128da9602f0214f38ed78a8ab0c38fd"
+      "sha256": "7c459cec2ac35f543b66f2307cda56a27b4eea6dcb29dae12b82b50500c2e7f2"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡turnos.blade.php",
@@ -3046,7 +3402,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/admin/⚡usuarios.blade.php",
-      "sha256": "03d35f4cdf2e9d48a56d491437409bae924894f29cde067021795ca42a0ebefd"
+      "sha256": "247d12cf63a9d959be90810c65a6418327791fdd20b872c4dcfe0a37d73cfb9b"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/asistencia/⚡mis.blade.php",
@@ -3054,7 +3410,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/asistencia/⚡tomar.blade.php",
-      "sha256": "67b0f711a2eb7fbe428d2ca7bd480bacde755f09eb577e123ace84448317fc31"
+      "sha256": "56914c2786eaff0e9f9dcb8377977c76fe34dfa5140d17095a894319a8ddccc7"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/auth/confirm-password.blade.php",
@@ -3086,19 +3442,19 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/planta/⚡comunicados.blade.php",
-      "sha256": "b9677c80cc09ae981e8f827fc8b83c1d301fd474f44a3eaa6a65e8c467813e2e"
+      "sha256": "262f971be4a3cbf578e63ed3bf55a03586cb4874b62cabf66f725d7a60c52e1e"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/planta/⚡entregas.blade.php",
-      "sha256": "87be874ae437993f8786c13dc68f59e8b12f2fc9acb4268d16460e3647d8851a"
+      "sha256": "1d250a7088617c2540dd36a2abb82f6ad1603db97d14028415a1263ed0e22cc0"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/planta/⚡laboratorio.blade.php",
-      "sha256": "f5c589dde29964ddf6bff64158c194de7875d8f98442d02530536536be5aea9b"
+      "sha256": "9f9717ec4694a81360fc475f40030d817c384d8c5f812bd75a27c1c355983da4"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/planta/⚡pagos.blade.php",
-      "sha256": "21e0341433feae57c99e22fc96847c50ebb395d98e96245ec32604cd2089e2a3"
+      "sha256": "ef38de384397826d3986e21802109b2381074fade8eb26f80cdda94514f3a979"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/planta/⚡panel.blade.php",
@@ -3106,7 +3462,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/planta/⚡rutas.blade.php",
-      "sha256": "456cb4abaf1f858590a739630c16b43e2e12cb1a1e4ba08c030d475a96f05b2e"
+      "sha256": "c370a197c425e7f4ff8fb958e2b17b37db4f199c28c04041e700e756ca9a4e26"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡compras.blade.php",
@@ -3114,11 +3470,11 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡insumos.blade.php",
-      "sha256": "92b4dc247110d04b58a10bfbc641b5a60c636dfc18c9d1cc6f07ba5a13a4265b"
+      "sha256": "62c7943248195ba4d3d81a71c9b2cb1ddbe12d55c4569ad56b1e98f1473c36be"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡inventario.blade.php",
-      "sha256": "19f015311926e70f73eafdfe4faebb7948ba588fdeceaa8dd4cab9ec50d7779e"
+      "sha256": "1602393350665a99412457ef70f976e44c1900a1741d6be0dc4f6fd00763eccc"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡panel.blade.php",
@@ -3126,15 +3482,15 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡productos.blade.php",
-      "sha256": "c5dc09483545ce9e7d0619f1a9c5ff46b60f985508eaa6a52971faa9f4ec5098"
+      "sha256": "19e64522060b05507e762da69ce4f07e2451f7d9a928e8ba431e3d980683d401"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡recetas.blade.php",
-      "sha256": "db6f34e04c1be682d4caad0188329beda8d83e9856032d169f082db96313cbf7"
+      "sha256": "6c035464e4c51e06d2092a22aa98640ed16ae4d712f1251a7359e2f11ff4c4e7"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡registros.blade.php",
-      "sha256": "5735fa463adc868fa9fe707bba45cb32b80280443f6734dc12d8a32f6660ad57"
+      "sha256": "e8ebb94093dadef58627daf421218105f2c3c3d1bb6ad02ea0ed5587f44554f5"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/produccion/⚡unidades.blade.php",
@@ -3142,15 +3498,15 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/proveedor/⚡comunicados.blade.php",
-      "sha256": "cf3b1f1ed40b17240a96570ebcf7cc737314af7fb1fa72aa508d0d6fa042760e"
+      "sha256": "59c0b71489f8336265737991fc6801626adbf7b6b4e73ca7edec86fccb7261fb"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/proveedor/⚡entregas.blade.php",
-      "sha256": "0cf75c847773b456fb40708507c5ebf6dcb81e0483d910e738cd22d1315e4201"
+      "sha256": "61a268ad69689b191b017392f71b257952607d6f9f18a9045668380c9662dbaa"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/proveedor/⚡laboratorio.blade.php",
-      "sha256": "b637ac65db6c29ce3bfc812c14d3451ab89a18028540b74d51b7f6113128cbce"
+      "sha256": "fe29d9932bc130e423c0941005450f7d0c79ede8dfce89882f92fcf51591e2c9"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/proveedor/⚡panel.blade.php",
@@ -3218,7 +3574,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡clientes.blade.php",
-      "sha256": "832dec544101b87c12c974213dffd6efee95f6bc6df483299e7313fdf278ffd3"
+      "sha256": "f5c58f86f529c56b76dd485372afda3596ea84907cd288e082701e42c253e368"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡configuracion-pagos.blade.php",
@@ -3226,27 +3582,27 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡historial.blade.php",
-      "sha256": "6bdc64fcb8661f36816203cb3851f52964e3c875c9456a28465d0c4569344d89"
+      "sha256": "843c6007149750b9e2940d0e8d49ff6aab7fae5ee4679cd7fedcaa5fa82f6cb2"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡inventario.blade.php",
-      "sha256": "795e1d2205ccbe6935923d0124840619f81483639caef944968e5b2608cf37a7"
+      "sha256": "0a7fdd1e3501bdceb0565b00517f452e91254c180570322a3c5f900d85fa6d3c"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡panel.blade.php",
-      "sha256": "d00023102c0565540957339cb8dc075754c52b5207ec533941d61acab6b31f52"
+      "sha256": "37d8f63b315074d538e914567a4aa6a930fd1ac5329f8f2b02f53db7d3243cb5"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡pedidos-web.blade.php",
-      "sha256": "8bb05b87e6b1b38133c1b9309f358824749b9aa736c5a0caadbb770eefc6ac85"
+      "sha256": "747b6cbf5445e4586c53b93e0911f584e884d3820804d4d1d2781861bbe2f68a"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡produccion.blade.php",
-      "sha256": "057064d6a141b1434d2382aab272a3bb436429b1837ad738d6e2dc2f874734b7"
+      "sha256": "b2cd9f1217ad2d981ca747df29ae52e9aa67287b05113d61be01901b1a4f8c7d"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/pages/vendedor/⚡ventas.blade.php",
-      "sha256": "2c3034a39ca47bd3ba294a202bcafe09c52cae649d3bd1cb47bfc8280ea3ab58"
+      "sha256": "b3d0667f1c91012165741f8d2fc0f70779b9484efeee6770f54b11d24904012c"
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/partials/head.blade.php",
@@ -3270,7 +3626,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/resources/views/welcome.blade.php",
-      "sha256": "e6921819821cdef4ec4727235e7d061ce354ccc3aa76c85a3f9d3fd2f16dfbbf"
+      "sha256": "d927a01f453c613582e8f8bfab06bf6760942c9aaf9d30489b916fd2dbe802dd"
     },
     {
       "path": "laravelEcolacteosHuata/routes/acopiador.php",
@@ -3278,11 +3634,11 @@
     },
     {
       "path": "laravelEcolacteosHuata/routes/admin.php",
-      "sha256": "9546b3da43f113e9dda78511e227f207547f01ba19d5b2970caf2dcad0037475"
+      "sha256": "8727cf0500f116c882cda8b711186215b304eb9a0cca67771f4e5d6ad72c1225"
     },
     {
       "path": "laravelEcolacteosHuata/routes/api.php",
-      "sha256": "d9477ee7955ca4b03f4b7cd6de950d5c6a25685715515baea1c84666e18890bf"
+      "sha256": "72162af0d46acd8c916c423a98476051b999efccf772c26e05dda28990c08285"
     },
     {
       "path": "laravelEcolacteosHuata/routes/asistencia.php",
@@ -3290,7 +3646,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/routes/clientes-web.php",
-      "sha256": "778dadfb2b5483cb0238866beeb9e0dd58ddc4be2ec8ecdebea06a9f90d4687c"
+      "sha256": "51f0aa517094a53646bcce98098de5bafeab7b244154d2cae010d59c63a21f84"
     },
     {
       "path": "laravelEcolacteosHuata/routes/console.php",
@@ -3341,6 +3697,10 @@
       "sha256": "32f79194633ddb34f013c6ee8819d112104ff822357adf308ec385b46a7f42f6"
     },
     {
+      "path": "laravelEcolacteosHuata/storage/framework/cache/data/.gitignore",
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d"
+    },
+    {
       "path": "laravelEcolacteosHuata/storage/framework/sessions/.gitignore",
       "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d"
     },
@@ -3366,7 +3726,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/AdminInicialSeederTest.php",
-      "sha256": "ca4ac25c83bdd2f721a53b09058f79de3fb26dcfe4adb6bb0533596993638d45"
+      "sha256": "d517746237a6bfd889759981140b3a4f8ba988f1aca6b9431cafa0be816d96b6"
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/AdminPanelTest.php",
@@ -3449,8 +3809,12 @@
       "sha256": "d3a9874e8c47d7045e0220a3081d77b17f4efc572f81cf00ede0ca21ad6f08b8"
     },
     {
+      "path": "laravelEcolacteosHuata/tests/Feature/DisponibilidadFinanzasAndroidTest.php",
+      "sha256": "98dfb9a413ef8ed9b77863863c266adf2c33ea0a6ef05dcc5121bdc6451d9e59"
+    },
+    {
       "path": "laravelEcolacteosHuata/tests/Feature/DistribucionesRolesTest.php",
-      "sha256": "36555176ec937b1b74874d198a513980cadc40b29aa7b57075e73696aff816bb"
+      "sha256": "b02111b757c1a255ac3b2c0c03a8b806ede098fc0ad69d90de6d9e7477d9690b"
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/EntregaAcopiadorEditarRecojoTest.php",
@@ -3467,6 +3831,10 @@
     {
       "path": "laravelEcolacteosHuata/tests/Feature/ExampleTest.php",
       "sha256": "e55aa080cc4c463ae1be19da7f8de2936a85bbbedd96174bafd661df3474b9ed"
+    },
+    {
+      "path": "laravelEcolacteosHuata/tests/Feature/FiltrosListadosTest.php",
+      "sha256": "3dafd12d06e0c0a88c0a904d8366522a4f1ad587c27b70aaef1cf6af784a68a7"
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/HistorialLimpiarTest.php",
@@ -3494,7 +3862,7 @@
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/PagosCanonicosTest.php",
-      "sha256": "567913b97662cc067065a04450551e5df956091e74cbd123753e5f2856234558"
+      "sha256": "590390808cc74ae45381fb613bcf48a94d28b90873c79d6d6cd0d0a6656ec788"
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/PanelesPorRolTest.php",
@@ -3503,6 +3871,10 @@
     {
       "path": "laravelEcolacteosHuata/tests/Feature/PaymentCredentialsTest.php",
       "sha256": "cbf34a0cd59f129b995da0b2edfa58e9a63b04dc3c6fa6151d1958d9026aacce"
+    },
+    {
+      "path": "laravelEcolacteosHuata/tests/Feature/PedidosSaldoFinanzasTest.php",
+      "sha256": "c9ae448c7252013e809afc6a20f40f1584c5b7554eb571045d91262a7fd0767d"
     },
     {
       "path": "laravelEcolacteosHuata/tests/Feature/PedidosWebTest.php",
@@ -4284,5 +4656,7 @@
       "path": "yape-bridge/settings.gradle.kts",
       "sha256": "c72da68ac481b79efc0d7992992dac0ea4a3de8f3ccc891f7c8fd900646c81b7"
     }
-  ]
+  ],
+  "publication_base_commit": "e3e6c928af57d39738ebe79716fc6a3ba85e77fc",
+  "source_state": "Fuentes locales acumuladas, sin cambios de código durante esta publicación; adaptaciones portables publicadas conservadas."
 }

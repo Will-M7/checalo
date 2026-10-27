@@ -9,6 +9,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public ?int $produccionId = null;
 
     /**
@@ -40,7 +42,7 @@ new class extends Component
         return [
             'recetas' => Receta::orderBy('nombre')->get(),
             'turnos' => Turno::where('es_produccion', true)->orderBy('hora_inicio')->get(),
-            'producciones' => Produccion::with('receta.detalles.insumo', 'turno')->orderByDesc('updated_at')->limit(20)->get(),
+            'producciones' => Produccion::with('receta.detalles.insumo', 'turno')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')->orWhereHas('receta', fn ($r) => $r->where('nombre', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('estado'), fn ($q, $v) => $q->where('estado', $v))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->orderByDesc('updated_at')->limit(20)->get(),
             'faltantesNueva' => $this->faltantesFormNueva(),
             'stockBajoNueva' => $this->stockBajoFormNueva(),
             'insumosAgotadosPorLinea' => $this->insumosAgotadosPorLinea(),
@@ -395,6 +397,8 @@ new class extends Component
             <flux:button size="sm" variant="primary" icon="plus" wire:click="nuevaProduccion">Nueva producción</flux:button>
         </flux:modal.trigger>
     </div>
+    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar producción..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Estado" wire:model.live="filtros.estado"><flux:select.option value="">Todos</flux:select.option>@foreach(\App\Enums\EstadoProduccion::options() as $op)<flux:select.option :value="$op['value']">{{ $op['label'] }}</flux:select.option>@endforeach</flux:select><flux:input label="Desde" type="date" wire:model.live="filtros.desde" /><flux:input label="Hasta" type="date" wire:model.live="filtros.hasta" /></x-ui.filtros></div>
+
 
     <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
         <flux:table>

@@ -314,32 +314,15 @@ test('ajuste y reverso administrativos son auditables idempotentes y no sobregir
     expect($client->saldoMinor())->toBe(0)->and(MovimientoSaldo::count())->toBe(2)->and(MovimientoSaldo::latest('id')->first()->autorizado_por)->toBe($admin->id);
 });
 
-test('checkout guarda pedido e intención antes del QR y sigue pendiente sin evidencia', function () {
-    [$client, , $receiver, $product] = pagosFixture();
-    $createdBeforeRemote = false;
-    Http::swap(new Factory);
-    Http::preventStrayRequests();
-    Http::fake(function ($request) use ($receiver, &$createdBeforeRemote) {
-        if (str_ends_with($request->url(), '/api/receivers')) {
-            return Http::response([['id' => $receiver->referencia_externa, 'name' => $receiver->nombre_receptor, 'phone' => $receiver->celular,
-                'qrSha256' => $receiver->qr_sha256, 'enabled' => true, 'verified' => true, 'online' => true]]);
-        }
-        $intent = IntentoPago::where('referencia', $request['reference'])->firstOrFail();
-        $createdBeforeRemote = $intent->pedido->items()->count() === 1 && $intent->pedido->cliente_web_id !== null;
-
-        return Http::response(pagoRespuesta($intent, 'PENDING'));
-    });
+test('checkout guarda pendiente sin intención ni QR incluso si un cliente antiguo envía Yape', function () {
+    [$client, , , $product] = pagosFixture();
     $response = $this->actingAs($client, 'cliente')->postJson(route('pedidos-web.store'), [
         'items' => [['produccion_id' => $product->id, 'cantidad' => 2]], 'metodo_pago' => 'yape',
         'celular' => '+51 987 654 321', 'idempotency_key' => (string) Str::uuid(),
-    ])->assertCreated();
-    $intent = IntentoPago::firstOrFail();
-    expect($createdBeforeRemote)->toBeTrue()->and($intent->estado)->toBe('PENDING')->and($intent->applied_at)->toBeNull()
-        ->and($intent->pedido->venta_id)->toBeNull()->and(Venta::count())->toBe(0)->and($client->saldoMinor())->toBe(0);
-    $this->get($response->json('url_pedido'))->assertOk()->assertSee('QR del receptor asignado')->assertSee('storage/pagos/qr.png', false)
-        ->assertSee($receiver->nombre_receptor)->assertSee($receiver->celular)->assertSee('Código de seguridad Yape')
-        ->assertSee('Aún no se ha confirmado ningún ingreso.');
-    expect($intent->fresh()->estado)->toBe('PENDING')->and($intent->receptor_snapshot['celular'])->toBe('51999999999');
+    ])->assertCreated()->assertJsonPath('metodo_pago', 'pendiente');
+    expect(IntentoPago::count())->toBe(0)->and(Venta::count())->toBe(0)->and($client->fresh()->celular)->toBe('51987654321');
+    $this->get($response->json('url_pedido'))->assertOk()->assertSee('PENDIENTE DE PAGO')->assertDontSee('QR del receptor asignado');
+    Http::assertNothingSent();
 });
 
 test('un pedido pendiente oculta QR y código si su receptor deja de estar disponible', function (string $reason) {

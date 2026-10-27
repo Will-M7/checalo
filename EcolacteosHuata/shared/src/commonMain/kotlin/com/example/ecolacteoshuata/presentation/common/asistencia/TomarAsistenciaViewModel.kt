@@ -88,6 +88,7 @@ data class TomarAsistenciaUiState(
     val fechaRegistrada: Boolean = false,
     val editando: Boolean = false,
     val busqueda: String = "",
+    val filtroAsistencia: String = "",
     val trabajadores: List<FilaTrabajador> = emptyList(),
     val presentes: Int = 0,
     val tardanzas: Int = 0,
@@ -123,6 +124,7 @@ private data class Control(
     val editando: Boolean = false,
     val estados: Map<String, EstadoAsistencia> = emptyMap(),
     val busqueda: String = "",
+    val filtroAsistencia: String = "",
     val filtro: FiltroJustificacion = FiltroJustificacion.PENDIENTES,
     val formHorario: HorarioForm? = null,
     val formAcopiador: MarcasAcopiadorForm? = null,
@@ -236,7 +238,8 @@ class TomarAsistenciaViewModel(
             fechaRegistrada = registrosDelDia.isNotEmpty(),
             editando = c.editando,
             busqueda = c.busqueda,
-            trabajadores = trabajadores,
+            trabajadores = trabajadores.filter { c.filtroAsistencia.isEmpty() || (registrosDelDia[it.usuario.id]?.estado?.name ?: "sin_registro") == c.filtroAsistencia },
+            filtroAsistencia = c.filtroAsistencia,
             presentes = estadosDelDia.count { it == EstadoAsistencia.PRESENTE },
             tardanzas = estadosDelDia.count { it == EstadoAsistencia.TARDANZA },
             faltas = estadosDelDia.count { it == EstadoAsistencia.FALTA },
@@ -276,6 +279,10 @@ class TomarAsistenciaViewModel(
     private fun rangoCalendario(mes: LocalDate): Pair<LocalDate, LocalDate> = mes.startOfMonth().startOfWeek() to mes.endOfMonth().endOfWeek()
 
     fun seleccionarPestana(pestana: PestanaAsistencia) = control.update { it.copy(pestana = pestana) }
+
+    fun onFiltroAsistencia(valor: String) = control.update { it.copy(filtroAsistencia = valor) }
+
+    fun limpiarFiltrosAsistencia() = control.update { it.copy(busqueda = "", filtroAsistencia = "") }
 
     fun onBusqueda(texto: String) = control.update { it.copy(busqueda = texto) }
 

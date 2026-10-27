@@ -46,6 +46,7 @@ object PantallasNativas {
         "admin.panel" to Screen.AdminDashboard,
         "admin.usuarios" to Screen.AdminUsuarios,
         "admin.asignar-roles" to Screen.AdminAsignarRoles,
+        "admin.finanzas" to Screen.AdminFinanzas,
         "admin.roles" to Screen.AdminRoles,
         "admin.descuentos" to Screen.AdminDescuentos,
         "admin.precios" to Screen.AdminPrecios,
@@ -85,6 +86,7 @@ object PantallasNativas {
     )
     data class Aspecto(val etiqueta: String, val icono: androidx.compose.ui.graphics.vector.ImageVector, val descripcion: String)
     val aspecto = mapOf(
+        "admin.finanzas" to Aspecto("Finanzas", Icons.Filled.AttachMoney, "Fondos, rendiciones, clientes y saldos"),
         "planta.laboratorio" to Aspecto("Laboratorio", Icons.Filled.Science, "Foto de resultados + OCR"),
         "planta.entregas" to Aspecto("Entregas de acopiadores", Icons.Filled.LocalShipping, "Recepción de leche"),
         "planta.pagos" to Aspecto("Pago a proveedores", Icons.Filled.AttachMoney, "Pagos por periodo"),

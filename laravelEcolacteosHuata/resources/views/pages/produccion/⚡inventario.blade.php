@@ -6,6 +6,7 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
     public string $busqueda = '';
 
     public string $filtroEstado = '';
@@ -58,7 +59,7 @@ new class extends Component
         // ningún resultado de laboratorio a producción todavía.
         Insumo::deLeche();
 
-        $insumos = Insumo::query()
+        $insumos = Insumo::query()->when($this->filtro('unidad'), fn ($q, $v) => $q->where('unidad_medida_id', $v))->when($this->filtro('leche') !== '', fn ($q) => $q->where('es_leche', $this->filtro('leche') === '1'))
             ->with('unidadMedida')
             ->when($this->busqueda, fn ($q) => $q->where('nombre', 'like', "%{$this->busqueda}%"))
             ->get()
@@ -73,6 +74,7 @@ new class extends Component
         $stockBajo = $insumos->filter(fn (Insumo $i) => $this->estado($i) === 'stock_bajo')->count();
 
         return [
+            'unidades' => \App\Models\UnidadMedida::orderBy('nombre')->get(),
             'insumos' => $this->filtroEstado
                 ? $insumos->filter(fn (Insumo $i) => $this->estado($i) === $this->filtroEstado)->values()
                 : $insumos,
@@ -117,12 +119,12 @@ new class extends Component
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
-        <flux:input
+        <div class="flex flex-wrap items-center gap-3"><flux:input
             wire:model.live.debounce.300ms="busqueda"
             icon="magnifying-glass"
             placeholder="Buscar insumo..."
             class="max-w-sm"
-        />
+        /><x-ui.filtros :activos="$filtros"><flux:select label="Tipo" wire:model.live="filtros.leche"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Leche</flux:select.option><flux:select.option value="0">Otros insumos</flux:select.option></flux:select><flux:select label="Unidad" wire:model.live="filtros.unidad"><flux:select.option value="">Todas</flux:select.option>@foreach($unidades as $u)<flux:select.option :value="$u->id">{{ $u->nombre }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
         @if ($filtroEstado)
             <flux:button size="sm" variant="ghost" icon="x-mark" wire:click="filtrarPor('')">
                 Quitar filtro

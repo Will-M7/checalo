@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.proveedor.laboratorio
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -91,7 +96,16 @@ fun ProveedorLaboratorioScreen(
     onPeriodo: (Periodo) -> Unit,
     onFecha: (LocalDate) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(state.resultados, busquedaFiltro, filtrosLista) { state.resultados.filter { (it.resultado.observaciones.contains(busquedaFiltro, true) || it.resultado.resultado.name.contains(busquedaFiltro, true)) && (filtrosLista["conforme"].isNullOrEmpty() || it.resultado.conforme == (filtrosLista["conforme"] == "1")) } }
+
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("conforme", "Análisis", filtrosLista["conforme"].orEmpty(), listOf("1" to "Conforme", "0" to "No conforme"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && state.resultados.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
         item(key = "ayuda") {
             Text("Calidad de la leche que has entregado.", style = CuerpoStyle, color = GrisTexto)
         }
@@ -108,7 +122,7 @@ fun ProveedorLaboratorioScreen(
                 KpiCard("No conformes", state.alteraciones.toString(), AcentoCoral, Modifier.weight(1f), Icons.Filled.Warning)
             }
         }
-        itemsIndexed(state.resultados, key = { _, f -> f.resultado.id }) { index, fila ->
+        itemsIndexed(filtrados, key = { _, f -> f.resultado.id }) { index, fila ->
             StaggeredListItem(index = index) { TarjetaResultado(fila) }
         }
     }

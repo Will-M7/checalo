@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.vendedor.inventario
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,34 +61,40 @@ fun VendedorInventarioScreen(
     busqueda: String,
     onBusquedaChange: (String) -> Unit,
 ) {
-    val sinStock = productos.count { it.registro.disponible <= 0 }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val productosFiltrados = remember(productos, filtrosLista) { productos.filter { coincideStock(it.registro.disponible, filtrosLista["stock"].orEmpty()) && coincideFecha(it.registro.fecha.toString(), filtrosLista["desde"].orEmpty(), filtrosLista["hasta"].orEmpty()) } }
+
+    val sinStock = productosFiltrados.count { it.registro.disponible <= 0 }
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
         // 1. Totales.
         item {
-            KpiCard("Valor del inventario", formatMoney(productos.sumOf { it.precioTotal }), AcentoVerde, Modifier.fillMaxWidth(), Icons.Filled.Payments)
+            KpiCard("Valor del inventario", formatMoney(productosFiltrados.sumOf { it.precioTotal }), AcentoVerde, Modifier.fillMaxWidth(), Icons.Filled.Payments)
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                KpiCard("Unidades disponibles", formatoCantidad(productos.sumOf { it.registro.disponible }), AcentoCeleste, Modifier.weight(1f), Icons.Filled.Inventory2)
+                KpiCard("Unidades disponibles", formatoCantidad(productosFiltrados.sumOf { it.registro.disponible }), AcentoCeleste, Modifier.weight(1f), Icons.Filled.Inventory2)
                 KpiCard("Sin stock", sinStock.toString(), if (sinStock > 0) AcentoCoral else AcentoVerde, Modifier.weight(1f), Icons.Filled.RemoveShoppingCart)
             }
         }
 
         // 2. Búsqueda.
-        item { AppTextField(busqueda, onBusquedaChange, "Buscar por receta...") }
+        item { FiltrosListado(busqueda, onBusquedaChange, listOf(
+                CampoFiltro("stock", "Disponibilidad", filtrosLista["stock"].orEmpty(), listOf("disponible" to "Con stock", "bajo" to "Cantidad baja (hasta 5)", "agotado" to "Sin stock")),
+                CampoFiltro("desde", "Desde", filtrosLista["desde"].orEmpty()), CampoFiltro("hasta", "Hasta", filtrosLista["hasta"].orEmpty()),
+            ), { k, v -> filtrosLista = filtrosLista + (k to v) }, { filtrosLista = emptyMap(); onBusquedaChange("") }, "Buscar por receta...") }
 
         // 3. Productos listos para vender.
-        item { TituloSeccion("Productos (${productos.size})") }
-        if (productos.isEmpty()) {
+        item { TituloSeccion("Productos (${productosFiltrados.size})") }
+        if (productosFiltrados.isEmpty()) {
             item {
                 EmptyState(
-                    "Sin productos",
-                    if (busqueda.isBlank()) "Cuando producción publique lo producido, aparecerá aquí." else "No se encontraron productos.",
+                    "Sin productosFiltrados",
+                    if (busqueda.isBlank() && filtrosLista.values.all { it.isBlank() }) "Cuando producción publique lo producido, aparecerá aquí." else "No se encontraron productosFiltrados.",
                     icono = Icons.Filled.Inventory,
                 )
             }
         }
-        itemsIndexed(productos, key = { _, it -> it.registro.id }) { index, producto ->
+        itemsIndexed(productosFiltrados, key = { _, it -> it.registro.id }) { index, producto ->
             val disponible = producto.registro.disponible
             StaggeredListItem(index = index) {
                 SectionCard {

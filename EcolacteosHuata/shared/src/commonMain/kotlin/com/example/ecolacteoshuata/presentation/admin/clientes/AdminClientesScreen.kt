@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.admin.clientes
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -81,6 +86,9 @@ fun AdminClientesScreen(
     onEliminar: () -> Unit,
     onConsumirMensaje: () -> Unit,
 ) {
+    var comprasFiltro by remember { mutableStateOf("") }
+    val filasFiltradas = remember(state.filas, comprasFiltro) { state.filas.filter { comprasFiltro.isEmpty() || (it.cliente.comprasCount > 0) == (comprasFiltro == "con") } }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
             item(key = "ayuda") {
@@ -110,8 +118,8 @@ fun AdminClientesScreen(
                     }
                 }
             }
-            item(key = "busqueda") { AppTextField(state.busqueda, onBusqueda, "Buscar cliente...", placeholder = "Nombre, apellido o DNI/RUC") }
-            if (state.filas.isEmpty()) {
+            item(key = "busqueda") { FiltrosListado(state.busqueda, onBusqueda, listOf(CampoFiltro("compras", "Compras registradas", comprasFiltro, listOf("con" to "Con compras", "sin" to "Sin compras"))), { _, v -> comprasFiltro = v }, { comprasFiltro = ""; onBusqueda("") }, "Buscar cliente...") }
+            if (filasFiltradas.isEmpty()) {
                 item(key = "vacio") {
                     EmptyState(
                         "Sin clientes",
@@ -120,7 +128,7 @@ fun AdminClientesScreen(
                     )
                 }
             }
-            itemsIndexed(state.filas, key = { _, f -> f.cliente.id }) { index, fila ->
+            itemsIndexed(filasFiltradas, key = { _, f -> f.cliente.id }) { index, fila ->
                 val cliente = fila.cliente
                 StaggeredListItem(index = index) {
                     TarjetaLista(

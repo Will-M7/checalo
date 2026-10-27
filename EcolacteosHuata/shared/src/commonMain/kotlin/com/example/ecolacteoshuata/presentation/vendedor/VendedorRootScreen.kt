@@ -80,7 +80,9 @@ fun VendedorRootScreen(usuario: Usuario, onCerrarSesion: () -> Unit, soloConteni
             Screen.VendedorDashboard -> {
                 val vm = koinViewModel<VendedorDashboardViewModel>()
                 val state by vm.state.collectAsState()
-                VendedorDashboardScreen(state = state, modulos = modulos)
+                VendedorDashboardScreen(state = state, modulos = modulos) {
+                    if (usuario.autorizacion?.permite("vendedor.pedidos-web") == true) DisponibilidadWebControl()
+                }
             }
             Screen.VendedorVenta -> {
                 val vm = koinViewModel<VendedorVentaViewModel>(key = "venta-${usuario.id}") { parametersOf(usuario.id) }
@@ -88,7 +90,9 @@ fun VendedorRootScreen(usuario: Usuario, onCerrarSesion: () -> Unit, soloConteni
                 val clientes by vm.clientes.collectAsState()
                 val descuentos by vm.descuentosDisponibles.collectAsState()
                 val state by vm.state.collectAsState()
-                VendedorVentaScreen(
+                if ("vendedor.ventas" !in usuario.autorizacion?.capacidades_comerciales.orEmpty()) {
+                    androidx.compose.material3.Text("La recepción de dinero no concede permiso para vender. Se requiere capacidad comercial explícita y actualizar la autorización del servidor.")
+                } else VendedorVentaScreen(
                     productos = productos,
                     clientes = clientes,
                     descuentos = descuentos,
@@ -116,6 +120,7 @@ fun VendedorRootScreen(usuario: Usuario, onCerrarSesion: () -> Unit, soloConteni
                 VendedorHistorialScreen(
                     state = state,
                     onDesde = vm::onDesde, onHasta = vm::onHasta, onMetodo = vm::onMetodo, onBusqueda = vm::onBusqueda,
+                    onVendedor = vm::onVendedor, onLimpiarFiltros = vm::limpiarFiltros,
                     onDescargarBoleta = vm::descargarBoleta,
                     onPedirLimpiar = vm::pedirLimpiar, onCancelarLimpiar = vm::cancelarLimpiar, onLimpiar = vm::limpiarHistorial,
                     onConsumirMensaje = vm::consumirMensaje,

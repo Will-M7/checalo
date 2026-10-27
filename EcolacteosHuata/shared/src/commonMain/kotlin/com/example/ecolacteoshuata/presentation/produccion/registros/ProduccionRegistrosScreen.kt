@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.produccion.registros
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.ui.BotonesFormulario
 import com.example.ecolacteoshuata.core.ui.MensajeError
 import androidx.compose.foundation.background
@@ -100,6 +105,11 @@ fun ProduccionRegistrosScreen(
     onActualizarTurnoChange: (String?) -> Unit,
     onGuardarActualizacion: () -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(registros, busquedaFiltro, filtrosLista) { registros.filter { (it.nombre.contains(busquedaFiltro, true) || it.recetaNombre.contains(busquedaFiltro, true)) && (filtrosLista["publicada"].isNullOrEmpty() || it.publicada == (filtrosLista["publicada"] == "1")) && coincideFecha(it.fecha.toString(), filtrosLista["desde"].orEmpty(), filtrosLista["hasta"].orEmpty()) } }
+
     val nombresTurno = turnos.associate { it.id to it.nombre }
     val opcionesTurno = listOf(OpcionTurno(null, "Sin turno")) + turnos.map { OpcionTurno(it.id, "${it.nombre} (${it.horaInicio} - ${it.horaFin})") }
     var porEliminar by remember { mutableStateOf<ProduccionRegistro?>(null) }
@@ -108,8 +118,12 @@ fun ProduccionRegistrosScreen(
             EmptyState("Sin producción registrada", "Registra la primera producción de hoy.", modifier = Modifier.padding(24.dp))
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("publicada", "Estado", filtrosLista["publicada"].orEmpty(), listOf("1" to "Publicado", "0" to "Pendiente")), CampoFiltro("desde", "Desde", filtrosLista["desde"].orEmpty()), CampoFiltro("hasta", "Hasta", filtrosLista["hasta"].orEmpty())), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && registros.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
                 item { TituloSeccion("Producciones (${registros.size})") }
-                itemsIndexed(registros) { index, registro ->
+                itemsIndexed(filtrados, key = { _, it -> it.id }) { index, registro ->
                     StaggeredListItem(index = index) {
                         SectionCard {
                             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

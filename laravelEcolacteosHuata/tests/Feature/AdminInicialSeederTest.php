@@ -17,7 +17,7 @@ test('instalación crea admin real idempotente con equipo, distribución y acces
         ->and($admin->rol)->toBe(Rol::Administrador)
         ->and($admin->puedeAdministracionCritica())->toBeTrue()
         ->and($admin->currentTeam)->not->toBeNull()
-        ->and(count(Pantallas::todas()))->toBe(41);
+        ->and(count(Pantallas::todas()))->toBe(42);
     $this->seed(DatabaseSeeder::class);
     expect(User::count())->toBe(1)->and(Team::count())->toBe(1)
         ->and($admin->fresh()->password)->toBe($hash)

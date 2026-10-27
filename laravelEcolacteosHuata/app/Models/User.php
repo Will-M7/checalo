@@ -92,7 +92,10 @@ class User extends Authenticatable implements PasskeyUser
                 abort_unless($actor->puedePantalla('admin.asignar-roles'), 403);
             }
         });
-        static::deleting(fn (User $user) => Autorizacion::protegerUsuario($user));
+        static::deleting(function (User $user) {
+            Autorizacion::protegerUsuario($user);
+            app(\App\Services\EliminarUsuarioSeguro::class)->comprobar($user);
+        });
     }
 
     /**
@@ -110,6 +113,8 @@ class User extends Authenticatable implements PasskeyUser
             'roles' => 'array',
             'toma_asistencia' => 'boolean',
             'activo' => 'boolean',
+            'pedidos_web_autorizado' => 'boolean',
+            'pedidos_web_pausado' => 'boolean',
         ];
     }
 
@@ -178,6 +183,22 @@ class User extends Authenticatable implements PasskeyUser
                 $q->orWhereJsonContains('roles', $valor);
             }
         });
+    }
+
+    public function puedeVender(string $pantalla): bool
+    {
+        return $this->activo && $this->rolesDinamicos()->where('activo', true)->where('codigo', '!=', 'administrador')->whereJsonContains('pantallas', $pantalla)->exists();
+    }
+
+    public function scopeVendedorWeb(Builder $query): Builder
+    {
+        return $query->where('activo', true)->whereHas('rolesDinamicos', fn (Builder $roles) => $roles
+            ->where('activo', true)->where('codigo', '!=', 'administrador')->whereJsonContains('pantallas', 'vendedor.pedidos-web'));
+    }
+
+    public function scopeDisponibleWeb(Builder $query): Builder
+    {
+        return $query->vendedorWeb()->where('pedidos_web_autorizado', true)->where('pedidos_web_pausado', false);
     }
 
     public function scopeConPantalla(Builder $query, string $pantalla): Builder

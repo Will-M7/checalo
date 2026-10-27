@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.admin.descuentos
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.theme.VerdeOscuro
 import com.example.ecolacteoshuata.core.theme.Rojo
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -75,8 +80,17 @@ fun AdminDescuentosScreen(
     onGuardar: () -> Unit,
     onConsumirMensaje: () -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(descuentos, busquedaFiltro, filtrosLista) { descuentos.filter { it.nombre.contains(busquedaFiltro, true) && (filtrosLista["estado"].isNullOrEmpty() || it.activo == (filtrosLista["estado"] == "1")) } }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("estado", "Estado", filtrosLista["estado"].orEmpty(), listOf("1" to "Activos", "0" to "Inactivos"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && descuentos.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
             item {
                 Text("Descuentos que el vendedor puede activar en el punto de venta.", style = CuerpoStyle, color = GrisTexto)
             }
@@ -85,7 +99,7 @@ fun AdminDescuentosScreen(
                     EmptyState("Sin descuentos", "No hay descuentos registrados todavía.", icono = Icons.Filled.Discount)
                 }
             } else {
-                itemsIndexed(descuentos, key = { _, d -> d.id }) { index, descuento ->
+                itemsIndexed(filtrados, key = { _, d -> d.id }) { index, descuento ->
                     StaggeredListItem(index = index) {
                         TarjetaLista(
                             titulo = descuento.nombre,

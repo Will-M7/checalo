@@ -6,6 +6,8 @@ use Livewire\Component;
 use Flux\Flux;
 
 new class extends Component {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public ?int $rolId = null;
     public string $nombre = '';
     public string $codigo = '';
@@ -22,21 +24,23 @@ new class extends Component {
         Autorizacion::guardarRol(auth('web')->user(), $this->rolId, $this->nombre, $this->codigo, $this->activo, $this->pantallas);
         Flux::modal('rol-funciones')->close(); Flux::toast('Rol actualizado.', variant: 'success');
     }
-    public function with(): array { return ['roles' => RolDinamico::orderBy('id')->get(), 'catalogo' => Pantallas::todas()]; }
+    public function with(): array { return ['roles' => RolDinamico::query()->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')->orWhere('codigo', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('estado') !== '', fn ($q) => $q->where('activo', $this->filtro('estado') === '1'))->when($this->filtro('pantalla'), fn ($q, $v) => $q->whereJsonContains('pantallas', $v))->orderBy('id')->get(), 'catalogo' => Pantallas::todas()]; }
 }; ?>
 <div class="flex flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <x-ui.titulo titulo="Roles y funciones">Una asignación para web y Android.</x-ui.titulo>
         <div class="flex gap-2"><flux:button wire:click="$dispatch('abrir-distribuciones')">Distribuciones</flux:button><flux:button variant="primary" icon="plus" wire:click="editar">Crear rol</flux:button></div>
     </div>
+    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar rol o identificador..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Estado" wire:model.live="filtros.estado"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Activos</flux:select.option><flux:select.option value="0">Inactivos</flux:select.option></flux:select><flux:select label="Pantalla asignada" wire:model.live="filtros.pantalla"><flux:select.option value="">Todas</flux:select.option>@foreach($catalogo as $id => $c)<flux:select.option :value="$id">{{ $c["label"] }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
+
     <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
         <flux:table><flux:table.columns><flux:table.column>Rol</flux:table.column><flux:table.column>Funciones</flux:table.column><flux:table.column>Estado</flux:table.column><flux:table.column>Acciones</flux:table.column></flux:table.columns>
-        <flux:table.rows>@foreach($roles as $r)<flux:table.row wire:key="rol-{{ $r->id }}">
+        <flux:table.rows>@forelse($roles as $r)<flux:table.row wire:key="rol-{{ $r->id }}">
             <flux:table.cell>{{ $r->nombre }}</flux:table.cell>
             <flux:table.cell>{{ count($r->pantallas) }}</flux:table.cell>
             <flux:table.cell><flux:badge size="sm" :color="$r->activo ? 'green' : 'zinc'">{{ $r->activo ? 'Activo' : 'Inactivo' }}</flux:badge></flux:table.cell>
             <flux:table.cell><flux:button size="sm" wire:click="editar({{ $r->id }})">Editar funciones</flux:button></flux:table.cell>
-        </flux:table.row>@endforeach</flux:table.rows></flux:table>
+        </flux:table.row>@empty<flux:table.row><flux:table.cell colspan="4">No se encontraron roles.</flux:table.cell></flux:table.row>@endforelse</flux:table.rows></flux:table>
     </div>
     <livewire:distribuciones-roles />
     <flux:modal name="rol-funciones" class="md:w-[40rem]">

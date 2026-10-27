@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.vendedor.venta
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.ui.MensajeError
 import com.example.ecolacteoshuata.core.ui.textoOpcion
 import com.example.ecolacteoshuata.core.ui.fondoOpcion
@@ -86,14 +91,19 @@ fun VendedorVentaScreen(
     onEfectivoChange: (String) -> Unit,
     onCobrar: () -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val productosFiltrados = remember(productos, busquedaFiltro, filtrosLista) { productos.filter { it.nombre.contains(busquedaFiltro, true) && coincideStock(it.disponible, filtrosLista["stock"].orEmpty()) && (filtrosLista["stock"] != "normal" || it.disponible > 5) } }
+
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+        item { FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("stock", "Disponibilidad", filtrosLista["stock"].orEmpty(), listOf("bajo" to "Cantidad baja (hasta 5)", "normal" to "Más de 5"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Buscar producto...") }
         item {
             TituloSeccion("Productos")
-            if (productos.isEmpty()) {
-                Text("No hay producción publicada con stock para vender.", style = CuerpoStyle, color = GrisTexto)
+            if (productosFiltrados.isEmpty()) {
+                Text("No hay productos que coincidan con la búsqueda.", style = CuerpoStyle, color = GrisTexto)
             }
             Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
-                productos.forEach { producto ->
+                productosFiltrados.forEach { producto ->
                     Column(
                         modifier = Modifier
                             .padding(end = 10.dp)

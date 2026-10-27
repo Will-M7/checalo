@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.planta.laboratorio
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,8 +104,17 @@ fun PlantaLaboratorioScreen(
     onDesbloquear: (Proveedor) -> Unit,
     onConsumirMensaje: () -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(state.resultados, busquedaFiltro, filtrosLista) { state.resultados.filter { it.nombreProveedor.contains(busquedaFiltro, true) && (filtrosLista["conforme"].isNullOrEmpty() || it.resultado.conforme == (filtrosLista["conforme"] == "1")) && coincideFecha(it.resultado.fecha.toString(), filtrosLista["desde"].orEmpty(), filtrosLista["hasta"].orEmpty()) } }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("conforme", "Análisis", filtrosLista["conforme"].orEmpty(), listOf("1" to "Conforme", "0" to "No conforme")), CampoFiltro("desde", "Desde", filtrosLista["desde"].orEmpty()), CampoFiltro("hasta", "Hasta", filtrosLista["hasta"].orEmpty())), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && state.resultados.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
             item(key = "ayuda") {
                 Text("Registra resultados de calidad de leche por proveedor.", style = CuerpoStyle, color = GrisTexto)
             }
@@ -117,7 +131,7 @@ fun PlantaLaboratorioScreen(
                     EmptyState("Sin resultados", "Sin resultados registrados. Presiona \"Nuevo resultado\".", icono = Icons.Filled.Science)
                 }
             }
-            itemsIndexed(state.resultados, key = { _, f -> f.resultado.id }) { index, fila ->
+            itemsIndexed(filtrados, key = { _, f -> f.resultado.id }) { index, fila ->
                 StaggeredListItem(index = index) {
                     TarjetaResultado(fila, onVerDetalle, onEditar, onPdf, onPedirEnviar, onDesbloquear)
                 }

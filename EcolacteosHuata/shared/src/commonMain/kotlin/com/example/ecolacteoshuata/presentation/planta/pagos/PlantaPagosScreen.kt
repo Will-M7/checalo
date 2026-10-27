@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.planta.pagos
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.theme.CuerpoStyle
 import com.example.ecolacteoshuata.core.theme.GrisTexto
 import androidx.compose.material.icons.filled.Payments
@@ -80,9 +85,18 @@ fun PlantaPagosScreen(
     onPeriodoChange: (Periodo) -> Unit,
     onPagar: (FilaPago, MetodoPago) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(state.filas, busquedaFiltro, filtrosLista) { state.filas.filter { it.proveedor.nombreCompleto.contains(busquedaFiltro, true) && (filtrosLista["pago"].isNullOrEmpty() || (it.resumen.totalPendiente > 0) == (filtrosLista["pago"] == "pendiente")) } }
+
     var filaPagando by remember { mutableStateOf<FilaPago?>(null) }
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("pago", "Saldo del período", filtrosLista["pago"].orEmpty(), listOf("pendiente" to "Con pendiente", "pagado" to "Sin pendiente"))), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && state.filas.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
         item {
             Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
                 Periodo.entries.forEach { periodo ->
@@ -110,7 +124,7 @@ fun PlantaPagosScreen(
         if (state.filas.isEmpty()) {
             item { EmptyState("Sin datos", "No hay recojos para el periodo seleccionado.") }
         } else {
-            items(state.filas) { fila ->
+            items(filtrados, key = { it.proveedor.id }) { fila ->
                 val pendiente = fila.resumen.totalPendiente > 0
                 TarjetaLista(
                     titulo = fila.proveedor.nombreCompleto,

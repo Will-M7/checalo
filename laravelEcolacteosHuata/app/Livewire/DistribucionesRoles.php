@@ -11,6 +11,8 @@ use Livewire\Component;
 
 class DistribucionesRoles extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     #[Locked]
     public bool $abierto = false;
 
@@ -141,6 +143,8 @@ class DistribucionesRoles extends Component
 
     public function render()
     {
-        return view('livewire.distribuciones-roles');
+        return view('livewire.distribuciones-roles', ['distribucionesFiltradas' => collect($this->datos['distribuciones'] ?? [])->filter(fn ($d) => ($this->busqueda === '' || str_contains(mb_strtolower($d['nombre']), mb_strtolower($this->busqueda)))
+            && ($this->filtro('tipo') === '' || $d['tipo'] === $this->filtro('tipo'))
+            && ($this->filtro('rol') === '' || collect($d['asignaciones'])->contains(fn ($a) => $a['codigo'] === $this->filtro('rol'))))]);
     }
 }

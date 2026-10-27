@@ -21,7 +21,7 @@ class CobrosService
     private function receptor(array $remote, ?int $seller = null, bool $deferred = false): ReceptorPago
     {
         DB::table('integracion_secuencias')->where('clave', 'reparto')->increment('valor', 0);
-        $eligible = User::conPantalla($seller ? 'vendedor.ventas' : 'vendedor.pedidos-web')->when($seller, fn ($q) => $q->whereKey($seller))->orderBy('id')->get()->map(function ($vendedor) use ($remote, $deferred) {
+        $eligible = User::query()->when($seller, fn ($q) => $q->conPantalla('vendedor.ventas')->whereKey($seller), fn ($q) => $q->disponibleWeb())->orderBy('id')->get()->map(function ($vendedor) use ($remote, $deferred) {
             $r = app(AsignacionesReceptor::class)->receptor($vendedor);
             if (! $r || (! $deferred && (! $r->enabled || ! $r->verified_at)) || ! $r->qr_path || ! $r->qr_sha256 || ! Storage::disk('public')->exists($r->qr_path) || ! hash_equals($r->qr_sha256, hash_file('sha256', Storage::disk('public')->path($r->qr_path)))) {
                 return null;
@@ -34,14 +34,14 @@ class CobrosService
         }
         $last = (int) DB::table('integracion_secuencias')->where('clave', 'reparto')->value('valor');
         $r = $eligible->first(fn ($r) => $r->getRelation('vendedorCobro')->id > $last) ?? $eligible->first();
-        DB::table('integracion_secuencias')->where('clave', 'reparto')->update(['valor' => $r->getRelation('vendedorCobro')->id]);
+        // Elegir un receptor para recarga no avanza el reparto comercial de pedidos.
 
         return $r;
     }
 
     public function pedido(ClienteWeb $client, array $items, string $method, string $key, bool $deferred = false): PedidoWeb
     {
-        if (! in_array($method, ['yape', 'saldo', 'efectivo', 'plin'], true)) {
+        if (! in_array($method, ['pendiente', 'yape', 'saldo', 'efectivo', 'plin'], true)) {
             throw ValidationException::withMessages(['metodo_pago' => 'Método no permitido.']);
         }
         $hash = hash('sha256', json_encode($deferred ? [$items, $method, 'deferred'] : [$items, $method], JSON_THROW_ON_ERROR));
@@ -64,29 +64,21 @@ class CobrosService
             if ($old = PedidoWeb::where('idempotency_key', $key)->first()) {
                 return $this->previous($old, $client->id, $hash);
             }
-            $receiver = null;
-            if ($method === 'yape') {
-                try { $receiver = $this->receptor($remote, deferred: $deferred); }
-                catch (ValidationException) { $receiver = $this->receptor([], deferred: true); $deferred = true; }
+            $seller = app(\App\Services\VendedoresWeb::class)->seleccionar();
+            $receiver = $method === 'yape' ? app(AsignacionesReceptor::class)->receptor($seller) : null;
+            if ($method === 'yape' && ! $receiver) {
+                throw ValidationException::withMessages(['pago' => 'El vendedor disponible no tiene receptor autorizado. La tienda debe completar su configuración de cobro.']);
             }
-            $seller = $receiver?->getRelation('vendedorCobro');
-            if (! $seller) {
-                $sellers = User::conPantalla('vendedor.pedidos-web')->orderBy('id')->get();
-                $last = (int) DB::table('integracion_secuencias')->where('clave', 'reparto')->value('valor');
-                $seller = $sellers->first(fn ($s) => $s->id > $last) ?? $sellers->first();
-                if ($seller) {
-                    DB::table('integracion_secuencias')->where('clave', 'reparto')->update(['valor' => $seller->id]);
-                }
-            }
-            if (! $seller) {
-                throw ValidationException::withMessages(['pago' => 'No hay vendedor disponible.']);
-            }
-            $contact = ReceptorPago::where('user_id', $seller->id)->first();
-            $snapshot = $receiver?->snapshot() ?? ($contact ? ['vendedor_id' => $seller->id, 'vendedor_nombre' => $seller->nombreCompleto(), 'whatsapp' => $contact->whatsapp] : null);
+            $snapshot = [...($receiver?->snapshot() ?? []), 'vendedor_id' => $seller->id, 'vendedor_nombre' => $seller->nombreCompleto(),
+                'vendedor_whatsapp' => app(\App\Services\VendedoresWeb::class)->contacto($seller)];
             $order = PedidoWeb::create(['cliente_web_id' => $client->id, 'nombre' => $client->nombreCompleto(), 'celular' => $client->celular, 'metodo_pago' => $method,
                 'total' => Dinero::decimal($quote['amount_minor']), 'canal' => 'web', 'idempotency_key' => $key, 'vendedor_asignado_id' => $seller->id,
                 'receptor_pago_id' => $receiver?->id, 'receptor_snapshot' => $snapshot, 'detalle_cobro' => [...array_diff_key($quote, ['lines' => true]), 'request_hash' => $hash]]);
             $order->items()->createMany($quote['lines']);
+            if ($receiver && ! $deferred) {
+                try { $this->receptorAsignado($remote, $seller->id); }
+                catch (ValidationException) { $deferred = true; }
+            }
             if ($receiver && ! $deferred) {
                 $this->nuevoIntento($receiver, $quote['amount_minor'], 'compra', $client, $order);
             }
@@ -94,6 +86,37 @@ class CobrosService
                 $this->comprarConSaldo($client, $order, $quote, $seller);
             }
 
+            return $order->fresh();
+        }, 5);
+    }
+
+    /** Paga el pedido guardado, sin volver a cotizar sus precios ni cobrar dos veces. */
+    public function pagarConSaldo(ClienteWeb $client, PedidoWeb $order): PedidoWeb
+    {
+        abort_unless($order->cliente_web_id === $client->id, 404);
+        return DB::transaction(function () use ($client, $order) {
+            DB::table('integracion_secuencias')->where('clave', 'boleta')->increment('valor', 0);
+            $order = PedidoWeb::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            if ($order->venta_id && $order->metodo_pago === 'saldo' && $order->pago_estado === 'pagado') {
+                return $order;
+            }
+            if ($order->estado !== EstadoPedidoWeb::Pendiente || $order->venta_id || ! in_array($order->pago_estado, ['pendiente', 'pending', 'expired', 'cancelled'], true)) {
+                throw ValidationException::withMessages(['pedido' => 'El pedido ya tiene una operación de pago o no admite este pago.']);
+            }
+            // Incluso un intento vencido podría haber recibido dinero aún no conciliado.
+            // No combinamos métodos ni descartamos evidencia histórica para cobrar otra vez.
+            if (IntentoPago::where('pedido_web_id', $order->id)->exists()) {
+                throw ValidationException::withMessages(['pedido' => 'Este pedido tiene un cobro externo previo. Consulta su estado con la tienda antes de usar saldo.']);
+            }
+            $total = Dinero::minor($order->total);
+            $meta = $order->detalle_cobro ?? [];
+            $quote = ['lines' => $order->items->map(fn ($i) => $i->only(['produccion_id', 'producto', 'cantidad', 'precio_unitario', 'subtotal']))->all(),
+                'amount_minor' => $total, 'subtotal_minor' => $meta['subtotal_minor'] ?? $total, 'discount_minor' => $meta['discount_minor'] ?? 0, 'descuento_tipo' => $meta['descuento_tipo'] ?? ''];
+            if (! $quote['lines'] || $total <= 0) {
+                throw ValidationException::withMessages(['pedido' => 'El pedido no contiene un importe y productos válidos.']);
+            }
+            $this->comprarConSaldo($client, $order, $quote, User::findOrFail($order->vendedor_asignado_id));
+            $order->update(['metodo_pago' => 'saldo']);
             return $order->fresh();
         }, 5);
     }
@@ -146,7 +169,7 @@ class CobrosService
     private function nuevoIntento(ReceptorPago $r, int $amount, string $purpose, ?ClienteWeb $client, ?PedidoWeb $order, ?string $reference = null): IntentoPago
     {
         return IntentoPago::create(['referencia' => $reference ?? (string) Str::uuid(), 'cliente_web_id' => $client?->id, 'user_id' => $order?->vendedor_asignado_id ?? ($r->relationLoaded('vendedorCobro') ? $r->getRelation('vendedorCobro')->id : $r->user_id),
-            'receptor_pago_id' => $r->id, 'pedido_web_id' => $order?->id, 'proposito' => $purpose, 'amount_minor' => $amount, 'receptor_snapshot' => $r->snapshot()]);
+            'receptor_pago_id' => $r->id, 'pedido_web_id' => $order?->id, 'proposito' => $purpose, 'amount_minor' => $amount, 'receptor_snapshot' => $order?->receptor_snapshot ?? $r->snapshot()]);
     }
 
     public function recarga(ClienteWeb $client, int $minor, string $reference): IntentoPago
@@ -169,13 +192,37 @@ class CobrosService
                 return $old;
             }
 
-            return $this->nuevoIntento($this->receptor($receivers), $minor, 'recarga', $client, null, $reference);
+            $sellerId = PedidoWeb::where('cliente_web_id', $client->id)->whereNotNull('vendedor_asignado_id')->latest('id')->value('vendedor_asignado_id');
+            $central = DB::table('payment_receiver_policy')->where('id', 1)->value('central_receiver_id');
+            // El último pedido es solo contexto de esta recarga; no crea pertenencia del comprador.
+            $receiver = $sellerId ? $this->receptorAsignado($receivers, (int) $sellerId) : ($central ? ReceptorPago::findOrFail($central) : $this->receptor($receivers));
+            if ($error = $this->indisponibilidad(new IntentoPago(['receptor_pago_id' => $receiver->id, 'receptor_snapshot' => $receiver->snapshot(), 'proposito' => 'recarga']))) {
+                throw ValidationException::withMessages(['pago' => $error]);
+            }
+            return $this->nuevoIntento($receiver, $minor, 'recarga', $client, null, $reference);
         }, 5);
+    }
+
+    private function receptorAsignado(array $remote, int $sellerId): ReceptorPago
+    {
+        $seller = User::find($sellerId);
+        $receiver = $seller ? app(AsignacionesReceptor::class)->receptor($seller) : null;
+        if (! $receiver) {
+            throw ValidationException::withMessages(['pago' => 'El vendedor asignado no tiene receptor disponible. La tienda debe completar su vinculación. No realices el pago.']);
+        }
+        $receiver->setRelation('vendedorCobro', $seller);
+        $match = collect($remote)->contains(fn ($r) => ($r['id'] ?? '') === $receiver->referencia_externa && ($r['enabled'] ?? false) && ($r['verified'] ?? false) && ($r['online'] ?? false)
+            && ($r['name'] ?? '') === $receiver->nombre_receptor && hash_equals((string) $receiver->qr_sha256, (string) ($r['qrSha256'] ?? '')) && TelefonoPeru::coinciden((string) ($r['phone'] ?? ''), $receiver->celular));
+        if (! $receiver->enabled || ! $receiver->verified_at || ! $receiver->qr_path || ! Storage::disk('public')->exists($receiver->qr_path)
+            || ! hash_equals((string) $receiver->qr_sha256, hash_file('sha256', Storage::disk('public')->path($receiver->qr_path))) || ! $match) {
+            throw ValidationException::withMessages(['pago' => 'El receptor del vendedor asignado no está verificado, habilitado o comunicado con Bridge. La tienda debe completar la vinculación técnica. No realices el pago.']);
+        }
+        return $receiver;
     }
 
     public function presencial(User $seller, array $items, array $discounts, array $customer, string $key): IntentoPago
     {
-        abort_unless($seller->activo && $seller->puedePantalla('vendedor.ventas'), 403);
+        abort_unless($seller->activo && $seller->puedeVender('vendedor.ventas'), 403);
         if ($old = PedidoWeb::where('idempotency_key', $key)->first()) {
             abort_unless($old->canal === 'pos' && $old->vendedor_asignado_id === $seller->id, 404);
 
@@ -217,7 +264,7 @@ class CobrosService
         $r = ReceptorPago::with('vendedor')->find($i->receptor_pago_id);
         $snapshot = $i->receptor_snapshot;
         $unavailable = 'Yape no está habilitado para el receptor asignado. La tienda debe verificar su vinculación, QR y comunicación del Bridge. No realices el pago.';
-        if (! $r?->enabled || ! $r->verified_at || ! User::find($snapshot['vendedor_id'] ?? $r->user_id)?->puedePantalla($i->proposito === 'pos' ? 'vendedor.ventas' : 'vendedor.pedidos-web') ||
+        if (! $r?->enabled || ! $r->verified_at || ($i->proposito !== 'recarga' && ! User::find($snapshot['vendedor_id'] ?? $i->user_id)?->puedeVender($i->proposito === 'pos' ? 'vendedor.ventas' : 'vendedor.pedidos-web')) ||
             ! ($snapshot['qr_path'] ?? null) || ! ($snapshot['qr_sha256'] ?? null) ||
             ! Storage::disk('public')->exists($snapshot['qr_path']) ||
             ! hash_equals($snapshot['qr_sha256'], hash_file('sha256', Storage::disk('public')->path($snapshot['qr_path'])))) {
@@ -286,6 +333,7 @@ class CobrosService
         }
 
         return DB::transaction(function () use ($i, $r) {
+            DB::table('integracion_secuencias')->where('clave', 'reparto')->increment('valor', 0);
             IntentoPago::whereKey($i->id)->update(['updated_at' => now()]);
             $i = IntentoPago::findOrFail($i->id);
             if ($i->applied_at) {
@@ -308,6 +356,7 @@ class CobrosService
 
     private function aplicar(IntentoPago $i): void
     {
+        app(\App\Services\Finanzas\FinanzasService::class)->ingresoCanonico($i);
         if ($i->proposito === 'recarga') {
             $this->wallet->movimiento($i->cliente, $i->amount_minor, 'recarga', 'payment:'.$i->id, $i->referencia, $i);
             $i->update(['applied_at' => now()]);
@@ -336,7 +385,7 @@ class CobrosService
     private function comprarConSaldo(ClienteWeb $client, PedidoWeb $order, array $quote, User $seller): void
     {
         $this->wallet->movimiento($client, -$quote['amount_minor'], 'compra', 'order:'.$order->id, 'pedido:'.$order->id, order: $order);
-        $sale = $this->sales->registrar($quote, $seller, 'saldo', ['cliente_nombre_libre' => $client->nombreCompleto()]);
+        $sale = $this->sales->registrar($quote, $seller, 'saldo', ['cliente_nombre_libre' => $client->nombreCompleto()], order: $order);
         $order->update(['estado' => EstadoPedidoWeb::Confirmado, 'venta_id' => $sale->id, 'pago_estado' => 'pagado']);
     }
 }

@@ -27,8 +27,8 @@ function copiaDistribuciones(User $admin, array $pantallas = ['vendedor.clientes
     return Distribuciones::guardar($admin, ['nombre' => 'Prueba', 'asignaciones' => [['codigo' => 'vendedor', 'pantallas' => $pantallas]]]);
 }
 
-test('instalación nueva aplica Inicial una sola vez conserva 41 pantallas 39 nativas y seis roles', function () {
-    expect(Pantallas::todas())->toHaveCount(41)->and(Pantallas::android())->toHaveCount(39);
+test('instalación conserva base de 41 pantallas más Finanzas Web y Android y 40 nativas', function () {
+    expect(Pantallas::todas())->toHaveCount(42)->and(Pantallas::android())->toHaveCount(40);
     expect(RolDinamico::count())->toBe(6)->and(User::count())->toBe(0);
     $base = DistribucionRoles::where('codigo', 'inicial')->firstOrFail();
     expect($base->predeterminada)->toBeTrue()->and($base->tipo)->toBe('base');
@@ -36,7 +36,7 @@ test('instalación nueva aplica Inicial una sola vez conserva 41 pantallas 39 na
     expect(array_map('count', $aprobada))->toBe(['administrador' => 15, 'personal_planta' => 7, 'acopiador' => 6, 'proveedor' => 4, 'vendedor' => 9, 'produccion' => 9]);
     expect(collect($aprobada)->flatten()->unique()->count())->toBe(41);
     foreach ($aprobada as $codigo => $pantallas) {
-        expect(RolDinamico::where('codigo', $codigo)->firstOrFail()->pantallas)->toBe($pantallas);
+        expect(RolDinamico::where('codigo', $codigo)->firstOrFail()->pantallas)->toBe($codigo === 'administrador' ? [...$pantallas, 'admin.finanzas'] : $pantallas);
     }
     $admin = principalDistribuciones();
     $rol = RolDinamico::where('codigo', 'vendedor')->first();
@@ -203,7 +203,7 @@ test('API nativa comparte catálogo preview servicio y actualización sin permit
     $admin->update(['usuario' => 'admin-distribucion', 'password' => 'secreto']);
     $token = $this->postJson('/api/mobile/login', ['usuario' => $admin->usuario, 'password' => 'secreto'])->assertOk()->json('token');
     $url = '/api/mobile/autorizaciones/distribuciones';
-    $catalogo = $this->withToken($token)->getJson($url)->assertOk()->assertJsonCount(2, 'distribuciones')->assertJsonCount(41, 'pantallas')->json();
+    $catalogo = $this->withToken($token)->getJson($url)->assertOk()->assertJsonCount(2, 'distribuciones')->assertJsonCount(42, 'pantallas')->json();
     file_put_contents('/tmp/huata-distribuciones-catalogo.json', json_encode($catalogo));
     $this->postJson($url, ['modo' => 'guardar', 'nombre' => 'API', 'asignaciones' => [['codigo' => 'vendedor', 'pantallas' => ['vendedor.clientes', 'produccion.unidades']]]])->assertOk();
     $d = DistribucionRoles::where('nombre', 'API')->first();

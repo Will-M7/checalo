@@ -18,6 +18,7 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
     /** Día seleccionado en el calendario (Y-m-d). */
     public string $fecha = '';
 
@@ -90,6 +91,7 @@ new class extends Component
             'semanas' => $this->semanasDelCalendario(),
             'usuarios' => $this->buscarUsuarios()
                 ->filter(fn (User $u) => $u->participaEnAsistenciaGeneral())
+                ->filter(fn (User $u) => $this->filtro('asistencia') === '' || ($registrosDelDia->get($u->id)?->estado?->value ?? 'sin_registro') === $this->filtro('asistencia'))
                 ->values(),
             'opciones' => EstadoAsistencia::cases(),
             'justificaciones' => $this->pestana === 'justificaciones'
@@ -788,12 +790,12 @@ new class extends Component
                     </div>
                 @else
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <flux:input
+                        <div class="flex flex-wrap items-center gap-3"><flux:input
                             wire:model.live.debounce.300ms="busqueda"
                             icon="magnifying-glass"
                             placeholder="Buscar por nombre o documento..."
                             class="sm:max-w-sm"
-                        />
+                        /><x-ui.filtros :activos="$filtros"><flux:select label="Asistencia guardada" wire:model.live="filtros.asistencia"><flux:select.option value="">Todas</flux:select.option>@foreach(\App\Enums\EstadoAsistencia::cases() as $e)<flux:select.option :value="$e->value">{{ $e->label() }}</flux:select.option>@endforeach<flux:select.option value="sin_registro">Sin registro</flux:select.option></flux:select></x-ui.filtros></div>
                         @if ($editando)
                             <div class="flex gap-2">
                                 <flux:button size="sm" variant="subtle" icon="check-circle" wire:click="marcarTodos('presente')">Todos presentes</flux:button>
@@ -862,7 +864,7 @@ new class extends Component
                                 @empty
                                     <flux:table.row>
                                         <flux:table.cell colspan="3" class="text-center text-zinc-500">
-                                            {{ $busqueda ? 'No se encontraron trabajadores.' : 'No hay trabajadores activos.' }}
+                                            {{ $busqueda !== '' || count($filtros) ? 'No se encontraron trabajadores.' : 'No hay trabajadores activos.' }}
                                         </flux:table.cell>
                                     </flux:table.row>
                                 @endforelse

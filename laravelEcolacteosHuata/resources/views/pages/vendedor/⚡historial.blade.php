@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
     use WithPagination;
 
     public string $desde = '';
@@ -18,6 +19,12 @@ new class extends Component
     public string $busqueda = '';
 
     public string $metodoPago = '';
+
+    public function limpiarFiltros(): void
+    {
+        $this->filtros = []; $this->busqueda = ''; $this->metodoPago = '';
+        $this->mount(); $this->resetPage();
+    }
 
     public function mount(): void
     {
@@ -50,7 +57,7 @@ new class extends Component
      */
     private function filtroVentas(): Builder
     {
-        return Venta::query()
+        return Venta::query()->when($this->filtro('vendedor'), fn ($q, $v) => $q->where('vendedor_id', $v))
             ->whereBetween('fecha', [$this->desde, $this->hasta])
             ->when($this->metodoPago, fn ($q) => $q->where('metodo_pago', $this->metodoPago))
             ->when($this->busqueda, fn ($q) => $q->where(function ($q) {
@@ -70,6 +77,7 @@ new class extends Component
             'totalPeriodo' => (clone $query)->reorder()->sum('total'),
             'boletasPeriodo' => (clone $query)->reorder()->count(),
             'metodos' => MetodoPago::options(),
+            'vendedoresFiltro' => \App\Models\User::whereIn('id', Venta::select('vendedor_id'))->orderBy('nombres')->get(),
         ];
     }
 
@@ -115,12 +123,12 @@ new class extends Component
                 <flux:select.option value="{{ $m['value'] }}">{{ $m['label'] }}</flux:select.option>
             @endforeach
         </flux:select>
-        <flux:input
+        <div class="flex flex-wrap items-center gap-3"><flux:input
             wire:model.live.debounce.300ms="busqueda"
             icon="magnifying-glass"
             placeholder="Boleta o cliente..."
             class="max-w-xs"
-        />
+        /><x-ui.filtros :activos="$filtros"><flux:select label="Vendedor" wire:model.live="filtros.vendedor"><flux:select.option value="">Todos</flux:select.option>@foreach($vendedoresFiltro as $v)<flux:select.option :value="$v->id">{{ $v->nombreCompleto() }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
     </div>
 
     <div class="grid gap-3 sm:grid-cols-2">

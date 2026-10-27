@@ -7,6 +7,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public string $periodo = 'turno';
 
     public string $fecha = '';
@@ -24,7 +26,7 @@ new class extends Component
 
         return [
             'periodos' => Periodo::options(),
-            'resultados' => ResultadoLaboratorio::query()
+            'resultados' => ResultadoLaboratorio::query()->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('observaciones', 'like', '%'.$this->busqueda.'%')->orWhere('resultado', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('conforme') !== '', fn ($q) => $q->where('conforme', $this->filtro('conforme') === '1'))
                 ->with('turno')
                 ->where('proveedor_id', $proveedor?->id)
                 ->whereBetween('fecha', [$desde->toDateString(), $hasta->toDateString()])
@@ -37,6 +39,8 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <x-ui.titulo titulo="Resultados de laboratorio">Calidad de la leche que has entregado.</x-ui.titulo>
+        <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar resultado u observación..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Análisis" wire:model.live="filtros.conforme"><flux:select.option value="">Todos</flux:select.option><flux:select.option value="1">Conforme</flux:select.option><flux:select.option value="0">No conforme</flux:select.option></flux:select></x-ui.filtros></div>
+
 
     <div class="flex flex-wrap items-end gap-4">
         <flux:select label="Período" wire:model.live="periodo" class="max-w-xs">
@@ -84,14 +88,14 @@ new class extends Component
             </div>
         @empty
             <div class="rounded-xl border border-huata-verde-100 p-6 text-center text-zinc-500 dark:border-zinc-700 huata-cuadro">
-                No hay resultados de laboratorio en este período.
+                {{ $busqueda !== '' || count($filtros) ? 'No se encontraron resultados con estos filtros en el período.' : 'No hay resultados de laboratorio en este período.' }}
             </div>
         @endforelse
     </div>
 
     <div>
         <flux:heading size="lg" class="mb-3">Resultados de laboratorio</flux:heading>
-        <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
+    <div class="overflow-x-auto rounded-xl border border-huata-verde-100 px-3 dark:border-zinc-700 huata-cuadro">
             <flux:table>
                 <flux:table.columns class="bg-white/80 dark:bg-zinc-800/80">
                     <flux:table.column>Fecha</flux:table.column>

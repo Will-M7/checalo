@@ -7,13 +7,15 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     public string $filtroTipo = '';
 
     public function with(): array
     {
         return [
             'tipos' => TipoComunicado::options(),
-            'comunicados' => Comunicado::query()
+            'comunicados' => Comunicado::query()->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('titulo', 'like', '%'.$this->busqueda.'%')->orWhere('descripcion', 'like', '%'.$this->busqueda.'%')))
                 ->paraRol(Rol::Proveedor)
                 ->when($this->filtroTipo, fn ($q) => $q->where('tipo', $this->filtroTipo))
                 ->orderByDesc('fecha')
@@ -25,6 +27,8 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <x-ui.titulo titulo="Comunicados y asesoramiento">Avisos publicados por la planta.</x-ui.titulo>
+    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar comunicado..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:input label="Desde" type="date" wire:model.live="filtros.desde" /><flux:input label="Hasta" type="date" wire:model.live="filtros.hasta" /></x-ui.filtros></div>
+
 
     <flux:select label="Filtrar por tipo" wire:model.live="filtroTipo" class="max-w-xs">
         <flux:select.option value="">Todos</flux:select.option>
@@ -47,7 +51,7 @@ new class extends Component
             </div>
         @empty
             <div class="rounded-xl border border-huata-verde-100 p-6 text-center text-zinc-500 dark:border-zinc-700 huata-cuadro">
-                No hay comunicados publicados todavía.
+                {{ $busqueda !== '' || count($filtros) ? 'No se encontraron comunicados con estos filtros.' : 'No hay comunicados publicados todavía.' }}
             </div>
         @endforelse
     </div>

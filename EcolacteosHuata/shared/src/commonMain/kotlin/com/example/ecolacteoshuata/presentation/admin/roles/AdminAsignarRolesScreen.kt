@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.admin.roles
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.theme.VerdeOscuro
 import androidx.compose.material.icons.filled.Person
 import com.example.ecolacteoshuata.core.ui.BotonesFormulario
@@ -64,16 +69,30 @@ fun AdminAsignarRolesScreen(
     onAlternarRol: (String) -> Unit,
     onGuardar: () -> Unit,
     onConsumirMensaje: () -> Unit,
+    catalogoRoles: List<com.example.ecolacteoshuata.domain.model.RolAsignado> = emptyList(),
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+    val opcionesRoles = remember(catalogoRoles, usuarios) { (catalogoRoles.map { it.id to it.nombre } + usuarios.flatMap { it.rolesParaFiltro() }).distinctBy { it.first }.sortedBy { it.second.lowercase() } }
+    val filtrados = remember(usuarios, busquedaFiltro, filtrosLista) { filtrarUsuarios(usuarios, busquedaFiltro, filtrosLista["rol"].orEmpty(), filtrosLista["estado"].orEmpty(), filtrosLista["cantidad"].orEmpty()) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         if (usuarios.isEmpty()) {
             EmptyState("Sin usuarios", "Crea usuarios primero para poder asignarles un rol.", modifier = Modifier.padding(24.dp))
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-lista") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(
+                        CampoFiltro("rol", "Rol actual", filtrosLista["rol"].orEmpty(), opcionesRoles),
+                        CampoFiltro("estado", "Estado", filtrosLista["estado"].orEmpty(), listOf("1" to "Activos", "0" to "Inactivos")),
+                        CampoFiltro("cantidad", "Asignaciones", filtrosLista["cantidad"].orEmpty(), listOf("varios" to "Varios roles", "ninguno" to "Sin roles")),
+                    ), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Nombre, usuario o documento...")
+                }
+                if (filtrados.isEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
                 item {
                     Text("Un usuario puede tener uno o varios roles a la vez.", style = CuerpoStyle, color = GrisTexto)
                 }
-                itemsIndexed(usuarios, key = { _, u -> u.id }) { index, usuario ->
+                itemsIndexed(filtrados, key = { _, u -> u.id }) { index, usuario ->
                     StaggeredListItem(index = index) {
                         TarjetaLista(
                             titulo = usuario.nombreCompleto,

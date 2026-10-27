@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.produccion.insumos
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.material.icons.filled.Inventory2
 import com.example.ecolacteoshuata.core.ui.TarjetaLista
 import com.example.ecolacteoshuata.core.ui.BotonesFormulario
@@ -82,6 +87,11 @@ fun ProduccionInsumosScreen(
     onCerrarCompra: () -> Unit,
     onRegistrarCompra: (cantidad: Double?, costoUnitario: Double?) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(insumos, busquedaFiltro, filtrosLista) { insumos.filter { it.nombre.contains(busquedaFiltro, true) && (filtrosLista["unidad"].isNullOrEmpty() || it.unidadMedidaId == filtrosLista["unidad"]) } }
+
     var porEliminar by remember { mutableStateOf<Insumo?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -89,8 +99,12 @@ fun ProduccionInsumosScreen(
             EmptyState("Sin insumos", "Registra el primer insumo de producción.", modifier = Modifier.padding(24.dp))
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("unidad", "Unidad", filtrosLista["unidad"].orEmpty(), unidades.map { it.id to it.nombre })), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && insumos.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
                 item { TituloSeccion("Insumos (${insumos.size})") }
-                itemsIndexed(insumos) { index, insumo ->
+                itemsIndexed(filtrados, key = { _, it -> it.id }) { index, insumo ->
                     StaggeredListItem(index = index) {
                         TarjetaLista(
                             titulo = insumo.nombre,

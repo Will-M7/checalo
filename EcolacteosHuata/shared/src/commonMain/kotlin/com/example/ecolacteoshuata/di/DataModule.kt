@@ -62,6 +62,7 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.dsl.module
 
 val dataModule = module {
+    single { com.example.ecolacteoshuata.data.remote.datasource.FinanzasRemota(get(), get(), get()) }
     single<com.example.ecolacteoshuata.data.remote.datasource.SincronizacionRemota> { get<com.example.ecolacteoshuata.data.remote.datasource.SyncRemoteDataSource>() }
     single<com.example.ecolacteoshuata.domain.repository.BorradorVentaYapeRepository> { com.example.ecolacteoshuata.data.repository.BorradorVentaYapeRepositoryImpl(get()) }
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }

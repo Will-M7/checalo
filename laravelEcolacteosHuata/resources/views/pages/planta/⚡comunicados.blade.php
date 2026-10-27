@@ -12,6 +12,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\FiltrosListado;
+    public string $busqueda = '';
     #[Validate('required|string')]
     public string $tipo = 'comunicado';
 
@@ -32,7 +34,7 @@ new class extends Component
         return [
             'tipos' => TipoComunicado::cases(),
             'roles' => Rol::cases(),
-            'comunicados' => Comunicado::with('autor')->orderByDesc('fecha')->orderByDesc('id')->get(),
+            'comunicados' => Comunicado::with('autor')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('titulo', 'like', '%'.$this->busqueda.'%')->orWhere('descripcion', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('tipo'), fn ($q, $v) => $q->where('tipo', $v))->orderByDesc('fecha')->orderByDesc('id')->get(),
         ];
     }
 
@@ -91,6 +93,8 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <x-ui.titulo titulo="Comunicados y asesoramiento">Publica avisos y consejos visibles para todos los proveedores.</x-ui.titulo>
+                    <div class="flex flex-wrap items-center gap-3"><flux:input wire:model.live.debounce.300ms="busqueda" icon="magnifying-glass" placeholder="Buscar comunicado..." class="max-w-sm" /><x-ui.filtros :activos="$filtros"><flux:select label="Tipo" wire:model.live="filtros.tipo"><flux:select.option value="">Todos</flux:select.option>@foreach(\App\Enums\TipoComunicado::cases() as $t)<flux:select.option :value="$t->value">{{ $t->label() }}</flux:select.option>@endforeach</flux:select></x-ui.filtros></div>
+
 
     <form wire:submit="publicar" class="flex flex-col gap-4 rounded-xl border border-huata-verde-100 p-5 dark:border-zinc-700 huata-cuadro">
         <flux:select label="Tipo" wire:model="tipo">
@@ -108,7 +112,7 @@ new class extends Component
             @unless ($paraTodos)
                 <div class="mt-3 flex flex-col gap-2 rounded-lg border border-huata-verde-100 p-3 dark:border-zinc-700">
                     <flux:text class="text-xs text-zinc-500">Selecciona uno o varios roles destinatarios:</flux:text>
-                    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($roles as $rol)
                             <flux:checkbox
                                 wire:key="rol-{{ $rol->value }}"
@@ -150,7 +154,7 @@ new class extends Component
             </div>
         @empty
             <div class="rounded-xl border border-huata-verde-100 p-6 text-center text-zinc-500 dark:border-zinc-700 huata-cuadro">
-                No hay comunicados publicados todavía.
+                {{ $busqueda !== '' || count($filtros) ? 'No se encontraron comunicados con estos filtros.' : 'No hay comunicados publicados todavía.' }}
             </div>
         @endforelse
     </div>

@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.produccion.recetas
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import com.example.ecolacteoshuata.core.ui.BotonesFormulario
 import com.example.ecolacteoshuata.core.ui.EncabezadoFormulario
 import com.example.ecolacteoshuata.core.ui.MensajeError
@@ -102,6 +107,11 @@ fun ProduccionRecetasScreen(
     onGuardar: () -> Unit,
     onEliminar: (String) -> Unit,
 ) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
+    val filtrados = remember(recetas, busquedaFiltro, filtrosLista) { recetas.filter { it.nombre.contains(busquedaFiltro, true) && (filtrosLista["insumo"].isNullOrEmpty() || it.detalle.any { d -> d.insumoId == filtrosLista["insumo"] }) } }
+
     val simbolos = insumos.associate { it.id to it.unidadMedidaSimbolo }
     val costos = insumos.associate { it.id to it.costoUnitario }
     var porEliminar by remember { mutableStateOf<Receta?>(null) }
@@ -111,8 +121,12 @@ fun ProduccionRecetasScreen(
             EmptyState("Sin recetas", "Crea la primera receta con sus insumos.", modifier = Modifier.padding(24.dp))
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = ListaPadding, verticalArrangement = ListaEspaciado) {
+                item(key = "filtros-listado") {
+                    FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("insumo", "Contiene insumo", filtrosLista["insumo"].orEmpty(), insumos.map { it.id to it.nombre })), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() })
+                }
+                if (filtrados.isEmpty() && recetas.isNotEmpty()) item { EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.") }
                 item { TituloSeccion("Recetas (${recetas.size})") }
-                itemsIndexed(recetas) { index, receta ->
+                itemsIndexed(filtrados, key = { _, it -> it.id }) { index, receta ->
                     // Costo por unidad = Σ cantidad × costo unitario de cada insumo (como Laravel).
                     val costo = receta.detalle.sumOf { it.cantidad * (costos[it.insumoId] ?: 0.0) }
                     StaggeredListItem(index = index) {

@@ -1,5 +1,10 @@
 package com.example.ecolacteoshuata.presentation.admin.roles
 
+import androidx.compose.runtime.*
+import com.example.ecolacteoshuata.core.ui.FiltrosListado
+import com.example.ecolacteoshuata.core.ui.CampoFiltro
+import com.example.ecolacteoshuata.presentation.common.filtros.*
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +22,9 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DistribucionesSheet(onDismiss: () -> Unit, vm: DistribucionesViewModel = koinViewModel()) {
+    var busquedaFiltro by remember { mutableStateOf("") }
+    var filtrosLista by remember { mutableStateOf(mapOf<String, String>()) }
+
     val s by vm.state.collectAsState()
     LaunchedEffect(Unit) { vm.cargar() }
     AppBottomSheet(onDismiss = { if (!s.ocupado) onDismiss() }) {
@@ -31,7 +39,10 @@ fun DistribucionesSheet(onDismiss: () -> Unit, vm: DistribucionesViewModel = koi
                 AppTextField(s.nombreCopia, vm::nombreCopia, "Nombre para guardar una copia")
                 BotonAgregar("Guardar asignaciones actuales como copia", onClick = { vm.copiar(true) })
                 BotonAgregar("Nueva distribución", vm::nueva)
-                c.distribuciones.forEach { d ->
+                FiltrosListado(busquedaFiltro, { busquedaFiltro = it }, listOf(CampoFiltro("tipo", "Tipo", filtrosLista["tipo"].orEmpty(), listOf("base" to "Base protegida", "personalizada" to "Personalizada")), CampoFiltro("rol", "Contiene rol", filtrosLista["rol"].orEmpty(), c.roles.map { it.codigo to it.nombre })), { k, v -> filtrosLista = filtrosLista + (k to v) }, { busquedaFiltro = ""; filtrosLista = emptyMap() }, "Buscar distribución...")
+                val visibles = c.distribuciones.filter { it.nombre.contains(busquedaFiltro, true) && (filtrosLista["tipo"].isNullOrEmpty() || it.tipo == filtrosLista["tipo"]) && (filtrosLista["rol"].isNullOrEmpty() || it.asignaciones.any { a -> a.codigo == filtrosLista["rol"] }) }
+                if (visibles.isEmpty()) EmptyState("Sin coincidencias", "Prueba otra búsqueda o limpia los filtros.")
+                visibles.forEach { d ->
                     TarjetaLista(titulo = d.nombre, subtitulo = "v${d.version} · ${if (d.tipo == "base") "Base protegida" else "Personalizada"}", icono = Icons.Filled.Shield,
                         acciones = { BotonAccion("Consultar / editar", Icons.Filled.Edit, VerdeOscuro, { vm.ver(d) }) }) {
                         if (d.predeterminada) Text("Inicial · Predeterminada para instalaciones nuevas", style = CuerpoMedioStyle, color = VerdeOscuro)

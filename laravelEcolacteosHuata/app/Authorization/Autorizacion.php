@@ -47,7 +47,7 @@ final class Autorizacion
             ? self::catalogoRoles($user)->map(fn ($r) => ['id' => $r->codigo, 'nombre' => $r->nombre, 'activo' => $r->activo, 'auxiliar' => $r->codigo === 'tomar_asistencia', 'pantallas' => $r->pantallas])->values()->all() : [];
 
         return ['pantallas_adicionales' => self::adicionales($user), 'categorias_historicas' => $user->rolesAsignados()->map(fn ($r) => $r->value)->values()->all(), 'catalogo_roles' => $catalogo, 'usuario_id' => (string) $user->id, 'version' => hash('sha256', json_encode([$user->activo, $roles, $pantallas, DB::table('authorization_state')->where('id', 1)->value('revision')])),
-            'roles' => $roles, 'pantallas' => $pantallas, 'mapeo_android' => Pantallas::android(),
+            'roles' => $roles, 'pantallas' => $pantallas, 'capacidades_comerciales' => array_values(array_filter(['vendedor.ventas', 'vendedor.pedidos-web'], fn ($p) => $user->puedeVender($p))), 'mapeo_android' => Pantallas::android(),
             'politica_offline' => 'ultima_autorizacion_conocida; cambios rechazados se conservan para revision'];
     }
 
