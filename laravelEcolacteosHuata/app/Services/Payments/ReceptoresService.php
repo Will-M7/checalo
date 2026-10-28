@@ -70,7 +70,7 @@ class ReceptoresService
 
     public function cambiar(User $actor, ReceptorPago $r, string $action, bool $physical = false): void
     {
-        abort_unless($actor->activo && $actor->puedePantalla('vendedor.configuracion-pagos') && $actor->puedeAdministracionCritica(), 403);
+        app(AsignacionesReceptor::class)->administrar($actor);
         abort_unless(in_array($action, ['verify', 'enable', 'disable'], true), 422);
         if ($action === 'verify' && ! $physical) {
             $this->error('Confirma físicamente titular, número, cuenta Yape y QR antes de verificar.');
@@ -100,6 +100,9 @@ class ReceptoresService
         }
         if (! $remote || ! isset($remote['version'])) {
             $this->error('Core requiere la actualización de administración de receptores. La recepción permanece bloqueada.');
+        }
+        if ($action === 'enable' && \Illuminate\Support\Facades\Schema::hasTable('yape_reception_requests') && ($request = app(SolicitudesRecepcionYape::class)->actual($r->id)) && ($request->status !== 'accepted' || ! DB::table('huata_yape_installations')->where('id', $request->installation_id)->where('status', 'active')->where('consent', true)->where('listener_ready', true)->exists())) {
+            $this->error('El responsable debe aceptar y vincular su teléfono con permiso Android antes de habilitar cobros.');
         }
         if ($action === 'enable' && app(BridgeProvisioning::class)->ready() && ! DB::table('payment_bridge_devices')->where('receiver_id', $r->id)->where('status', 'active')->exists()) {
             $this->error('Actualiza y vincula Bridge desde Huata para sustituir su credencial anterior antes de habilitar recepción.');

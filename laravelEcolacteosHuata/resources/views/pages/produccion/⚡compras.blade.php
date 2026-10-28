@@ -121,7 +121,7 @@ new class extends Component
 
     public function with(): array
     {
-        $query = $this->filtroCompras()->with('compra.registradoPor', 'insumo.unidadMedida')->orderByDesc('id');
+        $query = $this->filtroCompras()->with('compra.registradoPor', 'insumo.unidadMedida')->orderByDesc('created_at')->orderByDesc('id');
 
         $compras = $query->paginate(15);
 

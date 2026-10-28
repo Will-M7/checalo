@@ -33,7 +33,7 @@ new class extends Component
         $acopiador = auth()->user()->acopiador;
 
         $proveedores = $acopiador
-            ? $acopiador->proveedores()->with('user')->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->orderBy('id')->get()
+            ? $acopiador->proveedores()->with('user')->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->orderByDesc('created_at')->orderByDesc('id')->get()
             : collect();
 
         // Una vez que el acopiador entrega a planta, sus recojos de hoy quedan marcados como

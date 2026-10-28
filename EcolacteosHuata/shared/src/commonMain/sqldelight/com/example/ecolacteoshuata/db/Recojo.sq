@@ -25,34 +25,34 @@ CREATE INDEX idx_recojo_proveedor ON recojo(proveedor_id);
 CREATE INDEX idx_recojo_acopiador ON recojo(acopiador_id);
 
 selectAll:
-SELECT * FROM recojo ORDER BY fecha DESC;
+SELECT * FROM recojo ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectById:
 SELECT * FROM recojo WHERE id = ?;
 
 selectByProveedor:
-SELECT * FROM recojo WHERE proveedor_id = ? ORDER BY fecha DESC;
+SELECT * FROM recojo WHERE proveedor_id = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectByAcopiadorYFecha:
-SELECT * FROM recojo WHERE acopiador_id = ? AND fecha = ? ORDER BY fecha DESC;
+SELECT * FROM recojo WHERE acopiador_id = ? AND fecha = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectByAcopiadorTurnoFecha:
-SELECT * FROM recojo WHERE acopiador_id = ? AND turno_id = ? AND fecha = ?;
+SELECT * FROM recojo WHERE acopiador_id = ? AND turno_id = ? AND fecha = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectByAcopiadorEntreFechas:
-SELECT * FROM recojo WHERE acopiador_id = ? AND fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+SELECT * FROM recojo WHERE acopiador_id = ? AND fecha >= ? AND fecha <= ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectByProveedorEntreFechas:
-SELECT * FROM recojo WHERE proveedor_id = ? AND fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+SELECT * FROM recojo WHERE proveedor_id = ? AND fecha >= ? AND fecha <= ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectEntreFechas:
-SELECT * FROM recojo WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+SELECT * FROM recojo WHERE fecha >= ? AND fecha <= ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectPendientesSincronizar:
-SELECT * FROM recojo WHERE sincronizado = 0;
+SELECT * FROM recojo WHERE sincronizado = 0 ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 selectPendientesPago:
-SELECT * FROM recojo WHERE proveedor_id = ? AND pagado = 0;
+SELECT * FROM recojo WHERE proveedor_id = ? AND pagado = 0 ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, CASE WHEN recojo.id NOT GLOB '*[^0-9]*' THEN CAST(recojo.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'recojo' AND registro_id = recojo.id) DESC, recojo.id DESC;
 
 sumLitrosHoy:
 SELECT COALESCE(SUM(litros), 0.0) FROM recojo WHERE fecha = ?;

@@ -20,9 +20,9 @@ CREATE TABLE compra_detalle (
 CREATE INDEX idx_compra_fecha ON compra(fecha);
 CREATE INDEX idx_compra_detalle_compra ON compra_detalle(compra_id);
 
--- rowid desempata las compras del mismo día: la última registrada va primero.
+-- Orden de alta estable: editar o sincronizar no cambia la secuencia.
 selectAll:
-SELECT * FROM compra ORDER BY fecha DESC, rowid DESC;
+SELECT * FROM compra ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'compra' AND registro_id = compra.id) DESC, CASE WHEN compra.id NOT GLOB '*[^0-9]*' THEN CAST(compra.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'compra' AND registro_id = compra.id) DESC, compra.id DESC;
 
 selectById:
 SELECT * FROM compra WHERE id = ?;

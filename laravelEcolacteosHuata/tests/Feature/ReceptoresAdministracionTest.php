@@ -25,13 +25,13 @@ function receptorAdminFixture(): array
 test('administrador verifica por primera vez sin exigir habilitación previa y después habilita', function () {
     [$admin, $seller, $r, $core] = receptorAdminFixture();
     $this->actingAs($admin);
-    $page = Livewire::withQueryParams(['vendedor' => $seller->id])->test('pages::vendedor.configuracion-pagos');
-    $page->call('consultarConexion')->assertSet('operatividad', fn ($text) => str_contains($text, 'pendiente de verificación física'));
-    $page->set('confirmacionFisica', true)->call('verificar')->assertHasNoErrors();
+    $page = Livewire::test(\App\Livewire\ReceptoresYape::class)->call('editar', $r->id);
+    $page->call('consultar', $r->id)->assertSet('diagnosticos.'.$r->id, fn ($text) => str_contains($text, 'pendiente de verificación física'));
+    $page->set('confirmacionFisica.'.$r->id, true)->call('verificar', $r->id)->assertHasNoErrors();
     expect($r->fresh()->verified_by)->toBe($admin->id)->and($r->fresh()->enabled)->toBeFalse()->and($core->state['verified'])->toBeTrue();
-    $page->call('alternar');
+    $page->call('habilitar', $r->id);
     expect($r->fresh()->enabled)->toBeTrue()->and($core->state['enabled'])->toBeTrue();
-    $page->call('alternar');
+    $page->call('deshabilitar', $r->id);
     expect($r->fresh()->enabled)->toBeFalse()->and($core->state['enabled'])->toBeFalse();
 });
 
@@ -46,7 +46,7 @@ test('vendedor no verifica ni activa con peticiones manipuladas', function () {
     [, $seller, , $core] = receptorAdminFixture();
     $this->actingAs($seller);
     foreach (['verificar', 'alternar', 'desactivar'] as $action) {
-        Livewire::test('pages::vendedor.configuracion-pagos')->set('confirmacionFisica', true)->call($action)->assertForbidden();
+        Livewire::test(\App\Livewire\ReceptoresYape::class)->assertForbidden();
     }
     expect($core->mutations)->toBe(0);
 });

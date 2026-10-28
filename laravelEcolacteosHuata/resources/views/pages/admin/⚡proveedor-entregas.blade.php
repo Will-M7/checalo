@@ -17,7 +17,7 @@ new class extends Component
             'proveedores' => Proveedor::with('user')->orderBy('id')->get(),
             'recojosPorProveedor' => Recojo::with('turno')
                 ->whereBetween('fecha', [$desde->toDateString(), $hasta->toDateString()])
-                ->orderByDesc('fecha')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->get()
                 ->groupBy('proveedor_id'),
         ];

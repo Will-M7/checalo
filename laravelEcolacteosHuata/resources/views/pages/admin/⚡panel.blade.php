@@ -29,8 +29,8 @@ new class extends Component
             'recojosHoy' => (float) Recojo::query()->whereDate('fecha', $hoy)->sum('litros'),
             'ventasHoy' => (float) Venta::query()->whereDate('fecha', $hoy)->sum('total'),
             'pedidosPendientes' => PedidoWeb::query()->where('estado', 'pendiente')->count(),
-            'ultimasVentas' => Venta::query()->latest('id')->limit(4)->get(['id', 'numero_boleta', 'cliente_nombre_libre', 'cliente_id', 'total', 'fecha']),
-            'comunicados' => Comunicado::query()->latest('fecha')->latest('id')->limit(3)->get(['id', 'titulo', 'fecha']),
+            'ultimasVentas' => Venta::query()->latest('created_at')->latest('id')->limit(4)->get(['id', 'numero_boleta', 'cliente_nombre_libre', 'cliente_id', 'total', 'fecha']),
+            'comunicados' => Comunicado::query()->latest('created_at')->latest('id')->limit(3)->get(['id', 'titulo', 'fecha']),
         ];
     }
 };

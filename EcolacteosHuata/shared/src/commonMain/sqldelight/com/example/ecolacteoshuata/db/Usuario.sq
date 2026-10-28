@@ -20,16 +20,16 @@ actualizarTomaAsistencia:
 UPDATE usuario SET toma_asistencia = ? WHERE id = ? AND toma_asistencia != ?;
 
 selectAll:
-SELECT * FROM usuario ORDER BY nombres, apellidos;
+SELECT * FROM usuario ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'usuario' AND registro_id = usuario.id) DESC, CASE WHEN usuario.id NOT GLOB '*[^0-9]*' THEN CAST(usuario.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'usuario' AND registro_id = usuario.id) DESC, usuario.id DESC;
 
 selectById:
 SELECT * FROM usuario WHERE id = ?;
 
 selectByUsuario:
-SELECT * FROM usuario WHERE usuario = ? COLLATE NOCASE;
+SELECT * FROM usuario WHERE usuario = ? COLLATE NOCASE ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'usuario' AND registro_id = usuario.id) DESC, CASE WHEN usuario.id NOT GLOB '*[^0-9]*' THEN CAST(usuario.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'usuario' AND registro_id = usuario.id) DESC, usuario.id DESC;
 
 selectByRol:
-SELECT * FROM usuario WHERE rol = ? ORDER BY nombres, apellidos;
+SELECT * FROM usuario WHERE rol = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'usuario' AND registro_id = usuario.id) DESC, CASE WHEN usuario.id NOT GLOB '*[^0-9]*' THEN CAST(usuario.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'usuario' AND registro_id = usuario.id) DESC, usuario.id DESC;
 
 countActivos:
 SELECT COUNT(*) FROM usuario WHERE activo = 1;

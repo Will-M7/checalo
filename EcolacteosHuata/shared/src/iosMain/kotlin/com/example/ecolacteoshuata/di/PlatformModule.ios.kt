@@ -14,6 +14,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual val platformModule: Module = module {
+    single<com.example.ecolacteoshuata.domain.platform.YapeReception> { com.example.ecolacteoshuata.domain.platform.UnsupportedYapeReception() }
     // Motor Darwin (NSURLSession) para iOS
     single<HttpClientEngine> { Darwin.create() }
     single { DatabaseDriverFactory() }

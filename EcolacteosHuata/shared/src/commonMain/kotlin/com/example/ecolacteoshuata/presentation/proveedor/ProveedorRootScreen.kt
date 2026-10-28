@@ -66,10 +66,25 @@ fun ProveedorRootScreen(usuario: Usuario, onCerrarSesion: () -> Unit, soloConten
     val contenido: @Composable () -> Unit = {
         val proveedor = rootState.proveedor
         if (proveedor == null && rootState.cargado) {
-            // Rol de proveedor recién asignado: su perfil (finca) llega con la próxima sincronización.
             Column(Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                EmptyState("Perfil de proveedor en camino", "Tu rol de proveedor es nuevo: sus datos llegan al sincronizar con el servidor.")
-                SecondaryButton("Volver a intentar", onClick = rootViewModel::cargarProveedor, modifier = Modifier.padding(top = 12.dp))
+                val descargando = rootState.estadoSync == com.example.ecolacteoshuata.domain.model.EstadoSincronizacion.SINCRONIZANDO
+                val tituloEstado = when {
+                    descargando -> "Descargando tu información"
+                    rootState.requiereSesion -> "Confirma tu sesión con Laravel"
+                    rootState.error != null -> "No se pudo completar la descarga"
+                    !rootState.descargado -> "Perfil pendiente de descarga"
+                    else -> "Esta cuenta no tiene perfil de proveedor"
+                }
+                val detalle = when {
+                    descargando -> "Los datos aparecerán automáticamente al terminar."
+                    rootState.error != null -> rootState.error!!
+                    rootState.requiereSesion -> "Abre Conexión y sincronización para confirmar tu sesión y descargar los datos."
+                    !rootState.descargado -> "Sincroniza para consultar el perfil registrado en Laravel."
+                    else -> "Laravel no devolvió un perfil de proveedor para esta cuenta. Pide al administrador revisar la asociación del usuario y sus pantallas autorizadas."
+                }
+                EmptyState(tituloEstado, detalle)
+                if (descargando) CircularProgressIndicator(Modifier.padding(top = 12.dp))
+                else SecondaryButton("Sincronizar y reintentar", onClick = rootViewModel::cargarProveedor, modifier = Modifier.padding(top = 12.dp))
             }
         } else if (proveedor == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }

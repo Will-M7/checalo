@@ -8,6 +8,7 @@ import com.example.ecolacteoshuata.domain.repository.ProveedorRepository
 import com.example.ecolacteoshuata.domain.repository.RutaRepository
 import com.example.ecolacteoshuata.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class GetUsuarioByIdUseCase(private val repository: UsuarioRepository) {
     suspend operator fun invoke(id: String): Usuario? = repository.getById(id)
@@ -15,6 +16,7 @@ class GetUsuarioByIdUseCase(private val repository: UsuarioRepository) {
 
 class GetProveedorPorUsuarioUseCase(private val repository: ProveedorRepository) {
     suspend operator fun invoke(usuarioId: String): Proveedor? = repository.getByUsuarioId(usuarioId)
+    fun observe(usuarioId: String): Flow<Proveedor?> = repository.observeAll().map { filas -> filas.firstOrNull { it.usuarioId == usuarioId } }
 }
 
 class GetAcopiadorPorUsuarioUseCase(private val repository: AcopiadorRepository) {

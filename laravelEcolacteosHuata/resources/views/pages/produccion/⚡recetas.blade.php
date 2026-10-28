@@ -25,7 +25,7 @@ new class extends Component
     {
         return [
             'insumos' => Insumo::with('unidadMedida')->orderBy('nombre')->get(),
-            'recetas' => Receta::with('detalles.insumo.unidadMedida')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('insumo'), fn ($q, $v) => $q->whereHas('detalles', fn ($d) => $d->where('insumo_id', $v)))->orderBy('nombre')->get(),
+            'recetas' => Receta::with('detalles.insumo.unidadMedida')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('insumo'), fn ($q, $v) => $q->whereHas('detalles', fn ($d) => $d->where('insumo_id', $v)))->orderByDesc('created_at')->orderByDesc('id')->get(),
         ];
     }
 

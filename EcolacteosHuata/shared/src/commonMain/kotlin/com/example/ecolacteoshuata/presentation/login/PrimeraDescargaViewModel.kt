@@ -53,6 +53,19 @@ class PrimeraDescargaViewModel(
             }
         }
         viewModelScope.launch {
+            combine(syncService.estado, syncService.ultimoError, conexionServidorRepository.observe()) { estado, error, c -> Triple(estado, error, c) }
+                .collect { (estado, error, c) ->
+                    if (!_state.value.visible || omitida) return@collect
+                    val etapa = when {
+                        c.ultimaSincronizacion != null && estado == com.example.ecolacteoshuata.domain.model.EstadoSincronizacion.SINCRONIZADO -> EtapaDescarga.LISTA
+                        estado == com.example.ecolacteoshuata.domain.model.EstadoSincronizacion.SINCRONIZANDO -> EtapaDescarga.DESCARGANDO
+                        error != null -> EtapaDescarga.ERROR
+                        else -> _state.value.etapa
+                    }
+                    _state.value = _state.value.copy(etapa = etapa, error = if (etapa == EtapaDescarga.ERROR) error else null)
+                }
+        }
+        viewModelScope.launch {
             combine(syncService.progreso, syncService.ultimoResumen) { p, r -> p to r }.collect { (p, r) ->
                 _state.value = _state.value.copy(progreso = p, resumen = r)
             }

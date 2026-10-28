@@ -41,7 +41,7 @@ class SyncRemoteDataSource(
     override suspend fun autorizaciones(host: String, puerto: String): com.example.ecolacteoshuata.domain.model.AutorizacionUsuario {
         val respuesta = client.get(config.baseUrl(host, puerto) + "autorizaciones")
         if (respuesta.status == HttpStatusCode.Unauthorized) throw TokenRechazadoException()
-        check(respuesta.status.isSuccess()) { "No se pudo actualizar la autorización central: ${respuesta.status}." }
+        exigirSync(respuesta, "autorizaciones")
         return respuesta.body()
     }
 
@@ -120,7 +120,7 @@ class SyncRemoteDataSource(
             if (!since.isNullOrBlank()) parameter("since", since)
         }
         if (respuesta.status == HttpStatusCode.Unauthorized) throw TokenRechazadoException()
-        check(respuesta.status.isSuccess()) { "El servidor respondió ${respuesta.status}." }
+        exigirSync(respuesta, "descarga")
         return respuesta.body()
     }
 
@@ -132,7 +132,7 @@ class SyncRemoteDataSource(
             setBody(SubidaCambiosRequest(cambios))
         }
         if (respuesta.status == HttpStatusCode.Unauthorized) throw TokenRechazadoException()
-        check(respuesta.status.isSuccess()) { "El servidor respondió ${respuesta.status} al subir los cambios." }
+        exigirSync(respuesta, "subida de cambios")
         return respuesta.body()
     }
 
@@ -145,8 +145,8 @@ class SyncRemoteDataSource(
         val respuesta: HttpResponse = client.get(config.baseUrl(host, puerto) + "sync") {
             parameter("since", "2999-01-01T00:00:00+00:00")
         }
-        check(respuesta.status == HttpStatusCode.Unauthorized || respuesta.status.isSuccess()) {
-            "El servidor respondió ${respuesta.status}."
+        if (respuesta.status != HttpStatusCode.Unauthorized && !respuesta.status.isSuccess()) {
+            throw ErrorSyncHttp(respuesta.status.value, "prueba de conexión")
         }
         return inicio.elapsedNow().inWholeMilliseconds
     }
@@ -154,3 +154,15 @@ class SyncRemoteDataSource(
 
 /** Laravel no aceptó el token (nunca se inició sesión, se desactivó el usuario o cambió el servidor). */
 class TokenRechazadoException : Exception("El servidor pide iniciar sesión nuevamente.")
+
+/** Conserva HTTP y etapa sin exponer el cuerpo de la respuesta. */
+class ErrorSyncHttp(val codigo: Int, etapa: String) : Exception(when (codigo) {
+    403 -> "Laravel denegó la $etapa (HTTP 403). Revisa las pantallas autorizadas para esta cuenta."
+    404 -> "La ruta móvil de $etapa no existe en ese servidor (HTTP 404)."
+    in 500..599 -> "Laravel tuvo un error durante la $etapa (HTTP $codigo). Puedes reintentar; si persiste, informa al administrador."
+    else -> "No se pudo completar la $etapa (HTTP $codigo)."
+})
+
+private fun exigirSync(respuesta: HttpResponse, etapa: String) {
+    if (!respuesta.status.isSuccess()) throw ErrorSyncHttp(respuesta.status.value, etapa)
+}

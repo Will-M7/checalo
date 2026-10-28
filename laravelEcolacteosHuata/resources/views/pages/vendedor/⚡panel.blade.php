@@ -32,7 +32,7 @@ new class extends Component
             'valorInventario' => $disponibles->sum('valor'),
             'productosStockBajo' => $disponibles->filter(fn (array $d) => $d['disponible'] <= 5)->sortBy('disponible')->values(),
             'pedidosPendientes' => PedidoWeb::query()->where('estado', EstadoPedidoWeb::Pendiente)->count(),
-            'ultimasVentas' => Venta::query()->with('cliente')->latest('id')->limit(5)->get(),
+            'ultimasVentas' => Venta::query()->with('cliente')->latest('created_at')->latest('id')->limit(5)->get(),
         ];
     }
 };

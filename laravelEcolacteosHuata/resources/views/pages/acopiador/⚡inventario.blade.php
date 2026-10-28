@@ -28,7 +28,7 @@ new class extends Component
             ->with('proveedor.user', 'turno')->when($this->busqueda !== '', fn ($q) => $q->whereHas('proveedor.user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('entregado') !== '', fn ($q) => $q->where('entregado', $this->filtro('entregado') === '1'))->when($this->filtro('pagado') !== '', fn ($q) => $q->where('pagado', $this->filtro('pagado') === '1'))
             ->where('acopiador_id', $acopiador?->id)
             ->whereBetween('fecha', [$desde->toDateString(), $hasta->toDateString()])
-            ->orderByDesc('fecha')
+            ->orderByDesc('created_at')->orderByDesc('id')
             ->get();
 
         $proveedoresAsignados = $acopiador?->proveedores()->with('user')->get() ?? collect();

@@ -50,7 +50,6 @@ class ProveedorLaboratorioViewModel(
             fecha = fecha,
             resultados = resultados
                 .filter { it.fecha in desde..hasta }
-                .sortedByDescending { it.fecha }
                 .map { FilaResultado(it, it.turnoId?.let { id -> nombres[id] }) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProveedorLaboratorioUiState(fecha = hoy))

@@ -11,7 +11,7 @@ CREATE TABLE cliente (
 );
 
 selectAll:
-SELECT * FROM cliente ORDER BY compras_count DESC, nombres;
+SELECT * FROM cliente ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'cliente' AND registro_id = cliente.id) DESC, CASE WHEN cliente.id NOT GLOB '*[^0-9]*' THEN CAST(cliente.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'cliente' AND registro_id = cliente.id) DESC, cliente.id DESC;
 
 selectById:
 SELECT * FROM cliente WHERE id = ?;

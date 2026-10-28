@@ -108,7 +108,7 @@ new class extends Component
                 ->whereHas('recojos', fn ($q) => $q->where('entregado', true))
                 ->get(),
             'turnos' => Turno::where('es_produccion', true)->orderBy('hora_inicio')->get(),
-            'resultados' => ResultadoLaboratorio::with('proveedor.user', 'turno')->when($this->busqueda !== '', fn ($q) => $q->whereHas('proveedor.user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->when($this->filtro('conforme') !== '', fn ($q) => $q->where('conforme', $this->filtro('conforme') === '1'))->orderByDesc('fecha')
+            'resultados' => ResultadoLaboratorio::with('proveedor.user', 'turno')->when($this->busqueda !== '', fn ($q) => $q->whereHas('proveedor.user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->when($this->filtro('conforme') !== '', fn ($q) => $q->where('conforme', $this->filtro('conforme') === '1'))->orderByDesc('created_at')->orderByDesc('id')
                 ->limit(30)
                 ->get(),
             'resultadoDetalle' => $this->detalleId

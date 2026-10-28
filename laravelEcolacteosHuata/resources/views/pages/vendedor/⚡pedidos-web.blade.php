@@ -30,7 +30,7 @@ new class extends Component
         $pedidos = $this->pedidosVisibles()->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')->orWhere('celular', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('created_at', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('created_at', '<=', $v))->when($this->filtro('pago'), fn ($q, $v) => $q->where('pago_estado', $v))->when($this->filtro('vendedor'), fn ($q, $v) => $q->where('vendedor_asignado_id', $v))
             ->with('items')
             ->when($this->filtro !== 'todos', fn ($q) => $q->where('estado', $this->filtro))
-            ->latest()
+            ->latest()->orderByDesc('id')
             ->paginate(10);
 
         return [
@@ -128,7 +128,6 @@ new class extends Component
 
 <div class="flex flex-col gap-6">
     <flux:text>Recepción web: {{ ucfirst($disponibilidad['estado']) }}. Pausar conserva tus pedidos e historial.</flux:text>
-    @if($disponibilidad['capacidad'])<flux:button wire:click="pausarWeb({{ $disponibilidad['pausado'] ? 'false' : 'true' }})" :disabled="! $disponibilidad['autorizado']">{{ $disponibilidad['pausado'] ? 'Activar recepción web' : 'Pausar recepción web' }}</flux:button>@endif
     @error('disponibilidad')<flux:text role="alert">{{ $message }}</flux:text>@enderror
     @if(auth('web')->user()->puedePantalla('admin.usuarios'))
         <div class="flex flex-wrap gap-3"><flux:select label="Nuevo responsable disponible" wire:model="nuevoVendedor"><flux:select.option value="">Seleccionar</flux:select.option>@foreach($reasignables as $v)<flux:select.option :value="$v->id">{{ $v->nombreCompleto() }}</flux:select.option>@endforeach</flux:select><flux:input label="Motivo de reasignación (mínimo 10 caracteres)" wire:model="motivoReasignacion" /></div>

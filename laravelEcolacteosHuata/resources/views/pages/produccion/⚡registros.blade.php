@@ -42,7 +42,7 @@ new class extends Component
         return [
             'recetas' => Receta::orderBy('nombre')->get(),
             'turnos' => Turno::where('es_produccion', true)->orderBy('hora_inicio')->get(),
-            'producciones' => Produccion::with('receta.detalles.insumo', 'turno')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')->orWhereHas('receta', fn ($r) => $r->where('nombre', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('estado'), fn ($q, $v) => $q->where('estado', $v))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->orderByDesc('updated_at')->limit(20)->get(),
+            'producciones' => Produccion::with('receta.detalles.insumo', 'turno')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')->orWhereHas('receta', fn ($r) => $r->where('nombre', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('estado'), fn ($q, $v) => $q->where('estado', $v))->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->orderByDesc('created_at')->orderByDesc('id')->limit(20)->get(),
             'faltantesNueva' => $this->faltantesFormNueva(),
             'stockBajoNueva' => $this->stockBajoFormNueva(),
             'insumosAgotadosPorLinea' => $this->insumosAgotadosPorLinea(),

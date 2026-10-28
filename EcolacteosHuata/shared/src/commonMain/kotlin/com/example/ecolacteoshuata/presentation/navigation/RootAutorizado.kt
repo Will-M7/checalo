@@ -1,6 +1,13 @@
 package com.example.ecolacteoshuata.presentation.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.NotificationsActive
+import com.example.ecolacteoshuata.domain.platform.YapeReception
+import com.example.ecolacteoshuata.presentation.common.conexion.SolicitudRecepcionYape
+import com.example.ecolacteoshuata.presentation.common.conexion.RecepcionYapeScreen
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
@@ -188,6 +195,10 @@ object PantallasNativas {
 /** Usa RootScaffold y los seis hosts existentes. El enum de negocio no decide el acceso. */
 @Composable
 fun RootAutorizado(usuario: Usuario, rol: RolAsignado, onCerrarSesion: () -> Unit) {
+    val reception = koinInject<YapeReception>()
+    val receptionState by reception.state.collectAsState()
+    LaunchedEffect(usuario.id) { reception.refresh() }
+    SolicitudRecepcionYape()
     val a = usuario.autorizacion
     val ids = (rol.pantallas + a?.pantallas_adicionales.orEmpty()).distinct().filter {
         a?.permite(it) == true && PantallasNativas.pantallas.containsKey(it) &&
@@ -197,18 +208,24 @@ fun RootAutorizado(usuario: Usuario, rol: RolAsignado, onCerrarSesion: () -> Uni
     val estado by sync.estado.collectAsState()
     val pendientes by sync.pendientes.collectAsState()
     if (ids.isEmpty()) {
+        var recepcionAbierta by remember(usuario.id) { mutableStateOf(false) }
         RootScaffold(usuario, rol.nombre, TemaAdmin, estado, pendientes, onCerrarSesion,
             "Funciones", bottomNavItems = emptyList(), bottomNavSeleccionado = -1, onBottomNavSeleccionar = {}) {
-            EmptyState("Sin funciones móviles asignadas", "Este rol no tiene pantallas nativas habilitadas. Revisa su asignación en Laravel.")
+            if (recepcionAbierta && receptionState.authorized) {
+                Column { androidx.compose.material3.TextButton(onClick = { recepcionAbierta = false }) { androidx.compose.material3.Text("Volver a funciones") }; RecepcionYapeScreen() }
+            } else Column(Modifier.padding(18.dp)) {
+                EmptyState("Sin funciones móviles asignadas", "Este rol no tiene pantallas nativas habilitadas. Revisa su asignación en Laravel.")
+                if (receptionState.authorized) ModulosGrid(listOf(ModuloItem("Recepción Yape", Icons.Filled.NotificationsActive, "Estado del receptor y sus notificaciones") { recepcionAbierta = true }))
+            }
         }
         return
     }
     val inicial = PantallasNativas.barraHistorica[rol.id]?.firstOrNull()?.takeIf { it in ids } ?: ids.first()
     val pantallas = (listOf(inicial) + ids).distinct().mapNotNull { PantallasNativas.pantallas[it] }
     val estadoPantalla = remember(usuario.id, rol.id) { mutableStateOf(pantallas.first()) }
-    val actual = estadoPantalla.value.takeIf { PantallasNativas.id(it) in ids } ?: pantallas.first()
+    val actual = estadoPantalla.value.takeIf { PantallasNativas.id(it) in ids || (it == Screen.RecepcionYape && receptionState.authorized) } ?: pantallas.first()
     SideEffect { if (estadoPantalla.value != actual) estadoPantalla.value = actual }
-    val modulos = ids.filterNot { it == PantallasNativas.barraHistorica[rol.id]?.firstOrNull() }.map { id ->
+    val modulosBase = ids.filterNot { it == PantallasNativas.barraHistorica[rol.id]?.firstOrNull() }.map { id ->
         val aspecto = PantallasNativas.aspecto[id]
         ModuloItem(aspecto?.etiqueta ?: id, aspecto?.icono ?: Icons.Filled.Apps, aspecto?.descripcion ?: "") {
             if (usuario.autorizacion?.permite(id) == true) estadoPantalla.value = PantallasNativas.pantallas.getValue(id)
@@ -218,6 +235,7 @@ fun RootAutorizado(usuario: Usuario, rol: RolAsignado, onCerrarSesion: () -> Uni
         "personal_planta" -> TemaPlanta; "acopiador" -> TemaAcopiador; "proveedor" -> TemaProveedor
         "vendedor" -> TemaVendedor; "produccion" -> TemaProduccion; else -> TemaAdmin
     }
+    val modulos = modulosBase + if (receptionState.authorized) listOf(ModuloItem("Recepción Yape", Icons.Filled.NotificationsActive, "Estado del receptor y sus notificaciones", tema.acento) { estadoPantalla.value = Screen.RecepcionYape }) else emptyList()
     val barra = ((PantallasNativas.barraHistorica[rol.id].orEmpty().filter { it in ids }) + ids).distinct().take(4)
     val idActual = PantallasNativas.id(actual)
     val baseCabecera = PantallasNativas.encabezado(idActual, usuario)
@@ -226,10 +244,10 @@ fun RootAutorizado(usuario: Usuario, rol: RolAsignado, onCerrarSesion: () -> Uni
     RootScaffold(
         usuario = usuario, rolEtiqueta = rol.nombre, tema = tema, estadoSync = estado, pendientes = pendientes,
         onCerrarSesion = onCerrarSesion,
-        tituloPantalla = cabecera?.titulo ?: baseCabecera.first,
+        tituloPantalla = if (actual == Screen.RecepcionYape) "Recepción Yape" else cabecera?.titulo ?: baseCabecera.first,
         subtituloPantalla = cabecera?.subtitulo ?: baseCabecera.second,
-        showBack = cabecera?.volver == true,
-        onBack = cabecera?.onVolver,
+        showBack = actual == Screen.RecepcionYape || cabecera?.volver == true,
+        onBack = if (actual == Screen.RecepcionYape) ({ estadoPantalla.value = pantallas.first() }) else cabecera?.onVolver,
         expandirCabecera = idActual?.endsWith(".panel") == true,
         bottomNavItems = barra.map { BottomNavItem(PantallasNativas.etiquetas[it] ?: it, PantallasNativas.aspecto[it]?.icono ?: Icons.Filled.Apps) },
         bottomNavSeleccionado = barra.indexOf(idActual),
@@ -238,6 +256,7 @@ fun RootAutorizado(usuario: Usuario, rol: RolAsignado, onCerrarSesion: () -> Uni
     ) {
         key(a?.version, rol.id) {
             when {
+                actual == Screen.RecepcionYape -> RecepcionYapeScreen()
                 idActual == "asistencia.mis" -> MiAsistenciaHost(usuario)
                 idActual == "asistencia.tomar" -> TomarAsistenciaHost(usuario)
                 idActual?.startsWith("admin.") == true -> AdminRootScreen(usuario, onCerrarSesion, true, estadoPantalla, modulos)

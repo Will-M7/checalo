@@ -1,6 +1,7 @@
 package com.example.ecolacteoshuata.presentation.navigation
 
 sealed class Screen {
+    data object RecepcionYape : Screen()
     data object Login : Screen()
 
     /** "Tomar asistencia": del administrador o de quien él se lo asigne, desde cualquier rol. */

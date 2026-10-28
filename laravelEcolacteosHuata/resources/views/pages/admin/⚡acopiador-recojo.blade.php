@@ -18,7 +18,7 @@ new class extends Component
         $recojosPorProveedor = Recojo::whereDate('fecha', $this->fecha)->get()->groupBy('proveedor_id');
 
         return [
-            'acopiadores' => Acopiador::with(['user', 'proveedores.user'])->orderBy('id')->get(),
+            'acopiadores' => Acopiador::with(['user', 'proveedores.user'])->orderByDesc('created_at')->orderByDesc('id')->get(),
             'recogidosHoyIds' => $recojosPorProveedor->keys(),
             'litrosHoyPorProveedor' => $recojosPorProveedor->map(fn ($recojos) => $recojos->sum('litros')),
         ];

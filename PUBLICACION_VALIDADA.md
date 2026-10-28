@@ -1,5 +1,34 @@
 # Validación de la publicación
 
+## Publicación de avances actuales — 27/10/2026
+
+Actualización basada en `3ab9ddf58962eb3470b1dc25a96b2fd054b158fc`, conservando `main` y su historial.
+Se publica la instantánea local más reciente de Laravel y Kotlin/Android: correcciones de sesión,
+sincronización, recuperación de conexión, orden de altas, diseño nativo de Finanzas, Bridge integrado,
+Receptores Yape centralizados, solicitudes/consentimiento, vinculación automática, diagnóstico y
+asignación de receptores a vendedores. Incluye migraciones, pruebas y los tres informes recientes.
+Los cuatro componentes permanecen presentes; las fuentes actuales de Core y del Bridge original
+coinciden con las ya respaldadas, preservando sus revisiones e historial.
+
+La preparación se hizo en una clonación temporal de este repositorio. El checkout de trabajo y su
+remoto original permanecieron intactos. Se conservaron los ejemplos seguros y las adaptaciones
+portables ya publicadas (rutas relativas de herramientas y selección de Java), sin cambiar lógica.
+Se mantienen el seeder inicial, el acceso de desarrollo local y las instrucciones para compañeros.
+
+La validación de esta publicación comprende comparación SHA-256 con las fuentes, inspección de
+archivos nuevos y patrones/valores secretos, exclusión de datos privados y comprobación de clonación
+nueva tras publicar. `SOURCE_MANIFEST.json` permite verificar íntegramente el árbol publicado.
+No se ejecutaron suites, migraciones, builds, instalaciones ni reinicios para este encargo.
+Los resultados funcionales previos (86 Laravel, 7 Core aislado y 34 Android) se documentan en
+`laravelEcolacteosHuata/docs/SIMPLIFICACION_RECEPCION_YAPE.md`; no se atribuyen a una repetición.
+
+Se excluyen `.env` operativos, claves, certificados privados, bases, respaldos, APK, dependencias,
+builds, cachés, el QR bancario estático y las capturas históricas no publicadas. La única asignación
+literal de token señalada por el escáner corresponde a una fixture sintética dentro de una prueba.
+Las rutas absolutas en los informes históricos describen el entorno de origen, no son instrucciones
+para acceder a datos privados de esa instalación.
+
+
 ## Actualización de fuentes posterior al respaldo e3e6c928af57d39738ebe79716fc6a3ba85e77fc
 
 La actualización conserva el historial de `main`, las instrucciones de instalación, el seeder inicial y los cuatro componentes publicados. Incorpora las fuentes locales acumuladas de pedidos/saldo, Finanzas Web y Android, clientes/saldos, disponibilidad, roles/distribuciones y filtros, incluidos archivos de datos Kotlin que faltaban en el respaldo anterior.

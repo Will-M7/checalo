@@ -107,6 +107,7 @@ fun ConexionSyncSheet(onDismiss: () -> Unit) {
                 onGuardar = vm::guardar,
                 onSincronizar = vm::sincronizar,
                 onDescargarTodo = vm::descargarTodo,
+                onConfirmarSesion = vm::confirmarSesion,
             )
             ConfirmToastHost(mensaje = state.mensaje, onDismiss = vm::consumirMensaje, modifier = Modifier.align(Alignment.BottomCenter))
         }
@@ -124,7 +125,8 @@ private fun aspecto(s: ConexionSyncUiState): AspectoEstado = when (s.estado) {
     )
     EstadoSincronizacion.SIN_SENAL -> AspectoEstado(
         "Sin conexión con el servidor",
-        if (s.error != null) "El último intento falló. Trabajas con los datos guardados." else "Aún no se sincroniza en esta sesión.",
+        if (s.guardada.token.isNullOrBlank() && s.cuenta != null) "Confirma la sesión de esta cuenta con Laravel."
+        else if (s.error != null) "El último intento falló. Trabajas con los datos guardados." else "Aún no se sincroniza en esta sesión.",
         Ambar, Icons.Filled.CloudOff,
     )
     EstadoSincronizacion.MODO_LOCAL -> AspectoEstado(
@@ -142,6 +144,7 @@ fun ConexionSyncContenido(
     onGuardar: () -> Unit,
     onSincronizar: () -> Unit,
     onDescargarTodo: () -> Unit,
+    onConfirmarSesion: (String) -> Unit = {},
 ) {
     var confirmarDescarga by remember { mutableStateOf(false) }
     val a = aspecto(state)
@@ -154,6 +157,7 @@ fun ConexionSyncContenido(
             .padding(bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
+
         Text("Conexión y sincronización", style = TituloPantallaStyle.copy(fontSize = 20.sp), color = Negro)
 
         // ---- Estado actual ----
@@ -192,6 +196,26 @@ fun ConexionSyncContenido(
 
         if (state.error != null && state.estado != EstadoSincronizacion.SINCRONIZANDO) {
             Aviso(Icons.Filled.ErrorOutline, state.error, RojoFondo, RojoTexto)
+        }
+
+        if (state.guardada.activa && state.guardada.token.isNullOrBlank() && state.cuenta != null) {
+            var password by remember { mutableStateOf("") }
+            com.example.ecolacteoshuata.core.ui.SectionCard {
+                Text("Confirmar sesión de ${state.cuenta}", style = TituloPantallaStyle)
+                Text("Vuelve a autenticar esta cuenta con Laravel para recuperar la descarga. Los datos del teléfono se conservan.", style = CuerpoStyle)
+                androidx.compose.material3.OutlinedTextField(
+                    value = password, onValueChange = { password = it },
+                    label = { Text("Contraseña") }, singleLine = true,
+                    visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password),
+                    enabled = !state.autenticando, modifier = Modifier.fillMaxWidth(),
+                )
+                com.example.ecolacteoshuata.core.ui.PrimaryButton("Confirmar y sincronizar", {
+                    onConfirmarSesion(password)
+                    password = ""
+                }, habilitado = !state.autenticando && password.isNotBlank() && !state.sinGuardar, cargando = state.autenticando)
+                if (state.sinGuardar) Text("Guarda primero los cambios de conexión.", style = CuerpoMedioStyle)
+            }
         }
 
         // ---- Acciones de sincronización ----
@@ -369,7 +393,7 @@ private fun ResultadoPrueba(prueba: PruebaConexion) {
         }
         is PruebaConexion.Exitosa -> Aviso(
             Icons.Filled.CheckCircle,
-            "¡El servidor responde! (${prueba.milisegundos} ms). Toca Guardar para usarlo.",
+            "El servidor responde (${prueba.milisegundos} ms). Esta prueba no confirma la sesión ni la descarga de datos. Guarda la conexión y sincroniza.",
             VerdeClaro,
             VerdeOscuro,
         )

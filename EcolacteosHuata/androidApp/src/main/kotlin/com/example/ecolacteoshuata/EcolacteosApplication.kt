@@ -13,5 +13,6 @@ class EcolacteosApplication : Application() {
         }
         // Sincroniza cada 15 min aunque la app esté cerrada: así llegan las notificaciones.
         SincronizacionWorker.programar(this)
+        (org.koin.core.context.GlobalContext.get().get<com.example.ecolacteoshuata.domain.platform.YapeReception>() as com.example.ecolacteoshuata.yape.HuataYapeReception).start()
     }
 }

@@ -30,7 +30,6 @@ class AcopiadorInventarioViewModel(
             _turnos.value = turnoRepository.getAll().associateBy { it.id }
             _pendientes.value = recojoRepository.getAll()
                 .filter { it.acopiadorId == acopiadorId && !it.entregado }
-                .sortedByDescending { it.fecha }
         }
     }
 }

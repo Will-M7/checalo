@@ -49,3 +49,11 @@ Route::prefix('/mobile/vendedores-web')->middleware(AuthenticateMobileToken::cla
     Route::post('/pausa', [\App\Http\Controllers\Api\MobileVendedoresWebController::class, 'pausar']);
     Route::post('/{usuario}/autorizacion', [\App\Http\Controllers\Api\MobileVendedoresWebController::class, 'autorizar'])->whereNumber('usuario');
 });
+
+Route::prefix('/mobile/yape')->middleware([AuthenticateMobileToken::class, 'throttle:120,1'])->group(function () {
+    Route::post('/decision', [\App\Http\Controllers\Api\HuataYapeController::class, 'decision']);
+    Route::post('/status', [\App\Http\Controllers\Api\HuataYapeController::class, 'status']);
+    Route::post('/activate', [\App\Http\Controllers\Api\HuataYapeController::class, 'activate']);
+    Route::post('/heartbeat', [\App\Http\Controllers\Api\HuataYapeController::class, 'heartbeat']);
+    Route::post('/evidence', [\App\Http\Controllers\Api\HuataYapeController::class, 'evidence']);
+});

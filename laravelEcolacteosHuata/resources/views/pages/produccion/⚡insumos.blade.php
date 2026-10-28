@@ -39,7 +39,7 @@ new class extends Component
 
         return [
             'unidades' => UnidadMedida::orderBy('nombre')->get(),
-            'insumos' => Insumo::with('unidadMedida')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('unidad'), fn ($q, $v) => $q->where('unidad_medida_id', $v))->when($this->filtro('leche') !== '', fn ($q) => $q->where('es_leche', $this->filtro('leche') === '1'))->orderByDesc('es_leche')->orderBy('nombre')->get(),
+            'insumos' => Insumo::with('unidadMedida')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('nombre', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('unidad'), fn ($q, $v) => $q->where('unidad_medida_id', $v))->when($this->filtro('leche') !== '', fn ($q) => $q->where('es_leche', $this->filtro('leche') === '1'))->orderByDesc('created_at')->orderByDesc('id')->get(),
         ];
     }
 

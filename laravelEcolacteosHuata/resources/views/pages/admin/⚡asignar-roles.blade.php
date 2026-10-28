@@ -50,7 +50,7 @@ new class extends Component
                         ->orWhere('usuario', 'like', "%{$this->busqueda}%")
                         ->orWhere('documento', 'like', "%{$this->busqueda}%");
                 }))
-                ->orderBy('nombres')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->paginate(10),
             'roles' => \App\Authorization\Autorizacion::catalogoRoles(auth('web')->user(), $this->userId ? User::find($this->userId) : null)->where('codigo', '!=', 'tomar_asistencia'),
             'acopiadores' => Acopiador::with('user')->orderBy('id')->get(),

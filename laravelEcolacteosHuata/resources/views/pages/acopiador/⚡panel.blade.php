@@ -26,7 +26,7 @@ new class extends Component
             'proveedoresRecogidosHoy' => $proveedoresRecogidosHoy,
             'proveedoresPendientes' => max($proveedoresAsignados - $proveedoresRecogidosHoy, 0),
             'entregadoPlantaHoy' => (float) EntregaPlanta::query()->where('acopiador_id', $acopiador?->id)->whereDate('fecha', $fecha)->sum('litros_total'),
-            'ultimosRecojos' => (clone $recojosHoy)->with('proveedor.user')->latest('id')->limit(5)->get(),
+            'ultimosRecojos' => (clone $recojosHoy)->with('proveedor.user')->latest('created_at')->latest('id')->limit(5)->get(),
         ];
     }
 };

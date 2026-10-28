@@ -30,7 +30,7 @@ new class extends Component
             ->with('turno')
             ->where('proveedor_id', $proveedor?->id)
             ->whereBetween('fecha', [$desde->toDateString(), $hasta->toDateString()])
-            ->orderByDesc('fecha')
+            ->orderByDesc('created_at')->orderByDesc('id')
             ->get();
 
         return [

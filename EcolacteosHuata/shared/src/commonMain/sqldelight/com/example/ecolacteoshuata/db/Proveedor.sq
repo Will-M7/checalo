@@ -13,7 +13,7 @@ CREATE TABLE proveedor (
 );
 
 selectAll:
-SELECT * FROM proveedor;
+SELECT * FROM proveedor ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'proveedor' AND registro_id = proveedor.id) DESC, CASE WHEN proveedor.id NOT GLOB '*[^0-9]*' THEN CAST(proveedor.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'proveedor' AND registro_id = proveedor.id) DESC, proveedor.id DESC;
 
 selectById:
 SELECT * FROM proveedor WHERE id = ?;
@@ -22,7 +22,7 @@ selectByUsuarioId:
 SELECT * FROM proveedor WHERE usuario_id = ?;
 
 selectByAcopiador:
-SELECT * FROM proveedor WHERE acopiador_id = ?;
+SELECT * FROM proveedor WHERE acopiador_id = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'proveedor' AND registro_id = proveedor.id) DESC, CASE WHEN proveedor.id NOT GLOB '*[^0-9]*' THEN CAST(proveedor.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'proveedor' AND registro_id = proveedor.id) DESC, proveedor.id DESC;
 
 insert:
 INSERT INTO proveedor(id, usuario_id, finca_ubicacion, finca_referencia, latitud, longitud, acopiador_id, bloqueado, alteraciones)

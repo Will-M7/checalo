@@ -7,10 +7,10 @@ CREATE TABLE descuento (
 );
 
 selectAll:
-SELECT * FROM descuento ORDER BY nombre COLLATE NOCASE;
+SELECT * FROM descuento ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'descuento' AND registro_id = descuento.id) DESC, CASE WHEN descuento.id NOT GLOB '*[^0-9]*' THEN CAST(descuento.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'descuento' AND registro_id = descuento.id) DESC, descuento.id DESC;
 
 selectDisponibles:
-SELECT * FROM descuento WHERE activo = 1 ORDER BY nombre COLLATE NOCASE;
+SELECT * FROM descuento WHERE activo = 1 ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'descuento' AND registro_id = descuento.id) DESC, CASE WHEN descuento.id NOT GLOB '*[^0-9]*' THEN CAST(descuento.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'descuento' AND registro_id = descuento.id) DESC, descuento.id DESC;
 
 insert:
 INSERT INTO descuento(id, nombre, porcentaje, activo) VALUES (?, ?, ?, ?);

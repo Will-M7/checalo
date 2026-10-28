@@ -107,7 +107,7 @@ val viewModelModule = module {
     viewModel { params -> AcopiadorEntregaViewModel(params.get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> AcopiadorInventarioViewModel(params.get(), get(), get()) }
 
-    viewModel { params -> ProveedorRootViewModel(params.get(), get(), get(), get()) }
+    viewModel { params -> ProveedorRootViewModel(params.get(), get(), get(), get(), get(), get()) }
     viewModel { params ->
         ProveedorDashboardViewModel(params.get<String>(0), get(), get(), get(), get())
     }
@@ -129,7 +129,7 @@ val viewModelModule = module {
         )
     }
     viewModel { PrimeraDescargaViewModel(get(), get()) }
-    viewModel { ConexionSyncViewModel(get(), get(), get(), get()) }
+    viewModel { ConexionSyncViewModel(get(), get(), get(), get(), get()) }
 
     viewModel { params ->
         ReportesViewModel(

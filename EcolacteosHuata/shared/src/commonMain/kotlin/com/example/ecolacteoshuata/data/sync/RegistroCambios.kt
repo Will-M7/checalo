@@ -26,6 +26,7 @@ object RegistroCambios {
 
     fun instalar(driver: SqlDriver) {
         driver.execute(null, "INSERT OR IGNORE INTO sync_control(id, aplicando) VALUES (1, 0)", 0)
+        OrdenAltas.instalar(driver)
         instalarAutorizacion(driver)
         TABLAS.forEach { tabla ->
             listOf("ins", "upd", "del").forEach { evento -> driver.execute(null, "DROP TRIGGER IF EXISTS cambio_${tabla}_${evento}_v1", 0) }

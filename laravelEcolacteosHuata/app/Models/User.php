@@ -235,6 +235,7 @@ class User extends Authenticatable implements PasskeyUser
             foreach ($base as $grupo => $items) {
                 foreach ($items as $item) {
                     $id = $item['route'];
+                    if ($id === 'vendedor.configuracion-pagos') continue;
                     if ($id === 'asistencia.mis' && $asistenciaAdicional && ! $this->esAcopiador()) {
                         continue;
                     }
@@ -245,6 +246,7 @@ class User extends Authenticatable implements PasskeyUser
                 }
             }
             foreach ($pantallas as $id) {
+                if ($id === 'vendedor.configuracion-pagos') continue;
                 if ($id === 'asistencia.mis' && $asistenciaAdicional && ! $this->esAcopiador()) {
                     continue;
                 }

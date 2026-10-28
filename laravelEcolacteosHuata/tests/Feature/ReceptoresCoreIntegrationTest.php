@@ -17,6 +17,38 @@ beforeEach(function () {
     }
 });
 
+test('solicitud integrada activa un proveedor contra Core comercial sin credenciales móviles ni acreditación por aviso', function () {
+    $file = getenv('RECEIVER_TEST_CORE_CONFIG'); $url = getenv('RECEIVER_TEST_CORE_URL');
+    if (! $file || ! str_starts_with($file, '/tmp/huata-receiver-test-') || ! preg_match('~\Ahttp://127\.0\.0\.1:[0-9]+\z~', $url) || in_array(parse_url($url, PHP_URL_PORT), [8000, 8087], true)) throw new RuntimeException('Solo Core aislado.');
+    $cfg = json_decode(file_get_contents($file), true, flags: JSON_THROW_ON_ERROR);
+    config(['payments.enabled' => true, 'payments.url' => $url, 'payments.key' => $cfg['clients'][0]['key'], 'payments.allow_local_http' => true]);
+    Storage::fake('public'); Storage::disk('public')->put('qr/solicitud-core.png', 'fixture-image');
+    $admin = User::factory()->rol(Rol::Administrador)->create();
+    $user = User::factory()->rol(Rol::Proveedor)->create();
+    $s = app(\App\Services\Payments\SolicitudesRecepcionYape::class);
+    $r = $s->guardar($admin, null, 'Solicitud Core aislada', '955555555', $user->id, 'qr/solicitud-core.png', hash('sha256', 'fixture-image'));
+    $key = str_repeat('e', 64); $token = Str::random(40);
+    \Illuminate\Support\Facades\DB::table('mobile_tokens')->insert(['user_id' => $user->id, 'token' => hash('sha256', $token), 'created_at' => now(), 'updated_at' => now()]);
+    $this->withToken($token)->withHeader('X-Huata-Installation', $key);
+    $body = ['installation' => $key, 'label' => 'Android de prueba', 'listener' => false, 'consent' => false];
+    $this->postJson('/api/mobile/yape/status', $body)->assertOk()->assertJsonPath('requests.0.name', $r->nombre_receptor);
+    $this->postJson('/api/mobile/yape/decision', ['installation' => $key, 'requestId' => $s->actual($r->id)->id, 'accept' => true])->assertOk();
+    $this->postJson('/api/mobile/yape/activate', ['installation' => $key])->assertForbidden();
+    $this->postJson('/api/mobile/yape/status', [...$body, 'listener' => true, 'consent' => true])->assertJsonPath('authorized', true);
+    $this->postJson('/api/mobile/yape/activate', ['installation' => $key])->assertOk()->assertJsonPath('status', 'active')->assertJsonMissingPath('credential');
+    $this->postJson('/api/mobile/yape/heartbeat', ['listenerConnected' => true])->assertOk();
+    $receivers = app(ReceptoresService::class);
+    $receivers->cambiar($admin, $r->fresh(), 'verify', true);
+    $receivers->cambiar($admin, $r->fresh(), 'enable');
+    expect($r->fresh()->enabled)->toBeTrue()->and($user->puedeVender('vendedor.ventas'))->toBeFalse();
+    $event = ['receiverId' => $r->referencia_externa, 'bridgeEventId' => 'integrated_request_core_0001', 'packageName' => 'com.bcp.innovacxion.yapeapp', 'postedAt' => now()->utc()->format('Y-m-d\TH:i:s.u\Z'), 'text' => 'Yape! Persona Ficticia te envió un pago por S/ 1.00'];
+    $this->postJson('/api/mobile/yape/evidence', $event)->assertStatus(202)->assertJsonPath('result', 'REVIEW_CODE_UNAVAILABLE');
+    $this->postJson('/api/mobile/yape/evidence', $event)->assertStatus(202)->assertJsonPath('result', 'DUPLICATE');
+    expect(\Illuminate\Support\Facades\DB::table('movimientos_financieros')->count())->toBe(0)->and(\Illuminate\Support\Facades\DB::table('movimientos_saldo')->count())->toBe(0);
+    $s->revocar($admin, $r->fresh());
+    $this->postJson('/api/mobile/yape/evidence', $event)->assertForbidden();
+});
+
 test('Laravel verifica habilita y deshabilita receptor inicialmente bloqueado contra Core comercial real aislado', function () {
     $file = getenv('RECEIVER_TEST_CORE_CONFIG');
     $url = getenv('RECEIVER_TEST_CORE_URL');

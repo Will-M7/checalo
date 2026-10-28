@@ -30,7 +30,7 @@ new class extends Component
         return [
             'descuentos' => Descuento::query()->when($this->filtro('estado') !== '', fn ($q) => $q->where('activo', $this->filtro('estado') === '1'))
                 ->when($this->busqueda, fn ($q) => $q->where('nombre', 'like', "%{$this->busqueda}%"))
-                ->orderBy('nombre')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->paginate(10),
         ];
     }
@@ -63,6 +63,8 @@ new class extends Component
             'porcentaje' => $data['porcentaje'],
             'activo' => $this->activo,
         ]);
+
+        if ($this->descuentoId === null) $this->resetPage();
 
         Flux::modal('descuento-form')->close();
         Flux::toast('Descuento guardado correctamente.', variant: 'success');

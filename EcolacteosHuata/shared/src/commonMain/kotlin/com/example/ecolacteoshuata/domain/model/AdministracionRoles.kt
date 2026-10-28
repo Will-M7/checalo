@@ -23,4 +23,4 @@ data class GuardarUsuarioCentral(
 )
 
 @Serializable
-data class UsuarioAdministrado(val id: String, val autorizacion: AutorizacionUsuario)
+data class UsuarioAdministrado(val id: String, val autorizacion: AutorizacionUsuario, val creado_en: String? = null)

@@ -6,7 +6,7 @@ CREATE TABLE acopiador (
 );
 
 selectAll:
-SELECT * FROM acopiador;
+SELECT * FROM acopiador ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'acopiador' AND registro_id = acopiador.id) DESC, CASE WHEN acopiador.id NOT GLOB '*[^0-9]*' THEN CAST(acopiador.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'acopiador' AND registro_id = acopiador.id) DESC, acopiador.id DESC;
 
 selectById:
 SELECT * FROM acopiador WHERE id = ?;

@@ -19,6 +19,8 @@ final class Pantallas
         }
         $items['admin.roles'] = ['route' => 'admin.roles', 'label' => 'Roles y funciones', 'icon' => 'shield-check', 'android' => self::android()['admin.roles']];
 
+        $items['admin.receptores-yape'] = ['route' => 'admin.receptores-yape', 'label' => 'Receptores Yape', 'icon' => 'qr-code', 'android' => null];
+
         $items['admin.finanzas'] = ['route' => 'admin.finanzas', 'label' => 'Finanzas', 'icon' => 'banknotes', 'android' => 'AdminFinanzas'];
 
         foreach ($items as &$item) {

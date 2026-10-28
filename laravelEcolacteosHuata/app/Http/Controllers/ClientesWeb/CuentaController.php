@@ -21,7 +21,7 @@ class CuentaController extends Controller
     {
         $client = Auth::guard('cliente')->user();
 
-        return view('clientes-web.cuenta', ['client' => $client, 'orders' => PedidoWeb::with('items', 'vendedor')->where('cliente_web_id', $client->id)->latest()->paginate(10),
+        return view('clientes-web.cuenta', ['client' => $client, 'orders' => PedidoWeb::with('items', 'vendedor')->where('cliente_web_id', $client->id)->latest()->orderByDesc('id')->paginate(10),
             'payments' => IntentoPago::where('cliente_web_id', $client->id)->latest()->limit(20)->get(), 'movements' => MovimientoSaldo::where('cliente_web_id', $client->id)->latest()->limit(30)->get()]);
     }
 

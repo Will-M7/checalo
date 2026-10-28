@@ -17,7 +17,7 @@ new class extends Component
     public function with(): array
     {
         return [
-            'unidades' => UnidadMedida::orderBy('nombre')->get(),
+            'unidades' => UnidadMedida::orderByDesc('created_at')->orderByDesc('id')->get(),
         ];
     }
 

@@ -4,9 +4,8 @@ import com.example.ecolacteoshuata.domain.platform.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -57,21 +56,17 @@ object HttpClientFactory {
                 socketTimeoutMillis = config.solicitudTimeoutMs
             }
 
-            // Laravel entrega un token por dispositivo (sin endpoint de refresh): se envía en cada
-            // solicitud a la API salvo en el login. Ante un 401 se relee el almacén seguro: si se
-            // inició sesión de nuevo hay otro token y se reintenta con él; si es el mismo (o ya no
-            // hay), queda el 401 y el sync pide volver a iniciar sesión con conexión.
-            install(Auth) {
-                bearer {
-                    loadTokens { tokenStorage.read()?.let { BearerTokens(it, "") } }
-                    refreshTokens {
-                        tokenStorage.read()
-                            ?.takeIf { it != oldTokens?.accessToken }
-                            ?.let { BearerTokens(it, "") }
+            // Laravel no tiene refresh: el almacén seguro es la fuente vigente. Ktor 3.0.3
+            // conserva BearerTokens entre cuentas aunque cambie TokenStorage; consultar en cada
+            // petición evita enviar la identidad anterior o un token que ya fue eliminado.
+            install(createClientPlugin("HuataSesionVigente") {
+                onRequest { request, _ ->
+                    if (!request.url.encodedPath.endsWith("/login") &&
+                        !request.headers.contains(HttpHeaders.Authorization)) {
+                        tokenStorage.read()?.takeIf { it.isNotBlank() }?.let { request.bearerAuth(it) }
                     }
-                    sendWithoutRequest { request -> !request.url.encodedPath.endsWith("/login") }
                 }
-            }
+            })
 
             defaultRequest {
                 headers.append(HttpHeaders.Accept, ContentType.Application.Json.toString())

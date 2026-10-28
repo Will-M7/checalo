@@ -31,9 +31,9 @@ new class extends Component
             'analisisHoy' => (clone $laboratorioHoy)->count(),
             'noConformesHoy' => (clone $laboratorioHoy)->where('conforme', false)->count(),
             'pagadoMes' => (float) PagoProveedor::query()->whereBetween('fecha', [$hoy->copy()->startOfMonth()->toDateString(), $hoy->copy()->endOfMonth()->toDateString()])->sum('monto'),
-            'ultimasEntregas' => EntregaPlanta::query()->with('acopiador.user')->latest('fecha')->latest('id')->limit(4)->get(),
-            'ultimosResultados' => ResultadoLaboratorio::query()->with('proveedor.user')->latest('fecha')->latest('id')->limit(4)->get(),
-            'comunicados' => Comunicado::query()->paraRol(Rol::PersonalPlanta)->latest('fecha')->latest('id')->limit(3)->get(),
+            'ultimasEntregas' => EntregaPlanta::query()->with('acopiador.user')->latest('created_at')->latest('id')->limit(4)->get(),
+            'ultimosResultados' => ResultadoLaboratorio::query()->with('proveedor.user')->latest('created_at')->latest('id')->limit(4)->get(),
+            'comunicados' => Comunicado::query()->paraRol(Rol::PersonalPlanta)->latest('created_at')->latest('id')->limit(3)->get(),
         ];
     }
 };

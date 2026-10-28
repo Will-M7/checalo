@@ -33,9 +33,9 @@ new class extends Component
             'acopiadores' => Acopiador::with('user')->get()->sortBy(fn (Acopiador $acopiador) => $acopiador->user->nombreCompleto()),
             'entregadoMes' => Recojo::query()->where('proveedor_id', $proveedor?->id)->whereBetween('fecha', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])->sum('litros'),
             'pagosMes' => (float) PagoProveedor::query()->where('proveedor_id', $proveedor?->id)->whereBetween('fecha', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])->sum('monto'),
-            'ultimasEntregas' => Recojo::query()->where('proveedor_id', $proveedor?->id)->latest('fecha')->latest('id')->limit(5)->get(),
-            'ultimosResultados' => ResultadoLaboratorio::query()->where('proveedor_id', $proveedor?->id)->latest('fecha')->latest('id')->limit(4)->get(),
-            'comunicados' => Comunicado::query()->paraRol(Rol::Proveedor)->latest('fecha')->latest('id')->limit(3)->get(),
+            'ultimasEntregas' => Recojo::query()->where('proveedor_id', $proveedor?->id)->latest('created_at')->latest('id')->limit(5)->get(),
+            'ultimosResultados' => ResultadoLaboratorio::query()->where('proveedor_id', $proveedor?->id)->latest('created_at')->latest('id')->limit(4)->get(),
+            'comunicados' => Comunicado::query()->paraRol(Rol::Proveedor)->latest('created_at')->latest('id')->limit(3)->get(),
         ];
     }
 

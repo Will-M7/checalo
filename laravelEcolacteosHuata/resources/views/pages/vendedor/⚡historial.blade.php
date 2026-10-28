@@ -70,7 +70,7 @@ new class extends Component
 
     public function with(): array
     {
-        $query = $this->filtroVentas()->with('cliente', 'vendedor')->orderByDesc('fecha')->orderByDesc('id');
+        $query = $this->filtroVentas()->with('cliente', 'vendedor')->orderByDesc('created_at')->orderByDesc('id');
 
         return [
             'ventas' => $query->paginate(15),

@@ -75,7 +75,7 @@ class MobileSyncController extends Controller
         // turnos asignados (tablas pivote) no tocan su `updated_at`.
         $turnos = Turno::with('rutas')->get();
 
-        return response()->json(DatosMoviles::filtrar([
+        $datos = DatosMoviles::filtrar([
             'servidor_hora' => $servidorHora->toIso8601String(),
             'autorizacion' => Autorizacion::snapshot($request->user()),
             'empresa' => Empresa::query()->tap($filtrar)->get()->map($this->mapEmpresa(...)),
@@ -127,7 +127,9 @@ class MobileSyncController extends Controller
                 'creada_en' => $n->created_at?->toIso8601String(),
             ]),
             'ids' => $this->idsVigentes(),
-        ], $request->user()));
+        ], $request->user());
+        $datos['altas'] = \App\Support\OrdenAltas::paraSync($datos);
+        return response()->json($datos);
     }
 
     /**

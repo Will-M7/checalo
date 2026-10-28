@@ -15,6 +15,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual val platformModule: Module = module {
+    single<com.example.ecolacteoshuata.domain.platform.YapeReception> { com.example.ecolacteoshuata.yape.HuataYapeReception(androidContext(), get(), get(), get(), get(), get()) }
     // Motor OkHttp para Android
     single<HttpClientEngine> { OkHttp.create() }
     single { DatabaseDriverFactory(androidContext()) }

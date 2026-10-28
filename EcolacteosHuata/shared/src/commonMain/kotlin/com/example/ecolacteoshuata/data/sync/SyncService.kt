@@ -20,6 +20,8 @@ import com.example.ecolacteoshuata.domain.model.TipoComunicado
 import com.example.ecolacteoshuata.domain.repository.ConexionServidorRepository
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -174,7 +176,7 @@ class RealSyncService(
     private val conexionServidorRepository: ConexionServidorRepository,
     private val networkMonitor: NetworkMonitor,
     private val notificador: NotificadorSistema,
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val sesion: com.example.ecolacteoshuata.domain.repository.SessionRepository? = null,
 ) : SyncService {
     private val _estado = MutableStateFlow(EstadoSincronizacion.SIN_SENAL)
@@ -196,10 +198,37 @@ class RealSyncService(
     // la segunda espera a la primera y, como ya habrá `ultimaSincronizacion`, solo trae cambios.
     private val mutex = Mutex()
 
+    private var reintentoInicial: Job? = null
+    private var intentosIniciales = 0
+    private var falloInicialTransitorio = false
+    private var contextoReintento: Triple<String, String, String?>? = null
+
+    private fun programarRecuperacionInicial(c: com.example.ecolacteoshuata.domain.model.ConexionServidor) {
+        if (!networkMonitor.hayConexion() || c.ultimaSincronizacion != null || intentosIniciales >= ESPERAS_INICIALES.size || reintentoInicial?.isActive == true) return
+        reintentoInicial = scope.launch {
+            while (intentosIniciales < ESPERAS_INICIALES.size && falloInicialTransitorio) {
+                val espera = ESPERAS_INICIALES[intentosIniciales++]
+                delay(espera)
+                val actual = conexionServidorRepository.get()
+                if (!actual.activa || actual.host != c.host || actual.puerto != c.puerto || actual.token != c.token ||
+                    actual.ultimaSincronizacion != null || !networkMonitor.hayConexion()) break
+                // Mismo mutex que login, panel y Worker: no hay dos descargas simultáneas.
+                sincronizar(silencioso = false)
+            }
+        }
+    }
+
     init {
         scope.launch {
             var primeraVez = true
             conexionServidorRepository.observe().collect { conexion ->
+                val contexto = Triple(conexion.host, conexion.puerto, conexion.token)
+                if (contexto != contextoReintento || !conexion.activa) {
+                    contextoReintento = contexto
+                    reintentoInicial?.cancel()
+                    intentosIniciales = 0
+                    falloInicialTransitorio = false
+                }
                 val configurada = conexion.activa && conexion.host.isNotBlank()
                 val conToken = configurada && conexion.token != null
                 when {
@@ -208,7 +237,7 @@ class RealSyncService(
                 }
                 // Al abrir la app ya instalada y conectada, trae los cambios sin esperar al login.
                 // (Si nunca sincronizó, de eso se encarga la pantalla de primera descarga.)
-                if (primeraVez && conToken && conexion.ultimaSincronizacion != null) launch { sincronizarAhora() }
+                if (primeraVez && conToken) launch { sincronizarAhora() }
                 primeraVez = false
             }
         }
@@ -236,13 +265,16 @@ class RealSyncService(
                 val volvio = anterior == false && enLinea
                 anterior = enLinea
                 if (!enLinea) {
+                    reintentoInicial?.cancel()
                     if (_estado.value != EstadoSincronizacion.MODO_LOCAL) _estado.value = EstadoSincronizacion.SIN_SENAL
                     return@collect
                 }
                 val conexion = conexionServidorRepository.get()
-                val lista = conexion.activa && conexion.host.isNotBlank() && conexion.token != null &&
-                    conexion.ultimaSincronizacion != null
-                if (volvio && lista && !mutex.isLocked) scope.launch { sincronizar(silencioso = true) }
+                val lista = conexion.activa && conexion.host.isNotBlank() && conexion.token != null
+                if (volvio && lista && !mutex.isLocked) {
+                    intentosIniciales = 0 // Nuevo episodio de conectividad, con su propio límite.
+                    scope.launch { sincronizar(silencioso = conexion.ultimaSincronizacion != null) }
+                }
             }
         }
         // Mientras la app está abierta y en línea, trae los cambios de Laravel cada cierto tiempo.
@@ -254,10 +286,9 @@ class RealSyncService(
                 // Sin red no se intenta (evita esperar el timeout); el monitor avisa cuando vuelve.
                 if (!networkMonitor.hayConexion()) continue
                 val conexion = conexionServidorRepository.get()
-                val lista = conexion.activa && conexion.host.isNotBlank() && conexion.token != null &&
-                    conexion.ultimaSincronizacion != null
+                val lista = conexion.activa && conexion.host.isNotBlank() && conexion.token != null
                 actualizarPendientes(0)
-                if (lista && !mutex.isLocked) sincronizar(silencioso = true)
+                if (lista && conexion.ultimaSincronizacion != null && !mutex.isLocked) sincronizar(silencioso = true)
             }
         }
     }
@@ -269,6 +300,10 @@ class RealSyncService(
 
     override suspend fun probarConexion(host: String, puerto: String): AppResult<Long> = try {
         AppResult.Success(syncApi.probar(host, puerto))
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: com.example.ecolacteoshuata.data.remote.datasource.ErrorSyncHttp) {
+        AppResult.Error(e.message ?: "El servidor rechazó la prueba de conexión.")
     } catch (e: IllegalArgumentException) {
         AppResult.Error(e.message ?: "Datos de conexión inválidos.")
     } catch (e: Exception) {
@@ -287,7 +322,11 @@ class RealSyncService(
         _pendientes.value = db.cambioPendienteQueries.contarRegistros().executeAsOne().toInt()
     }
 
-    override suspend fun sincronizarAhora() = sincronizar(silencioso = false)
+    override suspend fun sincronizarAhora() {
+        reintentoInicial?.cancel()
+        intentosIniciales = 0
+        sincronizar(silencioso = false)
+    }
 
     override suspend fun sincronizarEnSegundoPlano() = sincronizar(silencioso = true)
 
@@ -299,12 +338,13 @@ class RealSyncService(
             return@withLock
         }
         val token = conexion.token
-        if (token == null) {
+        if (token.isNullOrBlank()) {
             // Recién instalada (o se cambió de servidor): el primer login con conexión trae el token.
             if (!silencioso) {
                 _ultimoError.value = "Inicia sesión con conexión al servidor para descargar los datos."
                 _progreso.value = null
             }
+            _estado.value = EstadoSincronizacion.SIN_SENAL
             return@withLock
         }
         if (!silencioso) {
@@ -312,6 +352,7 @@ class RealSyncService(
             _ultimoError.value = null
             _progreso.value = ProgresoSync("Conectando con ${conexion.host}:${conexion.puerto}", 0.05f)
         }
+        falloInicialTransitorio = false
         try {
             // Primero se sube lo hecho en el teléfono: así la descarga de abajo ya lo trae con su
             // id de Laravel y no pisa cambios que el servidor todavía no conocía.
@@ -324,7 +365,7 @@ class RealSyncService(
                 // El perfil propio del token debe demostrar que corresponde a la misma cuenta.
                 val identidad = syncApi.sync(conexion.host, conexion.puerto, null).usuarios.firstOrNull { it.id == autorizacion.usuario_id }
                 if (usuarioSesion.id.all { it.isDigit() } || identidad?.usuario != usuarioSesion.usuario || identidad.documento != usuarioSesion.documento) {
-                    conexionServidorRepository.guardarToken(null)
+                    if (conexionServidorRepository.get().token == token) conexionServidorRepository.guardarToken(null)
                     throw IllegalStateException("Inicia sesión con conexión en esta cuenta: el token guardado pertenece a otra identidad. No se envió su cola.")
                 }
                 conDatosDelServidor { migrarIdentidadUsuario(driver, usuarioSesion.id, autorizacion.usuario_id) }
@@ -356,19 +397,31 @@ class RealSyncService(
             _ultimoError.value = avisos.takeIf { it.isNotEmpty() }
                 ?.joinToString("\n", prefix = "Cambios conservados en revisión local (Laravel no los aceptó):\n")
             _estado.value = EstadoSincronizacion.SINCRONIZADO
+            falloInicialTransitorio = false
+        } catch (e: CancellationException) {
+            _progreso.value = null
+            if (_estado.value != EstadoSincronizacion.MODO_LOCAL) _estado.value = EstadoSincronizacion.SIN_SENAL
+            throw e
         } catch (e: TokenRechazadoException) {
+            falloInicialTransitorio = false
             // Usuario desactivado en Laravel o token de otro servidor: hay que volver a iniciar sesión.
-            conexionServidorRepository.guardarToken(null)
+            if (conexionServidorRepository.get().token == token) conexionServidorRepository.guardarToken(null)
             _ultimoError.value = "El servidor pide iniciar sesión nuevamente con conexión para seguir descargando datos."
             if (!silencioso) _progreso.value = null
             _estado.value = EstadoSincronizacion.SIN_SENAL
         } catch (e: Exception) {
-            println("RealSyncService: no se pudo sincronizar (${e.message})")
-            _ultimoError.value = "No se pudo descargar desde ${conexion.host}:${conexion.puerto}. " +
-                "Verifique que el servidor Laravel esté encendido (php artisan serve --host=0.0.0.0) " +
-                "y que el teléfono esté en la misma red.\n\nDetalle: ${e::class.simpleName}: ${e.message}"
+            // No registrar cuerpos de respuestas: pueden incluir datos personales.
+            _ultimoError.value = when (e) {
+                is com.example.ecolacteoshuata.data.remote.datasource.ErrorSyncHttp -> e.message
+                is kotlinx.serialization.SerializationException -> "El servidor respondió, pero los datos de sincronización tienen un formato incompatible. Reintenta; si persiste, informa al administrador."
+                is io.ktor.client.plugins.HttpRequestTimeoutException -> "La descarga superó el tiempo de espera. Puedes reintentar sin borrar los datos del teléfono."
+                is IllegalStateException -> e.message ?: "No se pudo guardar la descarga en el teléfono."
+                else -> "No se pudo completar la descarga (${e::class.simpleName}). Comprueba la conexión y vuelve a intentar; los datos locales se conservan."
+            }
             if (!silencioso) _progreso.value = null
             _estado.value = EstadoSincronizacion.SIN_SENAL
+            falloInicialTransitorio = esFalloTemporal(e)
+            if (falloInicialTransitorio) programarRecuperacionInicial(conexion)
         }
     }
 
@@ -574,6 +627,10 @@ class RealSyncService(
     private fun aplicar(r: SyncResponseDto, avisarNuevas: Boolean) {
         r.autorizacion?.let { AutorizacionLocal.guardar(db, it) }
         conDatosDelServidor {
+            r.altas.filter { it.tabla in OrdenAltas.tablas }.forEach {
+                db.ordenAltaQueries.asegurarFechaServidor(it.tabla, it.registro_id, it.creado_en)
+                db.ordenAltaQueries.guardarFechaServidor(it.creado_en, it.tabla, it.registro_id)
+            }
             paso("Guardando empresa y precio de la leche", 1)
             r.empresa.forEach { db.empresaQueries.upsertFromSync(it.id, it.razon_social, it.ruc, it.telefono, it.direccion) }
             r.precio_leche.forEach { db.precioLecheQueries.upsertFromSync(it.id, it.precio_litro, it.vigente_desde) }
@@ -886,4 +943,13 @@ class RealSyncService(
         driver.execute(null, "DELETE FROM ruta_proveedor WHERE ruta_id NOT IN (SELECT id FROM ruta)", 0)
         driver.execute(null, "DELETE FROM venta_item WHERE venta_id NOT IN (SELECT id FROM venta)", 0)
     }
+}
+
+/** Cuatro reintentos por sesión/episodio de red; no se reintenta autorización ni datos inválidos. */
+internal val ESPERAS_INICIALES = listOf(2_000L, 5_000L, 15_000L, 30_000L)
+internal fun esFalloTemporal(e: Exception): Boolean = when (e) {
+    is com.example.ecolacteoshuata.data.remote.datasource.ErrorSyncHttp -> e.codigo in listOf(408, 425, 429) || e.codigo in 500..599
+    is io.ktor.client.plugins.HttpRequestTimeoutException -> true
+    is io.ktor.utils.io.errors.IOException -> true
+    else -> false
 }

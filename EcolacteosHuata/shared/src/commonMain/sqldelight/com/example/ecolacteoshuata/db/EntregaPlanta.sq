@@ -13,13 +13,13 @@ CREATE TABLE entrega_planta (
 );
 
 selectAll:
-SELECT * FROM entrega_planta ORDER BY fecha DESC;
+SELECT * FROM entrega_planta ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'entrega_planta' AND registro_id = entrega_planta.id) DESC, CASE WHEN entrega_planta.id NOT GLOB '*[^0-9]*' THEN CAST(entrega_planta.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'entrega_planta' AND registro_id = entrega_planta.id) DESC, entrega_planta.id DESC;
 
 selectByAcopiador:
-SELECT * FROM entrega_planta WHERE acopiador_id = ? ORDER BY fecha DESC;
+SELECT * FROM entrega_planta WHERE acopiador_id = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'entrega_planta' AND registro_id = entrega_planta.id) DESC, CASE WHEN entrega_planta.id NOT GLOB '*[^0-9]*' THEN CAST(entrega_planta.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'entrega_planta' AND registro_id = entrega_planta.id) DESC, entrega_planta.id DESC;
 
 selectEntreFechas:
-SELECT * FROM entrega_planta WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+SELECT * FROM entrega_planta WHERE fecha >= ? AND fecha <= ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'entrega_planta' AND registro_id = entrega_planta.id) DESC, CASE WHEN entrega_planta.id NOT GLOB '*[^0-9]*' THEN CAST(entrega_planta.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'entrega_planta' AND registro_id = entrega_planta.id) DESC, entrega_planta.id DESC;
 
 insert:
 INSERT INTO entrega_planta(id, acopiador_id, turno_id, fecha, litros_total, total_pagado, total_deuda, proveedores_no_recogidos, guia)

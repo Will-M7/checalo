@@ -31,7 +31,7 @@ new class extends Component
     public function with(): array
     {
         return [
-            'acopiadores' => Acopiador::with(['user', 'proveedores.user'])->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('recepcion') === 'si', fn ($q) => $q->whereIn('id', EntregaPlanta::whereDate('fecha', $this->fecha)->select('acopiador_id')))->when($this->filtro('recepcion') === 'no', fn ($q) => $q->whereNotIn('id', EntregaPlanta::whereDate('fecha', $this->fecha)->select('acopiador_id')))->orderBy('id')->get(),
+            'acopiadores' => Acopiador::with(['user', 'proveedores.user'])->when($this->busqueda !== '', fn ($q) => $q->whereHas('user', fn ($u) => $u->where(fn ($n) => $n->where('nombres', 'like', '%'.$this->busqueda.'%')->orWhere('apellidos', 'like', '%'.$this->busqueda.'%'))))->when($this->filtro('recepcion') === 'si', fn ($q) => $q->whereIn('id', EntregaPlanta::whereDate('fecha', $this->fecha)->select('acopiador_id')))->when($this->filtro('recepcion') === 'no', fn ($q) => $q->whereNotIn('id', EntregaPlanta::whereDate('fecha', $this->fecha)->select('acopiador_id')))->orderByDesc('created_at')->orderByDesc('id')->get(),
             'recojosPorProveedor' => Recojo::with('turno')
                 ->whereDate('fecha', $this->fecha)
                 ->get()

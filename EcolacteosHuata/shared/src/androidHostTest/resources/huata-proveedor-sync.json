@@ -1,0 +1,264 @@
+{
+    "servidor_hora": "2026-10-27T10:00:00+00:00",
+    "autorizacion": {
+        "pantallas_adicionales": [],
+        "categorias_historicas": [
+            "proveedor"
+        ],
+        "catalogo_roles": [],
+        "usuario_id": "1",
+        "version": "f2c1f3dee9ea83cf3133f286c93de7a064cd789c353e26c932ee57acd98d27d7",
+        "roles": [
+            {
+                "id": "proveedor",
+                "nombre": "Proveedor",
+                "auxiliar": false,
+                "activo": true,
+                "pantallas": [
+                    "proveedor.panel",
+                    "proveedor.entregas",
+                    "proveedor.laboratorio",
+                    "proveedor.comunicados"
+                ]
+            }
+        ],
+        "pantallas": [
+            "proveedor.comunicados",
+            "proveedor.entregas",
+            "proveedor.laboratorio",
+            "proveedor.panel"
+        ],
+        "capacidades_comerciales": [],
+        "mapeo_android": {
+            "admin.finanzas": "AdminFinanzas",
+            "admin.panel": "AdminDashboard",
+            "admin.usuarios": "AdminUsuarios",
+            "admin.roles": "AdminRoles",
+            "admin.asignar-roles": "AdminAsignarRoles",
+            "admin.descuentos": "AdminDescuentos",
+            "admin.precios": "AdminPrecios",
+            "admin.turnos": "AdminTurnos",
+            "admin.empresa": "AdminEmpresa",
+            "planta.panel": "PlantaDashboard",
+            "planta.laboratorio": "PlantaLaboratorio",
+            "planta.entregas": "PlantaRecepcion",
+            "planta.pagos": "PlantaPagos",
+            "planta.rutas": "PlantaRutas",
+            "planta.comunicados": "PlantaComunicados",
+            "acopiador.panel": "AcopiadorDashboard",
+            "acopiador.recojo": "AcopiadorRecojo",
+            "acopiador.mapa-recojo": "AcopiadorMapaRecojo",
+            "acopiador.entrega": "AcopiadorEntrega",
+            "acopiador.inventario": "AcopiadorInventario",
+            "proveedor.panel": "ProveedorDashboard",
+            "proveedor.entregas": "ProveedorEntregas",
+            "proveedor.laboratorio": "ProveedorLaboratorio",
+            "proveedor.comunicados": "ProveedorComunicados",
+            "vendedor.panel": "VendedorDashboard",
+            "vendedor.ventas": "VendedorVenta",
+            "vendedor.produccion": "VendedorProductos",
+            "vendedor.historial": "VendedorHistorialVentas",
+            "vendedor.clientes": "VendedorClientes",
+            "vendedor.inventario": "VendedorInventario",
+            "produccion.panel": "ProduccionDashboard",
+            "produccion.registros": "ProduccionRegistros",
+            "produccion.recetas": "ProduccionRecetas",
+            "produccion.insumos": "ProduccionInsumos",
+            "produccion.unidades": "ProduccionUnidades",
+            "produccion.productos": "ProduccionProductos",
+            "produccion.compras": "ProduccionCompras",
+            "produccion.inventario": "ProduccionInventario",
+            "asistencia.tomar": "TomarAsistencia",
+            "asistencia.mis": "MiAsistencia"
+        },
+        "politica_offline": "ultima_autorizacion_conocida; cambios rechazados se conservan para revision"
+    },
+    "empresa": [],
+    "precio_leche": [],
+    "descuentos": [],
+    "usuarios": [
+        {
+            "autorizacion": null,
+            "id": "1",
+            "nombres": "Proveedor",
+            "apellidos": "Rescate",
+            "documento": "33717067",
+            "celular": "923784342",
+            "rol": "proveedor",
+            "usuario": "proveedor_rescate",
+            "activo": true,
+            "roles": [
+                "proveedor"
+            ],
+            "toma_asistencia": false,
+            "password_hash": ""
+        },
+        {
+            "autorizacion": null,
+            "id": "2",
+            "nombres": "Major",
+            "apellidos": "Reichert",
+            "documento": "95254467",
+            "celular": "925672143",
+            "rol": "acopiador",
+            "usuario": "orn.irwin",
+            "activo": true,
+            "roles": [
+                "acopiador"
+            ],
+            "toma_asistencia": false,
+            "password_hash": ""
+        }
+    ],
+    "acopiadores": [
+        {
+            "id": "1",
+            "usuario_id": "2",
+            "ruta_nombre": "Schroeder Parkway"
+        }
+    ],
+    "proveedores": [
+        {
+            "id": "1",
+            "usuario_id": "1",
+            "finca_ubicacion": "70504 Malinda Parkway Suite 525\nEast Osvaldoburgh, OK 00920",
+            "finca_referencia": "Sit voluptas enim non.",
+            "latitud": -15.863235,
+            "longitud": -69.900667,
+            "acopiador_id": "1",
+            "bloqueado": false,
+            "alteraciones": 0
+        }
+    ],
+    "turnos": [
+        {
+            "id": "1",
+            "acopiador_id": "",
+            "nombre": "Tarde",
+            "hora_inicio": "06:00",
+            "hora_fin": "10:00"
+        }
+    ],
+    "turnos_produccion": [],
+    "rutas": [],
+    "clientes": [],
+    "unidades_medida": [],
+    "insumos": [],
+    "recetas": [],
+    "receta_detalles": [],
+    "comunicados": [
+        {
+            "id": "1",
+            "tipo": "comunicado",
+            "titulo": "Aviso de prueba",
+            "descripcion": "Maxime corrupti non ducimus. Sapiente sint voluptatem quaerat nulla magnam et omnis. Saepe similique earum praesentium eligendi iure aliquam placeat.",
+            "fecha": "2026-10-27",
+            "autor_id": "3",
+            "roles": [
+                "proveedor"
+            ]
+        }
+    ],
+    "recojos": [
+        {
+            "id": "1",
+            "proveedor_id": "1",
+            "acopiador_id": "1",
+            "turno_id": "1",
+            "fecha": "2026-10-27",
+            "litros": 12,
+            "litros_entregados": 12,
+            "estado_leche": "normal",
+            "estado_otro": "",
+            "precio_litro": 1.8,
+            "total": 21.6,
+            "pagado": false,
+            "metodo_pago": null,
+            "entregado": false
+        }
+    ],
+    "resultados_laboratorio": [
+        {
+            "id": "1",
+            "proveedor_id": "1",
+            "fecha": "2026-10-27",
+            "turno_id": "2",
+            "resultado": "conforme",
+            "densidad": 1.029,
+            "acidez": 0.158,
+            "temperatura": 6.25,
+            "observaciones": "",
+            "conforme": true,
+            "enviado_produccion": false,
+            "litros": 26.41,
+            "grasa": 3.78,
+            "sng": 8.4,
+            "proteina": 3.38,
+            "lactosa": 4.1,
+            "sales": 0.76,
+            "total_solidos": 13.62,
+            "agua_anadida": 0,
+            "punto_congelacion": -0.556,
+            "ph": 6.64,
+            "sn": null,
+            "modo": null,
+            "hora_analisis": null,
+            "fecha_analisis": null
+        }
+    ],
+    "entregas_planta": [],
+    "pagos_proveedor": [],
+    "compras": [],
+    "compra_detalles": [],
+    "producciones": [],
+    "ventas": [],
+    "horarios_asistencia": [],
+    "dias_asistencia_acopiador": [],
+    "asistencias": [],
+    "justificaciones": [],
+    "notificaciones": [],
+    "ids": {
+        "empresa": [],
+        "precio_leche": [],
+        "descuento": [],
+        "usuario": [
+            "2",
+            "1"
+        ],
+        "acopiador": [
+            "1"
+        ],
+        "proveedor": [
+            "1"
+        ],
+        "turno": [
+            "1"
+        ],
+        "turno_produccion": [],
+        "ruta": [],
+        "cliente": [],
+        "unidad_medida": [],
+        "insumo": [],
+        "receta": [],
+        "receta_detalle": [],
+        "comunicado": [
+            "1"
+        ],
+        "recojo": [
+            "1"
+        ],
+        "resultado_laboratorio": [
+            "1"
+        ],
+        "entrega_planta": [],
+        "pago_proveedor": [],
+        "compra": [],
+        "compra_detalle": [],
+        "produccion": [],
+        "venta": [],
+        "horario_asistencia": [],
+        "dia_asistencia_acopiador": [],
+        "asistencia": [],
+        "justificacion": []
+    }
+}

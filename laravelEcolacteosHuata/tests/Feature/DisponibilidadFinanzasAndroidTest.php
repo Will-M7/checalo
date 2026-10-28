@@ -44,21 +44,19 @@ test('administrador receptor no se convierte en vendedor y reparto es por pedido
     Http::assertNothingSent();
 });
 
-test('pausa y revocacion administrativa excluyen nuevos pedidos y conservan historia', function () {
+test('control administrativo excluye nuevos pedidos y conserva historia', function () {
     [$admin, $flora, $pepe, $c, $p] = disponibilidadFixture();
     $old = disponiblePedido($c, $p);
     $service = app(VendedoresWeb::class);
-    $service->cambiar($flora, $flora, true, false);
-    expect(disponiblePedido($c, $p)->vendedor_asignado_id)->toBe($pepe->id);
+    expect(fn () => $service->cambiar($flora, $flora, true, false))->toThrow(\Symfony\Component\HttpKernel\Exception\HttpException::class);
     $service->cambiar($admin, $flora, false, true);
-    expect(fn () => $service->cambiar($flora, $flora, false, false))->toThrow(ValidationException::class);
-    $service->cambiar($admin, $flora, true, true);
-    expect($flora->fresh()->pedidos_web_pausado)->toBeTrue();
+    expect(disponiblePedido($c, $p)->vendedor_asignado_id)->toBe($pepe->id);
     $pepe->update(['activo' => false]);
     $count = PedidoWeb::count();
     expect(fn () => disponiblePedido($c, $p))->toThrow(ValidationException::class);
     expect(PedidoWeb::count())->toBe($count)->and($old->fresh()->vendedor_asignado_id)->toBe($flora->id);
-    $service->cambiar($flora, $flora, false, false);
+    $service->cambiar($admin, $flora, true, true);
+    expect($flora->fresh()->pedidos_web_pausado)->toBeFalse();
     expect(disponiblePedido($c, $p)->vendedor_asignado_id)->toBe($flora->id);
 });
 
@@ -130,10 +128,10 @@ test('usuario referenciado no se elimina por cascada y se desactiva sin error SQ
 test('API de disponibilidad no deja que vendedor habilite la autorizacion administrativa', function () {
     [$admin, $flora, $pepe] = disponibilidadFixture();
     $this->withToken(disponibleToken($admin))->postJson('/api/mobile/vendedores-web/'.$flora->id.'/autorizacion', ['autorizado' => false])->assertOk()->assertJsonPath('estado', 'inhabilitado');
-    $this->withToken(disponibleToken($flora))->postJson('/api/mobile/vendedores-web/pausa', ['pausado' => false])->assertUnprocessable();
+    $this->withToken(disponibleToken($flora))->postJson('/api/mobile/vendedores-web/pausa', ['pausado' => false])->assertForbidden();
     $this->postJson('/api/mobile/vendedores-web/'.$flora->id.'/autorizacion', ['autorizado' => true])->assertForbidden();
     expect($flora->fresh()->pedidos_web_autorizado)->toBeFalse();
-    $this->withToken(disponibleToken($pepe))->postJson('/api/mobile/vendedores-web/pausa', ['pausado' => true])->assertOk()->assertJsonPath('estado', 'pausado');
+    $this->withToken(disponibleToken($pepe))->postJson('/api/mobile/vendedores-web/pausa', ['pausado' => true])->assertForbidden();
 });
 
 test('recarga central sin vendedores usa responsable financiero y congela receptor incluso al cambiar politica', function () {
@@ -155,7 +153,7 @@ test('recarga central sin vendedores usa responsable financiero y congela recept
 test('solo usuario sin referencias admite eliminacion fisica y vendedor pausado conserva sus pedidos', function () {
     [$admin, $flora, $pepe, $c, $p] = disponibilidadFixture();
     $one = disponiblePedido($c, $p); $two = disponiblePedido($c, $p);
-    app(VendedoresWeb::class)->cambiar($flora, $flora, true, false);
+    app(VendedoresWeb::class)->cambiar($admin, $flora, false, true);
     $this->actingAs($flora);
     expect(fn () => Livewire::test('pages::vendedor.pedidos-web')->assertOk()->call('pedirConfirmar', $two->id))->toThrow(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
     Livewire::test('pages::vendedor.pedidos-web')->assertOk()->assertSet('filtro', 'pendiente');

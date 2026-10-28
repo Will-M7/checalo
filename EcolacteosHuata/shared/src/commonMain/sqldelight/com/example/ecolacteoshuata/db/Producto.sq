@@ -7,10 +7,10 @@ CREATE TABLE producto (
 );
 
 selectAll:
-SELECT * FROM producto ORDER BY nombre;
+SELECT * FROM producto ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'producto' AND registro_id = producto.id) DESC, CASE WHEN producto.id NOT GLOB '*[^0-9]*' THEN CAST(producto.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'producto' AND registro_id = producto.id) DESC, producto.id DESC;
 
 selectActivos:
-SELECT * FROM producto WHERE activo = 1 ORDER BY nombre;
+SELECT * FROM producto WHERE activo = 1 ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'producto' AND registro_id = producto.id) DESC, CASE WHEN producto.id NOT GLOB '*[^0-9]*' THEN CAST(producto.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'producto' AND registro_id = producto.id) DESC, producto.id DESC;
 
 selectById:
 SELECT * FROM producto WHERE id = ?;

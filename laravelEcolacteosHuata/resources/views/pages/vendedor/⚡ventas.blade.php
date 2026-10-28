@@ -80,7 +80,7 @@ new class extends Component
                     fn ($q2) => $q2->where('nombre', 'like', "%{$this->busquedaProducto}%")
                         ->orWhereHas('receta', fn ($r) => $r->where('nombre', 'like', "%{$this->busquedaProducto}%"))
                 ))
-                ->orderByDesc('fecha')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->get(),
             'clientesGuardados' => Cliente::orderBy('nombres')->orderBy('apellidos')->get(),
             'clienteSeleccionado' => $cliente,

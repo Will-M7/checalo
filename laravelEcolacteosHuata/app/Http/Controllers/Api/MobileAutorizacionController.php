@@ -43,7 +43,7 @@ class MobileAutorizacionController extends Controller
     {
         $user = app(GuardarUsuarioConRoles::class)($request->user(), $usuario, $request->all());
 
-        return response()->json(['id' => (string) $user->id, 'autorizacion' => Autorizacion::snapshot($user)]);
+        return response()->json(['id' => (string) $user->id, 'autorizacion' => Autorizacion::snapshot($user), 'creado_en' => $user->created_at?->utc()->format('Y-m-d\TH:i:s.v\Z')]);
     }
 
     public function show(Request $request)

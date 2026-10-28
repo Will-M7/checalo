@@ -67,7 +67,7 @@ new class extends Component
                         ->orWhere('usuario', 'like', "%{$this->busqueda}%")
                         ->orWhere('documento', 'like', "%{$this->busqueda}%");
                 }))
-                ->orderBy('nombres')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->paginate(10),
             'roles' => \App\Authorization\Autorizacion::catalogoRoles(auth('web')->user(), $this->userId ? User::find($this->userId) : null),
             'acopiadores' => Acopiador::with('user')->orderBy('id')->get(),
@@ -142,6 +142,8 @@ new class extends Component
             'finca_ubicacion' => $this->finca_ubicacion, 'finca_referencia' => $this->finca_referencia,
             'latitud' => $this->latitud, 'longitud' => $this->longitud, 'proveedorAcopiadorId' => $this->proveedorAcopiadorId,
         ]);
+
+        if ($this->userId === null) $this->resetPage();
 
         Flux::modal('usuario-form')->close();
         Flux::toast('Usuario guardado correctamente.', variant: 'success');

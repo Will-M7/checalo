@@ -29,11 +29,11 @@ new class extends Component
     public function with(): array
     {
         $clientes = Cliente::query()->when($this->filtro('compras') === 'con', fn ($q) => $q->where('compras_count', '>', 0))->when($this->filtro('compras') === 'sin', fn ($q) => $q->where('compras_count', 0))
-            ->when($this->busqueda, fn ($q) => $q->where('nombres', 'like', "%{$this->busqueda}%")
+            ->when($this->busqueda, fn ($q) => $q->where(fn ($texto) => $texto->where('nombres', 'like', "%{$this->busqueda}%")
                 ->orWhere('apellidos', 'like', "%{$this->busqueda}%")
-                ->orWhere('documento', 'like', "%{$this->busqueda}%"))
+                ->orWhere('documento', 'like', "%{$this->busqueda}%")))
             ->with('ventas')
-            ->orderByDesc('compras_count')
+            ->orderByDesc('created_at')->orderByDesc('id')
             ->paginate(10);
 
         // Porcentaje de descuento efectivamente recibido, calculado a partir del
@@ -79,6 +79,8 @@ new class extends Component
         ]);
 
         Cliente::updateOrCreate(['id' => $this->clienteId], $data);
+
+        if ($this->clienteId === null) $this->resetPage();
 
         Flux::modal('cliente-form')->close();
         Flux::toast('Cliente guardado correctamente.', variant: 'success');

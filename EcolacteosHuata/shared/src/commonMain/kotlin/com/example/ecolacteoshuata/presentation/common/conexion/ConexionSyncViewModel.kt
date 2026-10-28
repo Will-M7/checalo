@@ -44,6 +44,8 @@ data class ConexionSyncUiState(
     val prueba: PruebaConexion = PruebaConexion.Ninguna,
     val ultimaSincronizacionTexto: String? = null,
     val mensaje: String? = null,
+    val cuenta: String? = null,
+    val autenticando: Boolean = false,
 ) {
     /** Hay cambios en el formulario que todavía no se guardaron. */
     val sinGuardar: Boolean
@@ -58,6 +60,7 @@ class ConexionSyncViewModel(
     private val syncService: SyncService,
     private val db: com.example.ecolacteoshuata.db.AppDatabase,
     private val sesion: com.example.ecolacteoshuata.domain.repository.SessionRepository,
+    private val login: com.example.ecolacteoshuata.domain.usecase.LoginUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ConexionSyncUiState())
     val state: StateFlow<ConexionSyncUiState> = _state.asStateFlow()
@@ -65,6 +68,7 @@ class ConexionSyncViewModel(
     private var formularioCargado = false
 
     init {
+        viewModelScope.launch { sesion.usuarioActual.collect { _state.value = _state.value.copy(cuenta = it?.usuario) } }
         viewModelScope.launch {
             combine(db.autorizacionLocalQueries.revisiones().asFlow().mapToList(kotlinx.coroutines.Dispatchers.Default), sesion.usuarioActual) { filas, user ->
                 val administracion = user != null && listOf("admin.roles", "admin.usuarios", "admin.asignar-roles").all { user.autorizacion?.permite(it) == true }
@@ -89,6 +93,28 @@ class ConexionSyncViewModel(
                     estado, progreso, error, resumen, pendientes ->
                 _state.value.copy(estado = estado, progreso = progreso, error = error, resumen = resumen, pendientes = pendientes)
             }.collect { _state.value = it }
+        }
+    }
+
+    /** Recupera el token de la misma cuenta sin cerrar sesión ni borrar trabajo local. */
+    fun confirmarSesion(password: String) {
+        val cuenta = sesion.usuarioActual.value?.usuario ?: return
+        if (_state.value.autenticando || password.isBlank()) return
+        _state.value = _state.value.copy(autenticando = true, error = null)
+        viewModelScope.launch {
+            try {
+                when (val r = login(cuenta, password)) {
+                    is AppResult.Success -> {
+                        if (conexionServidorRepository.get().token.isNullOrBlank())
+                            _state.value = _state.value.copy(error = "Se validó la copia local, pero Laravel aún no confirmó la sesión. Comprueba la conexión y reintenta.")
+                        else _state.value = _state.value.copy(mensaje = "Sesión confirmada. Descargando datos de Laravel.")
+                    }
+                    is AppResult.Error -> _state.value = _state.value.copy(error = r.message)
+                }
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+            catch (_: Exception) {
+                _state.value = _state.value.copy(error = "No se pudo confirmar la sesión. Reintenta; los datos del teléfono se conservan.")
+            } finally { _state.value = _state.value.copy(autenticando = false) }
         }
     }
 
@@ -137,7 +163,7 @@ class ConexionSyncViewModel(
                     mensaje = "Conexión guardada. Inicia sesión con conexión para descargar los datos del servidor.",
                 )
             }
-            if (s.activa && guardada.token != null && guardada.ultimaSincronizacion != null) syncService.sincronizarAhora()
+            if (s.activa && guardada.token != null) syncService.sincronizarAhora()
         }
     }
 

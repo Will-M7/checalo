@@ -16,7 +16,7 @@ new class extends Component
     public function with(): array
     {
         return [
-            'acopiadores' => Acopiador::with('user')->orderBy('id')->get(),
+            'acopiadores' => Acopiador::with('user')->orderByDesc('created_at')->orderByDesc('id')->get(),
             'entregasPorAcopiador' => EntregaPlanta::whereDate('fecha', $this->fecha)->get()->keyBy('acopiador_id'),
         ];
     }

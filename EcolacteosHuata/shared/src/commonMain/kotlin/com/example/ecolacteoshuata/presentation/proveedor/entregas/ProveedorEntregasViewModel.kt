@@ -54,7 +54,6 @@ class ProveedorEntregasViewModel(
         val nombres = turnos.associate { it.id to it.nombre }
         val entregas = recojos
             .filter { it.fecha in desde..hasta }
-            .sortedByDescending { it.fecha }
             .map { FilaEntrega(it, nombres[it.turnoId]) }
         ProveedorEntregasUiState(f.periodo, f.fecha, entregas, entregas.firstOrNull { it.recojo.id == f.seleccionadaId })
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProveedorEntregasUiState(fecha = hoy))

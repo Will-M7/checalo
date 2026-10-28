@@ -89,17 +89,18 @@ class ProduccionComprasViewModel(
     val historial: StateFlow<HistorialComprasState> = combine(compras, insumos, filtros) { compras, insumos, f ->
         val simbolos = insumos.associate { it.id to it.unidadMedidaSimbolo }
         // De la más antigua a la más reciente, para saber cuál fue la compra anterior de cada insumo.
-        val cronologico = compras.reversed().flatMap { compra -> compra.detalle.map { compra.fecha to it } }
+        val cronologico = compras.sortedByDescending { it.fecha }.reversed().flatMap { compra -> compra.detalle.map { compra.fecha to it } }
         val ultimoPrecio = mutableMapOf<String, Double>()
         val todos = cronologico.map { (fecha, detalle) ->
             IngresoInsumo(detalle, fecha, simbolos[detalle.insumoId].orEmpty(), ultimoPrecio[detalle.insumoId])
                 .also { ultimoPrecio[detalle.insumoId] = detalle.costoUnitario }
         }
+        val porId = todos.associateBy { it.detalle.id }
+        val porAlta = compras.flatMap { compra -> compra.detalle.mapNotNull { porId[it.id] } }
         f.copy(
-            ingresos = todos
+            ingresos = porAlta
                 .filter { it.fecha >= f.desde && it.fecha <= f.hasta }
-                .filter { f.insumoId == null || it.detalle.insumoId == f.insumoId }
-                .reversed(),
+                .filter { f.insumoId == null || it.detalle.insumoId == f.insumoId },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HistorialComprasState())
 

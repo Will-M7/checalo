@@ -31,7 +31,13 @@ class AdministrarRolesUseCase(
     suspend fun cargar(): AppResult<CatalogoAdministrativo> = conectado { h, p -> api.catalogoRoles(h, p).also { guardarSnapshot(it.autorizacion) } }
     suspend fun guardar(id: Long?, datos: GuardarRolCentral): AppResult<CatalogoAdministrativo> = conectado { h, p -> api.guardarRol(h, p, id, datos).also { guardarSnapshot(it.autorizacion) } }
     suspend fun asignables(): AppResult<List<RolAsignado>> = conectado { h, p -> api.autorizaciones(h, p).also(::guardarSnapshot).catalogo_roles }
-    suspend fun guardarUsuario(id: String?, datos: GuardarUsuarioCentral): AppResult<UsuarioAdministrado> = conectado { h, p -> api.guardarUsuario(h, p, id, datos).also { guardarSnapshot(it.autorizacion) } }
+    suspend fun guardarUsuario(id: String?, datos: GuardarUsuarioCentral): AppResult<UsuarioAdministrado> = conectado { h, p -> api.guardarUsuario(h, p, id, datos).also {
+        guardarSnapshot(it.autorizacion)
+        it.creado_en?.let { fecha ->
+            db.ordenAltaQueries.asegurarFechaServidor("usuario", it.id, fecha)
+            db.ordenAltaQueries.guardarFechaServidor(fecha, "usuario", it.id)
+        }
+    } }
     suspend fun distribuciones(): AppResult<CatalogoDistribuciones> = conectado { h, p -> api.distribuciones(h, p).also { guardarSnapshot(it.autorizacion) } }
     suspend fun guardarDistribucion(datos: GuardarDistribucion): AppResult<CatalogoDistribuciones> = conectado { h, p -> api.guardarDistribucion(h, p, datos).also { guardarSnapshot(it.autorizacion) } }
     suspend fun prepararDistribucion(datos: PrepararDistribucion): AppResult<VistaDistribucion> = conectado { h, p -> api.prepararDistribucion(h, p, datos) }

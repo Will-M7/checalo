@@ -24,7 +24,7 @@ new class extends Component
                 fn ($q2) => $q2->where('nombre', 'like', "%{$this->busqueda}%")
                     ->orWhereHas('receta', fn ($r) => $r->where('nombre', 'like', "%{$this->busqueda}%"))
             ))
-            ->orderBy('fecha')
+            ->orderByDesc('created_at')->orderByDesc('id')
             ->get();
 
         $filas = $producciones->map(fn (Produccion $p) => [

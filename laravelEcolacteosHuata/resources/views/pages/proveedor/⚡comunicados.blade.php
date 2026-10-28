@@ -18,7 +18,7 @@ new class extends Component
             'comunicados' => Comunicado::query()->when($this->filtro('desde'), fn ($q, $v) => $q->whereDate('fecha', '>=', $v))->when($this->filtro('hasta'), fn ($q, $v) => $q->whereDate('fecha', '<=', $v))->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('titulo', 'like', '%'.$this->busqueda.'%')->orWhere('descripcion', 'like', '%'.$this->busqueda.'%')))
                 ->paraRol(Rol::Proveedor)
                 ->when($this->filtroTipo, fn ($q) => $q->where('tipo', $this->filtroTipo))
-                ->orderByDesc('fecha')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->get(),
         ];
     }

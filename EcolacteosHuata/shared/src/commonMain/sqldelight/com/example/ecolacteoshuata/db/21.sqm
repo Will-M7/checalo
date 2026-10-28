@@ -1,0 +1,7 @@
+CREATE TABLE orden_alta (
+    secuencia INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    tabla TEXT NOT NULL,
+    registro_id TEXT NOT NULL,
+    creado_en TEXT,
+    UNIQUE(tabla, registro_id)
+);

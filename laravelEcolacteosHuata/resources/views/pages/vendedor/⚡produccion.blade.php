@@ -32,7 +32,7 @@ new class extends Component
                 ->with('receta.detalles.insumo')
                 ->where('estado', EstadoProduccion::Completada)
                 ->when($this->busqueda, fn ($q) => $q->whereHas('receta', fn ($r) => $r->where('nombre', 'like', "%{$this->busqueda}%")))
-                ->orderByDesc('fecha')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->get(),
         ];
     }

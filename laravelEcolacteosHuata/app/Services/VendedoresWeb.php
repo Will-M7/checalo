@@ -20,6 +20,7 @@ final class VendedoresWeb
 
     public function cambiar(User $actor, User $user, bool $valor, bool $administrativo): array
     {
+        abort_unless($administrativo, 403, 'La recepción web se administra desde Usuarios.');
         abort_unless($actor->activo && ($administrativo ? $actor->puedePantalla('admin.usuarios') : $actor->id === $user->id && $actor->puedePantalla('vendedor.pedidos-web')), 403);
         if ($administrativo) Autorizacion::autorizarGestionUsuario($actor, $user);
         return DB::transaction(function () use ($actor, $user, $valor, $administrativo) {
@@ -31,6 +32,7 @@ final class VendedoresWeb
             $antes = $this->estado($user);
             $campo = $administrativo ? 'pedidos_web_autorizado' : 'pedidos_web_pausado';
             $user->$campo = $valor;
+            if ($administrativo) $user->pedidos_web_pausado = false;
             $user->save();
             Autorizacion::registrar($actor, 'disponibilidad_web', 'usuario:'.$user->id, $antes, $this->estado($user));
             return $this->estado($user);

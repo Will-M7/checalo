@@ -14,6 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 class MainActivity : ComponentActivity() {
     private val pedirPermisoNotificaciones = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    override fun onResume() {
+        super.onResume()
+        org.koin.core.context.GlobalContext.get().get<com.example.ecolacteoshuata.domain.platform.YapeReception>().refresh()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)

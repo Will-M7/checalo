@@ -13,7 +13,7 @@ Route::prefix('{current_team}/vendedor')
         Route::get('ventas/{venta}/boleta', VentaBoletaPdfController::class)->name('ventas.boleta');
         Route::livewire('produccion', 'pages::vendedor.produccion')->name('produccion');
         Route::livewire('historial', 'pages::vendedor.historial')->name('historial');
-        Route::livewire('configuracion-pagos', 'pages::vendedor.configuracion-pagos')->name('configuracion-pagos');
+        Route::get('configuracion-pagos', fn () => redirect()->route('admin.receptores-yape'))->name('configuracion-pagos');
         Route::livewire('inventario', 'pages::vendedor.inventario')->name('inventario');
         Route::livewire('clientes', 'pages::vendedor.clientes')->name('clientes');
         Route::livewire('pedidos-web', 'pages::vendedor.pedidos-web')->name('pedidos-web');

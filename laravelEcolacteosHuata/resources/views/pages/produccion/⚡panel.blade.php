@@ -20,7 +20,7 @@ new class extends Component
             'produccionesPendientes' => Produccion::query()->where('estado', '!=', EstadoProduccion::Completada->value)->count(),
             'productosPublicados' => Produccion::catalogoPublico()->count(),
             'insumosStockBajo' => Insumo::query()->with('unidadMedida')->where('stock_actual', '<=', 10)->orderBy('stock_actual')->get(),
-            'ultimasProducciones' => Produccion::query()->with('receta')->latest('fecha')->latest('id')->limit(5)->get(),
+            'ultimasProducciones' => Produccion::query()->with('receta')->latest('created_at')->latest('id')->limit(5)->get(),
         ];
     }
 };

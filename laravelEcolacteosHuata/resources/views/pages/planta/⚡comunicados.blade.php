@@ -34,7 +34,7 @@ new class extends Component
         return [
             'tipos' => TipoComunicado::cases(),
             'roles' => Rol::cases(),
-            'comunicados' => Comunicado::with('autor')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('titulo', 'like', '%'.$this->busqueda.'%')->orWhere('descripcion', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('tipo'), fn ($q, $v) => $q->where('tipo', $v))->orderByDesc('fecha')->orderByDesc('id')->get(),
+            'comunicados' => Comunicado::with('autor')->when($this->busqueda !== '', fn ($q) => $q->where(fn ($t) => $t->where('titulo', 'like', '%'.$this->busqueda.'%')->orWhere('descripcion', 'like', '%'.$this->busqueda.'%')))->when($this->filtro('tipo'), fn ($q, $v) => $q->where('tipo', $v))->orderByDesc('created_at')->orderByDesc('id')->get(),
         ];
     }
 

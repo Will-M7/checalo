@@ -27,7 +27,7 @@ final class BridgeProvisioning
 
     public function registrar(User $actor, ReceptorPago $r): void
     {
-        abort_unless($actor->activo && $actor->puedePantalla('vendedor.configuracion-pagos') && ($actor->puedeAdministracionCritica() || ($r->user_id === $actor->id && $this->assignments->puedePersonal($actor))), 403);
+        abort_unless($actor->activo && ($actor->puedePantalla('admin.receptores-yape') || ($actor->puedePantalla('vendedor.configuracion-pagos') && ($actor->puedeAdministracionCritica() || ($r->user_id === $actor->id && $this->assignments->puedePersonal($actor))))), 403);
         if (! $r->referencia_externa || ! $r->qr_sha256 || ! $r->qr_path || ! Storage::disk('public')->exists($r->qr_path) || ! hash_equals($r->qr_sha256, hash_file('sha256', Storage::disk('public')->path($r->qr_path)))) {
             $this->error('Guarda la identidad y el archivo QR íntegro antes de registrar el receptor.');
         }
@@ -53,13 +53,13 @@ final class BridgeProvisioning
         return DB::transaction(function () use ($actor, $r, $mode, $responsibleConfirmed, $legacyId) {
             DB::table('integracion_secuencias')->where('clave', 'reparto')->increment('valor', 0);
             // Re-enrollment rotates the same device instead of silently creating a duplicate Bridge.
-            $device = DB::table('payment_bridge_devices')->where('receiver_id', $r->id)->where('owner_id', $r->user_id)->whereIn('status', ['active', 'suspended', 'pending', 'legacy_pending'])->first();
+            $device = DB::table('payment_bridge_devices')->where('receiver_id', $r->id)->where('owner_id', $r->user_id)->whereIn('status', ['active', 'suspended', 'pending', 'legacy_pending', 'revoked'])->first();
             $id = $device?->id ?? $legacyId ?? 'bridge-'.Str::uuid();
             if (! $device) {
                 DB::table('payment_bridge_devices')->insert(['id' => $id, 'receiver_id' => $r->id, 'owner_id' => $r->user_id, 'mode' => $mode, 'status' => 'pending', 'created_at' => now(), 'updated_at' => now()]);
             }
             // Mode is part of the server-issued invitation, never taken from APK input.
-            DB::table('payment_bridge_devices')->where('id', $id)->update(['mode' => $mode, 'updated_at' => now()]);
+            DB::table('payment_bridge_devices')->where('id', $id)->update(['mode' => $mode, 'status' => $device?->status === 'revoked' ? 'pending' : ($device?->status ?? 'pending'), 'updated_at' => now()]);
             DB::table('payment_bridge_tickets')->where('device_id', $id)->whereNull('used_at')->update(['expires_at' => now()]);
             $token = Str::random(64);
             DB::table('payment_bridge_tickets')->insert(['token_hash' => hash('sha256', $token), 'device_id' => $id, 'expires_at' => now()->addMinutes(10), 'created_by' => $actor->id]);
@@ -79,11 +79,11 @@ final class BridgeProvisioning
         $d = DB::table('payment_bridge_devices')->find($t->device_id);
         $r = ReceptorPago::findOrFail($d->receiver_id);
         $actor = User::findOrFail($t->created_by);
-        abort_unless($actor->activo && $actor->puedePantalla('vendedor.configuracion-pagos'), 403);
+        abort_unless($actor->activo && ($actor->puedePantalla('admin.receptores-yape') || $actor->puedePantalla('vendedor.configuracion-pagos')), 403);
         if ($d->status === 'revoked' || ($t->claim_hash && ! hash_equals($t->claim_hash, $claimHash))) {
             $this->error('Esta vinculación ya pertenece a otra instalación.');
         }
-        if (! $actor->puedeAdministracionCritica() && (! $this->assignments->puedePersonal($actor) || $actor->id !== $d->owner_id)) {
+        if (! $actor->puedePantalla('admin.receptores-yape') && ! $actor->puedeAdministracionCritica() && (! $this->assignments->puedePersonal($actor) || $actor->id !== $d->owner_id)) {
             abort(403);
         }
         if (! $t->claim_hash) {
@@ -126,6 +126,10 @@ final class BridgeProvisioning
         if (! $this->ready()) {
             return $data;
         }
+        if (! $heartbeat && Schema::hasTable('yape_reception_requests')) {
+            $receiver = ReceptorPago::where('referencia_externa', $data['receiverId'] ?? '')->first();
+            if ($receiver && ($request = app(SolicitudesRecepcionYape::class)->actual($receiver->id)) && in_array($request->status, ['revoked', 'rejected'], true)) abort(403, 'Recepción revocada o rechazada.');
+        }
         $d = DB::table('payment_bridge_devices')->where('secret_hash', hash('sha256', $key))->first();
         if (! $d) {
             if (! $heartbeat && DB::table('payment_bridge_devices')->join('receptores_pago', 'payment_bridge_devices.receiver_id', '=', 'receptores_pago.id')->where('receptores_pago.referencia_externa', $data['receiverId'] ?? '')->exists()) {
@@ -137,6 +141,7 @@ final class BridgeProvisioning
             abort(403, 'Dispositivo no autorizado.');
         }
         $r = ReceptorPago::findOrFail($d->receiver_id);
+        if (Schema::hasTable('yape_reception_requests') && ($q = app(SolicitudesRecepcionYape::class)->actual($r->id)) && in_array($q->status, ['revoked', 'rejected'], true)) abort(403, 'Autorización de recepción retirada.');
         if (! $heartbeat && ($data['receiverId'] ?? '') !== $r->referencia_externa) {
             abort(403);
         }

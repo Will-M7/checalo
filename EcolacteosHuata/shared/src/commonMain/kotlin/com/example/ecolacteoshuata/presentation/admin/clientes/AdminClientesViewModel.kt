@@ -40,7 +40,6 @@ class AdminClientesViewModel(
         val texto = busqueda.trim()
         val filas = clientes
             .filter { texto.isEmpty() || it.nombres.contains(texto, true) || it.apellidos.contains(texto, true) || it.documento.contains(texto, true) }
-            .sortedByDescending { it.comprasCount }
             .map { cliente ->
                 val propias = porCliente[cliente.id].orEmpty()
                 val subtotal = propias.sumOf { it.subtotal }

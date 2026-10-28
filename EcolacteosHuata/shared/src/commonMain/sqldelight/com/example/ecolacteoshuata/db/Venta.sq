@@ -34,13 +34,13 @@ CREATE INDEX idx_venta_fecha ON venta(fecha);
 CREATE INDEX idx_venta_item_venta ON venta_item(venta_id);
 
 selectAll:
-SELECT * FROM venta ORDER BY fecha DESC;
+SELECT * FROM venta ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'venta' AND registro_id = venta.id) DESC, CASE WHEN venta.id NOT GLOB '*[^0-9]*' THEN CAST(venta.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'venta' AND registro_id = venta.id) DESC, venta.id DESC;
 
 selectById:
 SELECT * FROM venta WHERE id = ?;
 
 selectEntreFechas:
-SELECT * FROM venta WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC;
+SELECT * FROM venta WHERE fecha >= ? AND fecha <= ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'venta' AND registro_id = venta.id) DESC, CASE WHEN venta.id NOT GLOB '*[^0-9]*' THEN CAST(venta.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'venta' AND registro_id = venta.id) DESC, venta.id DESC;
 
 countAll:
 SELECT COUNT(*) FROM venta;
@@ -57,7 +57,7 @@ deleteItemsByVenta:
 DELETE FROM venta_item WHERE venta_id = ?;
 
 selectItemsByVenta:
-SELECT * FROM venta_item WHERE venta_id = ?;
+SELECT * FROM venta_item WHERE venta_id = ? ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'venta_item' AND registro_id = venta_item.id) DESC, CASE WHEN venta_item.id NOT GLOB '*[^0-9]*' THEN CAST(venta_item.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'venta_item' AND registro_id = venta_item.id) DESC, venta_item.id DESC;
 
 insertItem:
 INSERT INTO venta_item(id, venta_id, producto_id, nombre, precio_unitario, cantidad, subtotal, produccion_id)

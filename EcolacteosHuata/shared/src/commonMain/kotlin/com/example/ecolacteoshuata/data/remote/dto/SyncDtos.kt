@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SyncResponseDto(
     val servidor_hora: String,
+    val altas: List<AltaSyncDto> = emptyList(),
     val autorizacion: com.example.ecolacteoshuata.domain.model.AutorizacionUsuario? = null,
     val empresa: List<EmpresaDto> = emptyList(),
     val precio_leche: List<PrecioLecheDto> = emptyList(),
@@ -320,3 +321,6 @@ data class NotificacionSyncDto(
     val leida: Boolean = false,
     val creada_en: String? = null,
 )
+
+@Serializable
+data class AltaSyncDto(val tabla: String, val registro_id: String, val creado_en: String?)

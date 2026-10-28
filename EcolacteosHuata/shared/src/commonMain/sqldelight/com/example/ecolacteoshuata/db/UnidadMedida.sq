@@ -5,7 +5,7 @@ CREATE TABLE unidad_medida (
 );
 
 selectAll:
-SELECT * FROM unidad_medida ORDER BY nombre;
+SELECT * FROM unidad_medida ORDER BY (SELECT creado_en FROM orden_alta WHERE tabla = 'unidad_medida' AND registro_id = unidad_medida.id) DESC, CASE WHEN unidad_medida.id NOT GLOB '*[^0-9]*' THEN CAST(unidad_medida.id AS INTEGER) END DESC, (SELECT secuencia FROM orden_alta WHERE tabla = 'unidad_medida' AND registro_id = unidad_medida.id) DESC, unidad_medida.id DESC;
 
 selectById:
 SELECT * FROM unidad_medida WHERE id = ?;

@@ -1,5 +1,7 @@
 # Finanzas Android, disponibilidad y pedidos por vendedor — 27/10/2026
 
+> Actualización posterior: [Recepción Yape con administración central y solicitud Android](SIMPLIFICACION_RECEPCION_YAPE.md). Sustituye la activación por iniciativa del vendedor, Configuración de pagos y los controles de pausa del vendedor descritos en este informe histórico.
+
 Implementación sobre los avances locales, sin restaurar el respaldo ni crear de nuevo el rol Finanzas. No se hicieron commits, pushes, instalaciones, reinicios de servicios ni cambios en Payment Core o Yape Bridge. Se conservaron los filtros existentes y los estilos globales, portada, layouts y menús. Se añadieron controles funcionales dentro de las pantallas actuales y la correspondencia nativa de Finanzas al catálogo dinámico.
 
 ## Reglas implementadas

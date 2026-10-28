@@ -49,7 +49,7 @@ fun DisponibilidadWebControl(admin: Boolean = false) {
             LazyColumn(Modifier.fillMaxWidth().heightIn(max = 560.dp), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item {
                     Text("Vendedores web", style = MaterialTheme.typography.titleLarge)
-                    Text("La autorización y la pausa son independientes del receptor financiero y de Bridge.")
+                    Text("Administración controla la recepción web; es independiente del receptor financiero y de Bridge.")
                     FiltrosListado(busqueda, { busqueda = it }, listOf(CampoFiltro("estado", "Estado", estado, listOf("disponible" to "Disponible", "pausado" to "Pausado", "inhabilitado" to "Inhabilitado"))), { _,v -> estado = v }, { busqueda = ""; estado = "" }, "Vendedor")
                     if (s.ocupado) LinearProgressIndicator(Modifier.fillMaxWidth())
                     s.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -58,7 +58,7 @@ fun DisponibilidadWebControl(admin: Boolean = false) {
                 items(s.vendedores.filter { (it.capacidad || !it.autorizado) && it.nombre.contains(busqueda, ignoreCase = true) && (estado.isBlank() || it.estado == estado) }, key = { it.id }) { v ->
                     Card { Column(Modifier.padding(12.dp)) {
                         Text(v.nombre)
-                        Text("${v.estado} · ${if (v.activo) "Usuario activo" else "Usuario inactivo"} · ${if (v.pausado) "Pausa del vendedor" else "Sin pausa"}")
+                        Text("${v.estado} · ${if (v.activo) "Usuario activo" else "Usuario inactivo"} · ${if (v.pausado) "Pausa histórica; requiere autorización administrativa" else "Sin pausa"}")
                         TextButton(onClick = { vm.autorizar(v.id, !v.autorizado) }, enabled = !s.ocupado) { Text(if (v.autorizado) "Desautorizar recepción" else "Autorizar recepción") }
                     } }
                 }
@@ -68,11 +68,8 @@ fun DisponibilidadWebControl(admin: Boolean = false) {
         LaunchedEffect(Unit) { vm.cargar(false) }
         Card { Column(Modifier.padding(12.dp)) {
             Text("Recepción de pedidos web: ${s.propio?.estado ?: "consultando servidor"}")
-            Text("Pausar conserva tus pedidos e historial.")
+            Text("Administración gestiona la disponibilidad. Tus pedidos e historial se conservan.")
             s.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            s.propio?.let { p ->
-                if (p.capacidad) TextButton(onClick = { vm.pausar(!p.pausado) }, enabled = !s.ocupado && p.autorizado) { Text(if (p.pausado) "Activar recepción web" else "Pausar recepción web") }
-            }
             TextButton(onClick = { vm.cargar(false) }, enabled = !s.ocupado) { Text("Consultar estado actual") }
         } }
     }

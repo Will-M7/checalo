@@ -42,6 +42,8 @@ class LoginUseCase(
         }
         if (resultado is AppResult.Success) {
             sessionRepository.setUsuario(resultado.data)
+            // La identidad nueva debe estar establecida antes de que el sync revise el token.
+            if (conexion.activa && conexion.host.isNotBlank()) scope.launch { syncService.sincronizarAhora() }
         }
         return resultado
     }
@@ -92,12 +94,11 @@ class LoginUseCase(
 
         // Con el token, este teléfono ya puede descargar todo el sistema (y, con él, las
         // contraseñas de todos los usuarios para que puedan ingresar sin señal).
+        sessionRepository.setUsuario(guardado)
         conexionServidorRepository.guardarToken(datos.token)
 
         // No bloquea el login: la app navega de una vez y el SyncBanner (SessionHeader) refleja
         // el progreso a medida que avanza.
-        scope.launch { syncService.sincronizarAhora() }
-
         return AppResult.Success(guardado)
     }
 }
